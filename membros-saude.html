@@ -333,38 +333,31 @@
       100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: translateX(-6px) scale(1.05); }
     }
 
-    /* Pull handle (pontinha branca) */
+    /* ========== Minimalist pull-handle ========== */
     .pull-handle {
-      width: 20px;
-      height: 20px;
-      border-radius: 10px;
+      width: 14px;
+      height: 36px;
+      border-radius: 0 10px 10px 0; /* crescent that peeks out */
       background: #fff;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
       position: absolute;
-      left: -28px; /* fica à esquerda do botão */
+      left: -8px; /* only a sliver visible */
       top: 50%;
       transform: translate(0, -50%);
       cursor: grab;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 300ms cubic-bezier(.2,.9,.2,1);
-      touch-action: none; /* para pointer events */
+      box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+      touch-action: none;
       z-index: 4;
+      transition: box-shadow 180ms ease, left 220ms ease;
+      display: inline-block;
     }
     .pull-handle:active { cursor: grabbing; }
-
-    /* quando puxado, handle recebe sombra e leve esticamento */
     .pull-handle.dragging { box-shadow: 0 12px 26px rgba(0,0,0,0.5); }
-
-    /* efeito "jelly" quando soltar com sucesso */
     @keyframes jelly {
-      0% { transform: translateX(0) scale(1); }
-      30% { transform: translateX(-14px) scale(1.06, 0.96); }
-      55% { transform: translateX(6px) scale(0.98, 1.04); }
-      100% { transform: translateX(0) scale(1); }
+      0% { transform: translate(0, -50%) scaleX(1) scaleY(1); }
+      30% { transform: translate(-10px, -50%) scaleX(1.12) scaleY(0.92); }
+      55% { transform: translate(4px, -50%)  scaleX(0.96) scaleY(1.06); }
+      100% { transform: translate(0, -50%) scaleX(1) scaleY(1); }
     }
-
     .jelly-release { animation: jelly 600ms cubic-bezier(.2,.9,.2,1); }
 
     /* animação sutil quando aparece/entra */
@@ -378,7 +371,7 @@
     @media (max-width: 900px) {
       .percurso-forms { grid-template-columns: 1fr; }
       .paste-btn { min-width: 140px; left: 0; }
-      .pull-handle { left: -28px; }
+      .pull-handle { left: -6px; }
     }
 
     /* util */
@@ -510,7 +503,6 @@
 
                 <div style="height:42px;margin-top:8px;display:flex;align-items:center;">
                   <div class="paste-wrapper">
-                    <!-- pull handle será inserido por JS (ou já está posicionado com CSS se preferir) -->
                     <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido">
                       <span class="hole" aria-hidden="true"></span>
                       <span class="label">Colar plano</span>
@@ -544,7 +536,7 @@
               </div>
             </div>
 
-            <p style="text-align:center; color:#888; margin-top:18px;">Puxe a pontinha branca ao lado do botão para "soltar" e desfazer o colar — a animação simula algo mole.</p>
+            <p style="text-align:center; color:#888; margin-top:18px;">Puxe a pontinha branca ao lado do botão para "soltar" e desfazer o colar — a animação simula algo elástico.</p>
         </div>
     </div>
 </div>
@@ -782,8 +774,6 @@
               buttonEl.setAttribute('aria-pressed', 'true');
               buttonEl.disabled = true;
               buttonEl.setAttribute('aria-disabled', 'true');
-
-              // if there is a pull handle, reveal or make it interactive (already present)
             }
 
             if (pasteTreino) {
@@ -793,62 +783,53 @@
               pasteDieta.addEventListener('click', () => simulatePasteAndLock(pasteDieta, 'objetivo_dieta'));
             }
 
-            // -------------- PULL-HANDLE: cria + comportamento "puxe e solte" --------------
-            // Função utilitária para anexar um pull handle a um botão
-            function attachPullHandle(buttonEl, targetTextareaId) {
-              // garantir wrapper relativo para posicionamento
+            // -------------- Minimal pull-handle: cria + comportamento "puxe e solte" --------------
+            function attachMinimalPullHandle(buttonEl, targetTextareaId) {
               const wrapper = buttonEl.closest('.paste-wrapper') || buttonEl.parentElement;
               if (!wrapper) return;
 
-              // criar o handle
               const handle = document.createElement('div');
               handle.className = 'pull-handle';
               handle.setAttribute('role', 'button');
               handle.setAttribute('aria-label', 'Puxe para desfazer o colar');
               handle.tabIndex = 0;
 
-              // inserir antes do botão (à esquerda)
               wrapper.style.position = wrapper.style.position || 'relative';
               wrapper.insertBefore(handle, buttonEl);
 
-              // estados do pointer
               let active = false;
               let startX = 0;
               let currentX = 0;
-              const THRESHOLD = -60; // px (puxar para esquerda além disso executa desfazer)
-              const MIN = -120;
-              const MAX = 10;
+              const THRESHOLD = -48; // px
+              const MIN = -140;
+              const MAX = 12;
 
               function setTransforms(dx) {
-                // dx negativo = puxado para esquerda
-                handle.style.transform = `translate(${dx}px, -50%)`;
-                // mover levemente o botão para acompanhar (efeito mole)
-                const btnDx = Math.round(dx * 0.25);
+                dx = Math.max(MIN, Math.min(MAX, dx));
+                const scaleX = 1 + Math.min(1.4, Math.abs(dx) / 80);
+                handle.style.transform = `translate(${dx}px, -50%) scaleX(${scaleX.toFixed(3)}) translateZ(0)`;
+                const btnDx = Math.round(dx * 0.22);
                 buttonEl.style.transform = `translateX(${btnDx}px)`;
-                // transformar furo um pouco para dar sensação de elasticidade
                 const hole = buttonEl.querySelector('.hole');
                 if (hole) {
-                  const scale = 1 + Math.min(0.12, Math.abs(dx) / 300);
-                  hole.style.transform = `translateX(${btnDx * -0.6}px) scale(${scale.toFixed(3)})`;
+                  const holeShift = Math.round(btnDx * -0.6);
+                  const holeScale = 1 + Math.min(0.12, Math.abs(dx) / 300);
+                  hole.style.transform = `translateX(${holeShift}px) scale(${holeScale.toFixed(3)})`;
                 }
               }
 
               function pointerDown(e) {
-                // só permitir puxar se o botão estiver em estado "done" (ou disabled)
-                // we want user to be able to undo only after colado; but you might allow anytime:
-                // we'll allow pull only if button is disabled OR has class 'done' to match requested behavior
                 if (!(buttonEl.disabled || buttonEl.classList.contains('done'))) {
-                  // small hint bounce
                   handle.classList.add('dragging');
                   handle.classList.add('jelly-release');
-                  setTimeout(()=>{ handle.classList.remove('jelly-release'); handle.classList.remove('dragging'); }, 420);
+                  setTimeout(()=>{ handle.classList.remove('jelly-release'); handle.classList.remove('dragging'); }, 360);
                   return;
                 }
                 active = true;
                 startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0;
                 currentX = startX;
                 handle.classList.add('dragging');
-                handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
+                if (e.pointerId) handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
                 e.preventDefault();
               }
 
@@ -856,7 +837,6 @@
                 if (!active) return;
                 currentX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || currentX;
                 let dx = currentX - startX;
-                // we want negative dx (left) to trigger undo
                 dx = Math.max(MIN, Math.min(MAX, dx));
                 setTransforms(dx);
               }
@@ -865,85 +845,61 @@
                 if (!active) return;
                 active = false;
                 handle.classList.remove('dragging');
-                // compute final dx
                 const dx = (currentX - startX);
-                // if pulled left beyond threshold -> execute undo
                 if (dx < THRESHOLD) {
-                  // visual: quick fly-out then recoil
-                  handle.style.transition = 'transform 380ms cubic-bezier(.2,.9,.2,1)';
-                  handle.style.transform = `translate(${MIN - 20}px, -50%)`;
-                  // small timeout to allow fly-out then reset
+                  handle.style.transition = 'transform 320ms cubic-bezier(.2,.9,.2,1)';
+                  handle.style.transform = `translate(${MIN - 20}px, -50%) scaleX(1.05)`;
                   setTimeout(() => {
-                    // perform undo: clear field, enable button, reset visuals
-                    undoPaste(buttonEl, targetTextareaId, handle);
-                    // reset handle position with jelly
+                    undoPaste(buttonEl, targetTextareaId);
                     handle.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1)';
                     handle.classList.add('jelly-release');
-                    handle.style.transform = `translate(0px, -50%)`;
-                    // cleanup after animation
-                    setTimeout(() => {
-                      handle.classList.remove('jelly-release');
-                      handle.style.transition = '';
-                    }, 650);
-                  }, 200);
+                    handle.style.transform = `translate(0px, -50%) scaleX(1)`;
+                    setTimeout(()=>{ handle.classList.remove('jelly-release'); handle.style.transition = ''; }, 650);
+                  }, 170);
                 } else {
-                  // simply snap back
                   handle.style.transition = 'transform 420ms cubic-bezier(.2,.9,.2,1)';
-                  handle.style.transform = 'translate(0px, -50%)';
+                  handle.style.transform = 'translate(0, -50%) scaleX(1)';
                   buttonEl.style.transition = 'transform 420ms cubic-bezier(.2,.9,.2,1)';
-                  buttonEl.style.transform = 'translateX(0px)';
+                  buttonEl.style.transform = 'translateX(0)';
                   const hole = buttonEl.querySelector('.hole');
                   if (hole) hole.style.transform = '';
-                  setTimeout(() => {
-                    handle.style.transition = '';
-                    buttonEl.style.transition = '';
-                  }, 430);
+                  setTimeout(()=>{ handle.style.transition=''; buttonEl.style.transition=''; }, 430);
                 }
               }
 
-              // Undo routine: clear target, enable button, visual reset
-              function undoPaste(buttonEl, targetTextareaId, handleEl) {
+              function undoPaste(buttonEl, targetTextareaId) {
                 const target = document.getElementById(targetTextareaId);
                 const label = buttonEl.querySelector('.label');
-                if (target) {
-                  target.value = '';
-                }
+                if (target) target.value = '';
                 if (label) label.textContent = 'Colar plano';
-                buttonEl.classList.remove('pasted', 'done');
+                buttonEl.classList.remove('pasted','done');
                 buttonEl.disabled = false;
                 buttonEl.removeAttribute('aria-disabled');
-                buttonEl.setAttribute('aria-pressed', 'false');
-
-                // subtle jelly animation on button to simulate "mole" release
+                buttonEl.setAttribute('aria-pressed','false');
                 buttonEl.classList.add('jelly-release');
-                setTimeout(() => buttonEl.classList.remove('jelly-release'), 700);
-
-                // reset transforms
+                setTimeout(()=>buttonEl.classList.remove('jelly-release'),700);
                 buttonEl.style.transform = '';
                 const hole = buttonEl.querySelector('.hole');
                 if (hole) hole.style.transform = '';
               }
 
-              // pointer events (works with mouse/touch)
               handle.addEventListener('pointerdown', pointerDown);
               window.addEventListener('pointermove', pointerMove);
               window.addEventListener('pointerup', pointerUp);
 
-              // also support keyboard activation: Enter or Space triggers undo when available
-              handle.addEventListener('keydown', (ev) => {
+              handle.addEventListener('keydown',(ev)=>{
                 if ((ev.key === 'Enter' || ev.key === ' ') && (buttonEl.disabled || buttonEl.classList.contains('done'))) {
                   ev.preventDefault();
-                  // animate quick release
                   handle.classList.add('jelly-release');
-                  setTimeout(() => handle.classList.remove('jelly-release'), 650);
-                  undoPaste(buttonEl, targetTextareaId, handle);
+                  setTimeout(()=>handle.classList.remove('jelly-release'),650);
+                  undoPaste(buttonEl, targetTextareaId);
                 }
               });
             }
 
             // Attach handles to both paste buttons
-            attachPullHandle(pasteTreino, 'objetivo_treino');
-            attachPullHandle(pasteDieta, 'objetivo_dieta');
+            attachMinimalPullHandle(pasteTreino, 'objetivo_treino');
+            attachMinimalPullHandle(pasteDieta, 'objetivo_dieta');
             // ----------------------------------------------------------------------
 
         }
