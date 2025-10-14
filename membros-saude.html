@@ -251,6 +251,14 @@
     }
     .paste-btn:active { transform: translateY(1px) scale(0.997); }
 
+    /* Disabled look */
+    .paste-btn:disabled {
+      cursor: default;
+      opacity: 0.92;
+      filter: saturate(0.95);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset 0 -3px 6px rgba(0,0,0,0.28);
+    }
+
     /* "furo" (o círculo) - inicialmente oculto no canto esquerdo com pequena sombra */
     .paste-btn .hole {
       position: absolute;
@@ -301,6 +309,14 @@
       transform: scale(0.6);
     }
     .paste-btn.pasted .label { transform: translateX(14px); }
+
+    /* Estilo final quando pronto (desativado) */
+    .paste-btn.done {
+      background: linear-gradient(90deg, #7a0f18, #3e0610);
+      color: #ffecec;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4);
+    }
+    .paste-btn.done .label { letter-spacing: 0.2px; }
 
     @keyframes hole-pulse {
       0% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
@@ -686,31 +702,43 @@
             }
 
             // ------------------- PASTE BUTTONS BEHAVIOR (Percurso) -------------------
-            // O comportamento abaixo: ao clicar, faz a animação e insere (simulação) o conteúdo do prompt-output
+            // Agora: ao clicar, cola O CONTEÚDO COMPLETO DO #prompt-output, muda label para "Formulário pronto ✓" e desativa o botão.
             const pasteTreino = document.getElementById('paste-treino');
             const pasteDieta = document.getElementById('paste-dieta');
 
             function simulatePaste(buttonEl, targetTextareaId) {
               const txtOutput = document.getElementById('prompt-output').textContent || '';
               const target = document.getElementById(targetTextareaId);
-              // Toggle visual state
-              const isPasted = buttonEl.classList.toggle('pasted');
-              buttonEl.setAttribute('aria-pressed', isPasted ? 'true' : 'false');
+              const label = buttonEl.querySelector('.label');
 
-              // small visual pulse via class (appearing already used)
+              // Se já estiver disabled, não faz nada (proteção)
+              if (buttonEl.disabled) return;
+
+              // pequeno efeito visual de entrada
               buttonEl.classList.remove('appearing');
               void buttonEl.offsetWidth;
               buttonEl.classList.add('appearing');
 
-              // If there is content in prompt-output, paste it into the target textarea (simulate)
-              if (isPasted && txtOutput.trim()) {
-                // insert a summarized version or entire prompt depending on length
-                const pasteContent = txtOutput.length > 120 ? txtOutput.slice(0, 120) + '…' : txtOutput;
-                if (target) target.value = pasteContent;
-              } else if (!isPasted && target) {
-                // unpaste = clear target (user can change)
-                // (We keep what user had if they manually edited — but here we clear for demo)
-                target.value = '';
+              // Se houver conteúdo, cola o conteúdo inteiro no campo destino
+              if (txtOutput.trim() && target) {
+                target.value = txtOutput;
+              } else if (target) {
+                // Se não houver conteúdo no prompt-output, insere placeholder explicativo
+                target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]';
+              }
+
+              // Atualiza visual do botão: texto, estado e estilo final
+              if (label) label.textContent = 'Formulário pronto ✓';
+              buttonEl.classList.add('pasted', 'done');
+              buttonEl.setAttribute('aria-pressed', 'true');
+
+              // Desativa o botão para evitar múltiplos cliques/desfazer
+              buttonEl.disabled = true;
+              buttonEl.setAttribute('aria-disabled', 'true');
+
+              // (Opcional) foco visual na área preenchida
+              if (target) {
+                try { target.focus(); } catch (e) {}
               }
             }
 
