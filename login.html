@@ -13,7 +13,7 @@
     .btn { background: #0b74de; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px; }
     .link { text-align: center; margin-top: 15px; }
     .link a { color: #0b74de; text-decoration: none; }
-    #msg { color: red; margin-top: 10px; text-align: center; }
+    #msg { color: red; margin-top: 10px; text-align: center; min-height: 18px; }
   </style>
 </head>
 <body>
@@ -37,11 +37,12 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // ====== CONFIGURE AQUI ======
-    const SUPABASE_URL = 'SUPABASE_URL_HERE';
-    const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';
+    // ====== CONFIGURAÇÃO COM SUAS CHAVES ======
+    const SUPABASE_URL = 'https://mrebmxvxlajqfgcpsvfv.supabase.co';
+    // ATENÇÃO: A chave abaixo parece incompleta. Cole a chave 'anon public' inteira aqui.
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ============================
+    // ==========================================
 
     const el = id => document.getElementById(id);
 
@@ -55,14 +56,13 @@
         return;
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
-        el('msg').innerText = 'Erro: ' + error.message;
+        el('msg').innerText = 'Credenciais inválidas. Verifique seu email e senha.';
         return;
       }
-
-      // Login bem-sucedido, redireciona para o index, que cuidará de levar para a página certa.
+      
       window.location.replace('/');
     };
   </script>
