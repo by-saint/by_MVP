@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Carregando...</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+  </style>
+</head>
+<body>
+  <p>Carregando sua área de membros...</p>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    // ====== CONFIGURE AQUI ======
+    const SUPABASE_URL = 'SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ============================
+
+    (async function checkSessionAndRedirect() {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        // Se não há usuário logado, vai para a página de login
+        window.location.replace('/login.html');
+        return;
+      }
+
+      // Se há usuário logado, busca o perfil para saber o nicho
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('niche')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error || !profile) {
+        // Se o perfil não for encontrado por algum motivo, desloga e manda para login
+        console.error('Perfil não encontrado, deslogando.');
+        await supabase.auth.signOut();
+        window.location.replace('/login.html');
+        return;
+      }
+
+      // Redireciona para a página do nicho correto
+      if (profile.niche === 'saude') {
+        window.location.replace('/membros-saude.html');
+      } else if (profile.niche === 'estudos') {
+        window.location.replace('/membros-estudos.html');
+      } else {
+        // Fallback caso o nicho não esteja definido
+        window.location.replace('/login.html');
+      }
+    })();
+  </script>
+</body>
+</html>
