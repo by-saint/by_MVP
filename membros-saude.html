@@ -130,18 +130,30 @@
         background-color: #333;
         color: #fff;
     }
-    .sidebar-logout-btn {
+    .sidebar-action-btn {
         width: 100%;
-        background-color: #be123c;
-        border: 1px solid #be123c;
-        color: #fff;
-        padding: 12px;
+        padding: 10px;
         border-radius: 8px;
         cursor: pointer;
         font-family: 'Poppins', sans-serif;
-        font-size: 1em;
+        font-size: 0.9em;
         font-weight: 600;
         transition: all 0.2s ease-in-out;
+        margin-top: 10px;
+    }
+    .sidebar-reset-btn {
+        background-color: transparent;
+        border: 1px solid var(--color-ia-specialist);
+        color: var(--color-ia-specialist);
+    }
+    .sidebar-reset-btn:hover {
+        background-color: var(--color-ia-specialist);
+        color: #fff;
+    }
+    .sidebar-logout-btn {
+        background-color: #be123c;
+        border: 1px solid #be123c;
+        color: #fff;
     }
     .sidebar-logout-btn:hover {
         background-color: #ff4757;
@@ -190,8 +202,6 @@
     .countdown-container { text-align: center; margin-top: 20px; }
     .countdown-days { font-size: 4rem; font-weight: 700; color: #fff; line-height: 1; }
     .countdown-label { font-size: 1rem; color: #aaa; }
-    .reset-button { background: none; border: 1px solid #555; color: #aaa; padding: 8px 15px; cursor: pointer; display: inline-block; border-radius: 6px; transition: background-color 0.3s; }
-    .reset-button:hover { background-color: #444; }
     .text-glow-blue { text-shadow: 0 0 8px rgba(0, 198, 255, 0.6); }
     .playlist-section { text-align: center; margin: 40px 0; }
     .playlist-btn { background-color: #007BFF; color: white; border: none; padding: 12px 24px; font-size: 1.1em; cursor: pointer; border-radius: 8px; }
@@ -217,12 +227,13 @@
         </ul>
     </nav>
     <div class="sidebar-footer">
-        <!-- NOVA ESTRUTURA DE BOTÕES COM EMOJI -->
         <button id="config-btn" class="sidebar-config-btn">
             <span>⚙️</span>
             <span>Configurações</span>
         </button>
-        <button id="logout-btn" class="sidebar-logout-btn hidden">Sair da conta</button>
+        <!-- BOTÕES DE AÇÃO ESCONDIDOS -->
+        <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
+        <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
     </div>
 </div>
 
@@ -287,7 +298,7 @@
                       <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
                       <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
                       <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-                      <div style="text-align:center"><button id="reset-btn" class="reset-button">Definir Nova Meta</button></div>
+                      <!-- BOTÃO "DEFINIR NOVA META" FOI MOVIDO PARA O MENU LATERAL -->
                   </div>
              </div>
         </div>
@@ -337,7 +348,7 @@
         if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); }
         return null;
     }
-    function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; document.getElementById('reset-btn').style.display='inline-block'; }
+    function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
     function analyzeGoal(text) {
         const lowerText = text.toLowerCase();
         const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento'];
@@ -353,13 +364,15 @@
     // --- LÓGICA PRINCIPAL ---
     document.addEventListener('DOMContentLoaded', () => {
 
-        // SETUP DOS ELEMENTOS E EVENTOS PRINCIPAIS DA UI (NÃO PRECISAM ESPERAR DADOS)
+        let user = null;
+
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const navLinks = document.querySelectorAll('.nav-link');
         const configBtn = document.getElementById('config-btn');
         const logoutBtn = document.getElementById('logout-btn');
+        const resetBtn = document.getElementById('reset-btn');
 
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -394,6 +407,7 @@
         configBtn.addEventListener('click', (e) => {
             e.preventDefault();
             logoutBtn.classList.toggle('hidden');
+            resetBtn.classList.toggle('hidden');
         });
 
         logoutBtn.addEventListener('click', async (e) => {
@@ -402,13 +416,25 @@
             window.location.replace('/login.html');
         });
 
-        // FUNÇÃO ASYNC PARA CARREGAR DADOS E CONFIGURAR O RESTANTE DA PÁGINA
+        resetBtn.addEventListener('click', async () => {
+            if (!user) return;
+            const { error: resetError } = await supabase.from('profiles').update({
+                goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null,
+            }).eq('id', user.id);
+            if (resetError) {
+                console.error('Erro ao resetar a meta: ' + resetError.message);
+            } else {
+                window.location.reload();
+            }
+        });
+
         async function initializePageData() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            const { data } = await supabase.auth.getUser();
+            if (!data.user) {
                 window.location.replace('/login.html');
                 return;
             }
+            user = data.user;
             document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
 
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
@@ -441,7 +467,6 @@
                 };
             }
             
-            // LISTENERS QUE DEPENDEM DOS DADOS DO USUÁRIO
             const objetivoInput = document.getElementById('objetivo');
             if (objetivoInput) {
                 objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; });
@@ -456,7 +481,6 @@
             if(iaFitForm) {
                 iaFitForm.addEventListener('submit', async function(event) {
                     event.preventDefault();
-                    // ... (código do formulário permanece o mesmo)
                     const formElements = event.target.elements;
                     const prazoText = formElements.prazo.value;
                     const endDate = calculateEndDate(prazoText);
@@ -488,18 +512,6 @@
                     document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
                 });
             }
-            
-            const resetBtn = document.getElementById('reset-btn');
-            if(resetBtn) {
-                resetBtn.addEventListener('click', async function(){
-                    // Removido o 'confirm' que estava quebrando o script
-                    const { error: resetError } = await supabase.from('profiles').update({
-                        goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null,
-                    }).eq('id', user.id);
-                    if (resetError) console.error('Erro ao resetar a meta: ' + resetError.message);
-                    else window.location.reload();
-                });
-            }
 
             const copyBtn = document.getElementById('copy-btn');
             if(copyBtn) {
@@ -513,8 +525,6 @@
                 });
             }
         }
-
-        // Inicia o carregamento dos dados da página
         initializePageData();
     });
 </script>
