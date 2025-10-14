@@ -29,7 +29,7 @@
     }
     h1, h2, h3 { color: #f0f0f0; text-align: center; margin-top: 30px; margin-bottom: 15px; }
 
-    /* --- NOVO MENU E SIDEBAR --- */
+    /* --- MENU E SIDEBAR ATUALIZADOS --- */
     .menu-toggle {
         position: fixed;
         top: 25px;
@@ -76,6 +76,9 @@
         transition: left 0.3s ease-in-out;
         z-index: 1000;
         border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .sidebar.open {
         left: 0;
@@ -88,19 +91,51 @@
     .sidebar nav a {
         display: block;
         padding: 15px 30px;
-        color: #E0E0E0;
         text-decoration: none;
         font-size: 1.1em;
-        font-weight: 600;
+        font-weight: 700; /* Aumenta o peso da fonte */
         border-left: 5px solid transparent;
-        transition: background-color 0.2s, border-left 0.2s, color 0.2s;
+        transition: background-color 0.2s, border-left 0.2s;
     }
     .sidebar nav a:hover {
         background-color: #2c2c2c;
     }
-    .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); color: var(--color-ia-specialist); }
-    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); color: var(--color-video-lessons); }
-    .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); color: var(--color-journey); }
+
+    /* TÍTULOS COM DEGRADÊ DE ALTO CONTRASTE E MAIS INTENSOS */
+    .link-ia, .link-aulas, .link-percurso {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); } /* Azul mais intenso */
+    .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); } /* Roxo mais profundo */
+    .link-percurso { background-image: linear-gradient(90deg, #ff4757, #be123c); } /* Vermelho mais forte */
+    
+    .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); }
+    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
+    .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
+
+    .sidebar-footer {
+        padding: 20px 30px;
+    }
+    .sidebar-logout-btn {
+        width: 100%;
+        background: transparent;
+        border: 1px solid #444;
+        color: #aaa;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1em;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+    .sidebar-logout-btn:hover {
+        background-color: var(--color-journey);
+        border-color: var(--color-journey);
+        color: #fff;
+    }
 
     .overlay {
         position: fixed;
@@ -120,12 +155,11 @@
     }
 
     .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    #welcome-msg { color: #bbb; margin-right: 20px; }
+    #welcome-msg { color: #bbb; }
 
-    /* Gerenciamento do conteúdo das abas */
+    /* Estilos do conteúdo principal (sem alterações) */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
     .form-wrapper, .results-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
     .form-container, .results-container, .percurso-container { background-color: #1E1E1E; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid #333; }
     .form-group { margin-bottom: 25px; }
@@ -156,6 +190,7 @@
 </head>
 <body>
 
+<!-- Elementos do Menu -->
 <button class="menu-toggle" id="menu-toggle">
     <span class="bar"></span>
     <span class="bar"></span>
@@ -170,15 +205,21 @@
             <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
         </ul>
     </nav>
+    <div class="sidebar-footer">
+        <button id="logout-btn" class="sidebar-logout-btn">Sair</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay"></div>
+<!-- Fim dos Elementos do Menu -->
+
 <div class="container">
     <div class="header">
         <p id="welcome-msg">A carregar...</p>
-        <button id="logout-btn" class="reset-button">Sair</button>
+        <!-- O botão "Sair" foi movido para o menu lateral -->
     </div>
 
+    <!-- Conteúdo IA -->
     <div id="ia-planejamento" class="tab-content active">
         <div class="form-wrapper" id="form-wrapper" style="display: none;">
               <div class="form-container">
@@ -237,6 +278,7 @@
         </div>
     </div>
 
+    <!-- Conteúdo Videoaulas -->
     <div id="video-aulas" class="tab-content">
         <h2>Nossas Aulas</h2>
         <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
@@ -244,11 +286,13 @@
         <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
     </div>
 
+    <!-- Conteúdo da Nova Aba "Percurso" -->
     <div id="percurso" class="tab-content">
         <div class="percurso-container">
             <h2>Meu Percurso</h2>
             <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
-            </div>
+            <!-- O conteúdo desta seção será adicionado futuramente -->
+        </div>
     </div>
 </div>
 
