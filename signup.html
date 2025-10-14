@@ -44,12 +44,11 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // ====== CONFIGURAÇÃO COM SUAS CHAVES ======
-    const SUPABASE_URL = 'https://mrebmxvxlajqfgcpsvfv.supabase.co';
-    // ATENÇÃO: A chave abaixo parece incompleta. Cole a chave 'anon public' inteira aqui.
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+    // ====== CONFIGURAÇÃO CORRIGIDA ======
+    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ==========================================
+    // ===================================
 
     const el = id => document.getElementById(id);
 
