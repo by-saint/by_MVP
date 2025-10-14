@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Acessar Conta</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h1 { text-align: center; color: #333; }
+    label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+    input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    .btn { background: #0b74de; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px; }
+    .link { text-align: center; margin-top: 15px; }
+    .link a { color: #0b74de; text-decoration: none; }
+    #msg { color: red; margin-top: 10px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Acessar sua Conta</h1>
+    <div id="login-form">
+      <label for="in-email">Email</label>
+      <input id="in-email" type="email" placeholder="seu@email.com" />
+
+      <label for="in-password">Senha</label>
+      <input id="in-password" type="password" />
+
+      <button id="login-btn" class="btn">Entrar</button>
+      <div id="msg"></div>
+      <div class="link">
+        <p>Não tem uma conta? <a href="/signup.html">Cadastre-se</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    // ====== CONFIGURE AQUI ======
+    const SUPABASE_URL = 'SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ============================
+
+    const el = id => document.getElementById(id);
+
+    el('login-btn').onclick = async () => {
+      el('msg').innerText = '';
+      const email = el('in-email').value.trim();
+      const password = el('in-password').value;
+
+      if (!email || !password) {
+        el('msg').innerText = 'Por favor, preencha email e senha.';
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        el('msg').innerText = 'Erro: ' + error.message;
+        return;
+      }
+
+      // Login bem-sucedido, redireciona para o index, que cuidará de levar para a página certa.
+      window.location.replace('/');
+    };
+  </script>
+</body>
+</html>
