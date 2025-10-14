@@ -10,8 +10,8 @@
   <style>
     :root {
       --color-ia-specialist: #007BFF;
-      --color-video-lessons: #8A2BE2; /* Roxo */
-      --color-journey: #DC143C; /* Vermelho */
+      --color-video-lessons: #8A2BE2;
+      --color-journey: #DC143C;
     }
 
     html { scroll-behavior: smooth; }
@@ -23,13 +23,13 @@
         padding: 40px 20px;
     }
     .container {
-        max-width: 1600px; /* Layout mais amplo para desktop */
+        max-width: 1600px;
         margin: 0 auto;
         padding: 0 20px;
     }
     h1, h2, h3 { color: #f0f0f0; text-align: center; margin-top: 30px; margin-bottom: 15px; }
 
-    /* --- MENU E SIDEBAR ATUALIZADOS --- */
+    /* --- MENU E SIDEBAR --- */
     .menu-toggle {
         position: fixed;
         top: 25px;
@@ -55,24 +55,17 @@
         border-radius: 2px;
         transition: all 0.3s ease-in-out;
     }
-    .menu-toggle.open .bar:nth-child(1) {
-        transform: translateY(8px) rotate(45deg);
-    }
-    .menu-toggle.open .bar:nth-child(2) {
-        opacity: 0;
-    }
-    .menu-toggle.open .bar:nth-child(3) {
-        transform: translateY(-8px) rotate(-45deg);
-    }
+    .menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
     .sidebar {
         position: fixed;
         top: 0;
-        left: -300px; /* Começa escondido */
+        left: -300px;
         width: 280px;
         height: 100%;
         background-color: #1E1E1E;
-        padding-top: 100px;
         transition: left 0.3s ease-in-out;
         z-index: 1000;
         border-right: 1px solid #333;
@@ -80,49 +73,68 @@
         flex-direction: column;
         justify-content: space-between;
     }
-    .sidebar.open {
-        left: 0;
+    .sidebar.open { left: 0; }
+    .sidebar nav {
+        padding-top: 100px;
     }
-    .sidebar nav ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+    .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar nav a {
         display: block;
         padding: 15px 30px;
         text-decoration: none;
         font-size: 1.1em;
-        font-weight: 700; /* Aumenta o peso da fonte */
+        font-weight: 700;
         border-left: 5px solid transparent;
         transition: background-color 0.2s, border-left 0.2s;
     }
-    .sidebar nav a:hover {
-        background-color: #2c2c2c;
-    }
+    .sidebar nav a:hover { background-color: #2c2c2c; }
 
-    /* TÍTULOS COM DEGRADÊ DE ALTO CONTRASTE E MAIS INTENSOS */
+    /* TÍTULOS COM DEGRADÊ */
     .link-ia, .link-aulas, .link-percurso {
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); } /* Azul mais intenso */
-    .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); } /* Roxo mais profundo */
-    .link-percurso { background-image: linear-gradient(90deg, #ff4757, #be123c); } /* Vermelho mais forte */
+    .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); }
+    .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); }
+    .link-percurso { background-image: linear-gradient(90deg, #ff4757, #be123c); }
     
     .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); }
     .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
     .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
 
+    /* ESTILOS ATUALIZADOS PARA O RODAPÉ DO MENU */
     .sidebar-footer {
         padding: 20px 30px;
+        text-align: center;
     }
-    .sidebar-logout-btn {
+    .sidebar-config-btn {
         width: 100%;
         background: transparent;
         border: 1px solid #444;
         color: #aaa;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .sidebar-config-btn:hover {
+        background-color: #333;
+        color: #fff;
+    }
+    .sidebar-logout-btn {
+        width: 100%;
+        background-color: #be123c;
+        border: 1px solid #be123c;
+        color: #fff;
         padding: 12px;
         border-radius: 8px;
         cursor: pointer;
@@ -132,9 +144,11 @@
         transition: all 0.2s ease-in-out;
     }
     .sidebar-logout-btn:hover {
-        background-color: var(--color-journey);
-        border-color: var(--color-journey);
-        color: #fff;
+        background-color: #ff4757;
+        border-color: #ff4757;
+    }
+    .hidden {
+        display: none;
     }
 
     .overlay {
@@ -149,12 +163,9 @@
         visibility: hidden;
         transition: opacity 0.3s, visibility 0.3s;
     }
-    .overlay.show {
-        opacity: 1;
-        visibility: visible;
-    }
+    .overlay.show { opacity: 1; visibility: visible; }
 
-    .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; }
     #welcome-msg { color: #bbb; }
 
     /* Estilos do conteúdo principal (sem alterações) */
@@ -206,7 +217,12 @@
         </ul>
     </nav>
     <div class="sidebar-footer">
-        <button id="logout-btn" class="sidebar-logout-btn">Sair</button>
+        <!-- NOVA ESTRUTURA DE BOTÕES COM EMOJI -->
+        <button id="config-btn" class="sidebar-config-btn">
+            <span>⚙️</span>
+            <span>Configurações</span>
+        </button>
+        <button id="logout-btn" class="sidebar-logout-btn hidden">Sair da conta</button>
     </div>
 </div>
 
@@ -216,7 +232,6 @@
 <div class="container">
     <div class="header">
         <p id="welcome-msg">A carregar...</p>
-        <!-- O botão "Sair" foi movido para o menu lateral -->
     </div>
 
     <!-- Conteúdo IA -->
@@ -299,15 +314,13 @@
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     
-    // ====== CONFIGURAÇÃO CORRIGIDA ======
+    // ====== CONFIGURAÇÃO ======
     const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ===================================
-    
     const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-    // --- FUNÇÕES DE LÓGICA (mantidas do original) ---
+    // --- FUNÇÕES DE LÓGICA ---
     function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
     function calculateEndDate(prazoText) {
         const now = new Date();
@@ -337,20 +350,20 @@
     }
     function reorderVideos(order) { const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        let user = null;
-        let profile = null;
+    // --- LÓGICA PRINCIPAL ---
+    document.addEventListener('DOMContentLoaded', () => {
 
-        // --- LÓGICA DO MENU LATERAL ---
+        // SETUP DOS ELEMENTOS E EVENTOS PRINCIPAIS DA UI (NÃO PRECISAM ESPERAR DADOS)
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const navLinks = document.querySelectorAll('.nav-link');
+        const configBtn = document.getElementById('config-btn');
+        const logoutBtn = document.getElementById('logout-btn');
 
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
             navLinks.forEach(link => link.classList.remove('active'));
             document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active');
         };
@@ -378,134 +391,133 @@
             });
         });
 
-        // --- LÓGICA DE AUTENTICAÇÃO E DADOS ---
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (!authUser) {
-            window.location.replace('/login.html');
-            return;
-        }
-        user = authUser;
-        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
+        configBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutBtn.classList.toggle('hidden');
+        });
 
-        const { data: profileData, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (error || !profileData) {
-            console.error('Erro ao buscar perfil:', error);
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             await supabase.auth.signOut();
             window.location.replace('/login.html');
-            return;
-        }
-        profile = profileData;
-        
-        if (profile.goal_end_date) {
-            displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
-            document.getElementById('prompt-output').textContent = profile.goal_prompt;
-            if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
-        } else {
-            document.getElementById('form-wrapper').style.display = 'block';
-        }
+        });
 
-        const difyContainer = document.getElementById('dify-container');
-        if (difyContainer && profile.conversation_id) {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://udify.app/chatbot/${DIFY_APP_TOKEN}`;
-            iframe.style.cssText = 'width:100%;height:100%;border:none;';
-            iframe.allow = 'microphone';
-            difyContainer.appendChild(iframe);
-            iframe.onload = () => {
-              iframe.contentWindow.postMessage({
-                type: 'dify-chatbot-set-system-variable', data: { conversation_id: profile.conversation_id }
-              }, 'https://udify.app');
-            };
-        }
-        
-        // --- LÓGICA DE EVENTOS (FORMULÁRIOS E BOTÕES) ---
-        document.getElementById('objetivo').addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; });
-        document.getElementById('uso_suplemento').addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; });
-        
-        document.getElementById('ia-fit-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const formElements = event.target.elements;
-            const prazoText = formElements.prazo.value;
-            const endDate = calculateEndDate(prazoText);
-            if (!endDate) { alert("Não consegui entender o prazo da sua meta."); return; }
+        // FUNÇÃO ASYNC PARA CARREGAR DADOS E CONFIGURAR O RESTANTE DA PÁGINA
+        async function initializePageData() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.replace('/login.html');
+                return;
+            }
+            document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
 
-            const startDate = new Date(); startDate.setHours(0,0,0,0);
-            const objetivoText = formElements.objetivo.value;
-            const goalType = analyzeGoal(objetivoText);
-            const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-            const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
-            const orcamentoValue = formElements.orcamento.value.replace(',', '.');
-            const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
-            let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
-            if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`;}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            if (error || !profile) {
+                console.error('Erro ao buscar perfil:', error);
+                await supabase.auth.signOut();
+                window.location.replace('/login.html');
+                return;
+            }
             
-            const initialMessage = `
-**GERAR PLANO DE AÇÃO COMPLETO**
-**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:
-**- Objetivo Principal:** ${formData.objetivo}
-**- Prazo para a Meta:** ${formData.prazo}
-**- Perfil do Utilizador:**
-  - Idade: ${formData.idade} anos
-  - Sexo: ${formData.sexo}
-  - Peso: ${formData.peso} kg
-  - Altura: ${formData.altura} m
-  - Nível de Experiência: ${formData.nivel}
-**- Logística e Recursos:**
-  - Disponibilidade: ${formData.disponibilidade} dias/semana
-  - Local de Treino: ${formData.local_treino}
-  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}
-  - ${suplementoInfo}
-**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
-
-            const { error: updateError } = await supabase.from('profiles').update({
-                goal_start_date: startDate.toISOString(),
-                goal_end_date: endDate.toISOString(),
-                goal_prompt: initialMessage,
-                goal_type: goalType,
-            }).eq('id', user.id);
-
-            if (updateError) {
-                alert("Erro ao salvar a sua meta: " + updateError.message);
+            if (profile.goal_end_date) {
+                displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
+                document.getElementById('prompt-output').textContent = profile.goal_prompt;
+                if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
             } else {
-                document.getElementById('prompt-output').textContent = initialMessage;
-                document.getElementById('playlist-section').style.display = 'block';
-                displayProgress(startDate, endDate);
+                document.getElementById('form-wrapper').style.display = 'block';
             }
-        });
 
-        document.getElementById('playlist-btn').addEventListener('click', function() {
-            if (!profile) return;
-            let videoOrder;
-            if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];}
-            reorderVideos(videoOrder);
-            switchTab('video-aulas');
-            document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        document.getElementById('reset-btn').addEventListener('click', async function(){
-            if(confirm("Tem a certeza que quer apagar a sua meta atual e começar de novo?")){
-                const { error: resetError } = await supabase.from('profiles').update({
-                    goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null,
-                }).eq('id', user.id);
-                if (resetError) alert('Erro ao resetar a meta: ' + resetError.message);
-                else window.location.reload();
+            const difyContainer = document.getElementById('dify-container');
+            if (difyContainer && profile.conversation_id) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://udify.app/chatbot/${DIFY_APP_TOKEN}`;
+                iframe.style.cssText = 'width:100%;height:100%;border:none;';
+                iframe.allow = 'microphone';
+                difyContainer.appendChild(iframe);
+                iframe.onload = () => {
+                  iframe.contentWindow.postMessage({
+                    type: 'dify-chatbot-set-system-variable', data: { conversation_id: profile.conversation_id }
+                  }, 'https://udify.app');
+                };
             }
-        });
+            
+            // LISTENERS QUE DEPENDEM DOS DADOS DO USUÁRIO
+            const objetivoInput = document.getElementById('objetivo');
+            if (objetivoInput) {
+                objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; });
+            }
 
-        document.getElementById('copy-btn').addEventListener('click', function() {
-            const textToCopy=document.getElementById('prompt-output').textContent;
-            const textArea=document.createElement("textarea");
-            textArea.value=textToCopy; textArea.style.position="fixed";
-            document.body.appendChild(textArea); textArea.focus(); textArea.select();
-            try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
-            document.body.removeChild(textArea);
-        });
-        
-        document.getElementById('logout-btn').onclick = async () => {
-            await supabase.auth.signOut();
-            window.location.replace('/login.html');
-        };
+            const usoSuplementoSelect = document.getElementById('uso_suplemento');
+            if (usoSuplementoSelect) {
+                usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; });
+            }
+
+            const iaFitForm = document.getElementById('ia-fit-form');
+            if(iaFitForm) {
+                iaFitForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    // ... (código do formulário permanece o mesmo)
+                    const formElements = event.target.elements;
+                    const prazoText = formElements.prazo.value;
+                    const endDate = calculateEndDate(prazoText);
+                    if (!endDate) { console.error("Prazo da meta inválido."); return; }
+                    const startDate = new Date(); startDate.setHours(0,0,0,0);
+                    const objetivoText = formElements.objetivo.value;
+                    const goalType = analyzeGoal(objetivoText);
+                    const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
+                    const orcamentoValue = formElements.orcamento.value.replace(',', '.');
+                    const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
+                    let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
+                    if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`;}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
+                    const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
+                    const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
+                    if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); } 
+                    else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display = 'block'; displayProgress(startDate, endDate); }
+                });
+            }
+
+            const playlistBtn = document.getElementById('playlist-btn');
+            if(playlistBtn) {
+                playlistBtn.addEventListener('click', function() {
+                    if (!profile) return;
+                    let videoOrder;
+                    if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];}
+                    reorderVideos(videoOrder);
+                    switchTab('video-aulas');
+                    document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+            
+            const resetBtn = document.getElementById('reset-btn');
+            if(resetBtn) {
+                resetBtn.addEventListener('click', async function(){
+                    // Removido o 'confirm' que estava quebrando o script
+                    const { error: resetError } = await supabase.from('profiles').update({
+                        goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null,
+                    }).eq('id', user.id);
+                    if (resetError) console.error('Erro ao resetar a meta: ' + resetError.message);
+                    else window.location.reload();
+                });
+            }
+
+            const copyBtn = document.getElementById('copy-btn');
+            if(copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    const textToCopy=document.getElementById('prompt-output').textContent;
+                    const textArea=document.createElement("textarea");
+                    textArea.value=textToCopy; textArea.style.position="fixed";
+                    document.body.appendChild(textArea); textArea.focus(); textArea.select();
+                    try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
+                    document.body.removeChild(textArea);
+                });
+            }
+        }
+
+        // Inicia o carregamento dos dados da página
+        initializePageData();
     });
 </script>
 </body>
 </html>
+
