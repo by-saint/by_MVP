@@ -330,7 +330,7 @@
       .paste-btn { min-width: 140px; }
     }
 
-    /* pull-handle */
+    /* pull-handle (branco atrás do botão de colar) */
     .pull-handle{
       width:12px;height:12px;border-radius:50%;
       background:#fff;position:absolute;left:-6px;top:50%;transform:translate(0,-50%);cursor:grab;
@@ -452,16 +452,6 @@
     <div id="percurso" class="tab-content">
         <div class="percurso-container">
             <h2>Meu Percurso</h2>
-
-            <!-- BOTÃO ADICIONADO: desfazer / reset do formulário Percurso -->
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-              <button id="percurso-reset-btn" class="paste-btn" style="--h:34px;min-width:150px">
-                <span class="hole" aria-hidden="true"></span>
-                <span class="label">Desfazer formulário</span>
-              </button>
-            </div>
-            <!-- fim botão adicionado -->
-
             <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
 
             <!-- Novos formulários de Treino e Dieta -->
@@ -483,7 +473,7 @@
                       <span class="hole" aria-hidden="true"></span>
                       <span class="label">Colar plano</span>
                     </button>
-                    <!-- handle será inserida pelo JS, posicionada atrás do botão -->
+                    <!-- pull-handle (branco) será inserido atrás do botão via JS -->
                   </div>
                   <div class="small-note">Clique para colar (simulação)</div>
                 </div>
@@ -506,14 +496,14 @@
                       <span class="hole" aria-hidden="true"></span>
                       <span class="label">Colar plano</span>
                     </button>
-                    <!-- handle será inserida pelo JS, posicionada atrás do botão -->
+                    <!-- pull-handle (branco) será inserido atrás do botão via JS -->
                   </div>
                   <div class="small-note">Clique para colar (simulação)</div>
                 </div>
               </div>
             </div>
 
-            <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). Eles apenas alternam o estado visual por enquanto.</p>
+            <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). As pequenas bolinhas brancas à esquerda (pull-handles) desfazem a colagem.</p>
         </div>
     </div>
 </div>
@@ -807,6 +797,7 @@
               handle.setAttribute('aria-label','Puxe para desfazer o colar');
               handle.tabIndex=0;
               wrapper.style.position = wrapper.style.position || 'relative';
+              // insert BEFORE the button so it is visually behind and only a sliver shows
               wrapper.insertBefore(handle, buttonEl);
 
               let active=false,startX=0,currentX=0;
@@ -824,7 +815,9 @@
               }
 
               function pointerDown(e){
+                // only start drag if the paste button is disabled/done (i.e. there is something to undo)
                 if(!(buttonEl.disabled || buttonEl.classList.contains('done'))){
+                  // small nudge animation to indicate handle exists
                   handle.classList.add('dragging'); handle.classList.add('jelly-release');
                   setTimeout(()=>{ handle.classList.remove('jelly-release'); handle.classList.remove('dragging') }, 320);
                   return;
@@ -885,43 +878,6 @@
 
             attachMinimalPullHandle(pasteTreino,'objetivo_treino');
             attachMinimalPullHandle(pasteDieta,'objetivo_dieta');
-
-            /* === LÓGICA DO BOTÃO "Desfazer formulário" ADICIONADA === */
-            const percursoResetBtn = document.getElementById('percurso-reset-btn');
-            if(percursoResetBtn){
-              percursoResetBtn.addEventListener('click',()=>{
-                // campos a limpar
-                const ids = ['objetivo_treino','frequencia_treino','objetivo_dieta','orcamento_dieta'];
-                ids.forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
-
-                // restaurar estado dos botões "Colar plano" (re-enable e label)
-                function resetPasteBtn(btn){
-                  if(!btn) return;
-                  const label = btn.querySelector('.label');
-                  if(label) label.textContent = 'Colar plano';
-                  btn.classList.remove('pasted','done');
-                  btn.disabled = false;
-                  btn.removeAttribute('aria-disabled');
-                  btn.setAttribute('aria-pressed','false');
-                  btn.style.transform = '';
-                  const hole = btn.querySelector('.hole');
-                  if(hole) hole.style.transform = '';
-                }
-                resetPasteBtn(pasteTreino);
-                resetPasteBtn(pasteDieta);
-
-                // feedback rápido no próprio botão
-                const originalLabel = percursoResetBtn.querySelector('.label') ? percursoResetBtn.querySelector('.label').textContent : percursoResetBtn.textContent;
-                const labelEl = percursoResetBtn.querySelector('.label');
-                if(labelEl) labelEl.textContent = 'Desfeito ✓';
-                percursoResetBtn.classList.add('done');
-                setTimeout(()=>{
-                  if(labelEl) labelEl.textContent = originalLabel;
-                  percursoResetBtn.classList.remove('done');
-                },1500);
-              });
-            }
-            /* === fim lógica botão Desfazer === */
 
         } // end initializePageData
         initializePageData();
