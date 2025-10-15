@@ -1,69 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <title>Acessar Conta</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-    h1 { text-align: center; color: #333; }
-    label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
-    input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-    .btn { background: #0b74de; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px; }
-    .link { text-align: center; margin-top: 15px; }
-    .link a { color: #0b74de; text-decoration: none; }
-    #msg { color: red; margin-top: 10px; text-align: center; min-height: 18px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Plataforma de IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #1E1E1E;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #f0f0f0;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #BBBBBB;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #2C2C2C;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #E0E0E0;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            border: none;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #0056b3, #007BFF);
+        }
+        #error-msg {
+            color: #ff4757;
+            margin-top: 15px;
+            font-weight: 600;
+            min-height: 24px;
+        }
+        .switch-form {
+            margin-top: 20px;
+        }
+        .switch-form a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Acessar sua Conta</h1>
-    <div id="login-form">
-      <label for="in-email">Email</label>
-      <input id="in-email" type="email" placeholder="seu@email.com" />
 
-      <label for="in-password">Senha</label>
-      <input id="in-password" type="password" />
-
-      <button id="login-btn" class="btn">Entrar</button>
-      <div id="msg"></div>
-      <div class="link">
-        <p>Não tem uma conta? <a href="/signup.html">Cadastre-se</a></p>
-      </div>
+    <div class="login-container">
+        <h1>Acessar Plataforma</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Sua senha" required>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+        <p id="error-msg"></p>
+        <div class="switch-form">
+            <p>Não tem uma conta? <a href="/criar-conta.html">Crie agora</a></p>
+        </div>
     </div>
-  </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // ====== CONFIGURAÇÃO CORRIGIDA ======
-    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ===================================
+        const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const el = id => document.getElementById(id);
+        const loginForm = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
 
-    el('login-btn').onclick = async () => {
-      el('msg').innerText = '';
-      const email = el('in-email').value.trim();
-      const password = el('in-password').value;
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Impede o recarregamento da página
 
-      if (!email || !password) {
-        el('msg').innerText = 'Por favor, preencha email e senha.';
-        return;
-      }
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        el('msg').innerText = 'Credenciais inválidas. Verifique seu email e senha.';
-        return;
-      }
-      
-      window.location.replace('/');
-    };
-  </script>
+            // Tenta fazer o login com o Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                // Se houver erro, exibe a mensagem
+                console.error('Erro no login:', error.message);
+                errorMsg.textContent = 'Email ou senha inválidos. Tente novamente.';
+            } else {
+                // Se o login for bem-sucedido, limpa a mensagem de erro e redireciona
+                errorMsg.textContent = '';
+                console.log('Login bem-sucedido!', data);
+                // **AQUI A MÁGICA ACONTECE**
+                // Redireciona o usuário para a página principal da sua aplicação
+                window.location.href = '/index.html'; // Certifique-se que o nome do arquivo está correto
+            }
+        });
+    </script>
+
 </body>
 </html>
