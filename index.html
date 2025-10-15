@@ -1,83 +1,192 @@
 <script type="module">
-    // Importa o cliente Supabase do CDN recomendado
+    // Importa o cliente Supabase do CDN
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // ... (toda a sua configuração e funções auxiliares como getEaster, calculateEndDate, etc. continuam aqui, sem alterações) ...
-    // ====== CONFIGURAÇÃO SUPABASE & EDGE FUNCTION ======
+    // ===================================================================
+    // 1. CONFIGURAÇÃO E CONSTANTES GLOBAIS
+    // ===================================================================
     const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIJWTJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
-    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
+    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- FUNÇÕES DE LÓGICA (mantidas do código original) ---
-    // (cole aqui todas as suas funções: getEaster, calculateEndDate, displayProgress, analyzeGoal, reorderVideos, etc.)
+    // ===================================================================
+    // 2. DEFINIÇÃO DE TODAS AS FUNÇÕES
+    // (Colocamos todas as definições aqui para garantir que elas existam antes de serem chamadas)
+    // ===================================================================
+
+    // Funções do Chat
+    function addMessage(text, sender = "bot") {
+      const chatMessages = document.getElementById("chat-messages");
+      if (!chatMessages) return;
+      const msg = document.createElement("div");
+      msg.textContent = text;
+      Object.assign(msg.style, { margin: "8px 0", padding: "10px 14px", borderRadius: "10px", maxWidth: "85%", wordWrap: "break-word", background: sender === "user" ? "#007BFF" : "#333", color: sender === "user" ? "#fff" : "#E0E0E0", alignSelf: sender === "user" ? "flex-end" : "flex-start", marginLeft: sender === "user" ? "auto" : "0", marginRight: sender === "user" ? "0" : "auto" });
+      chatMessages.style.display = "flex";
+      chatMessages.style.flexDirection = "column";
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function loadChatHistory() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { addMessage("⚠️ Você precisa estar logado para conversar."); return; }
+      const chatInput = document.getElementById("chat-input");
+      const sendChatBtn = document.getElementById("send-chat-btn");
+      if(chatInput) chatInput.disabled = false;
+      if(sendChatBtn) { sendChatBtn.disabled = false; sendChatBtn.style.opacity = '1'; }
+      try {
+        const res = await fetch(EDGE_URL, { headers: { "Authorization": `Bearer ${session.access_token}` } });
+        if (!res.ok) throw new Error(`Erro na requisição: ${res.statusText}`);
+        const result = await res.json();
+        const chatMessages = document.getElementById("chat-messages");
+        if(chatMessages) chatMessages.innerHTML = '';
+        if (result.history && result.history.length > 0) {
+            result.history.forEach(msg => addMessage(msg.text, msg.sender));
+        } else {
+            addMessage("Olá! Como posso te ajudar a atingir sua meta hoje?", "bot");
+        }
+      } catch (error) {
+        console.error("Falha ao carregar histórico:", error);
+        addMessage("❌ Erro ao conectar com o assistente. Tente recarregar a página.", "bot");
+      }
+    }
+
+    async function sendMessage() {
+      const chatInput = document.getElementById("chat-input");
+      const sendChatBtn = document.getElementById("send-chat-btn");
+      if (!chatInput || !sendChatBtn) return;
+      const text = chatInput.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      chatInput.value = "";
+      sendChatBtn.disabled = true;
+      sendChatBtn.textContent = '...';
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { addMessage("⚠️ Sua sessão expirou. Faça login novamente para continuar."); return; }
+      try {
+        const res = await fetch(EDGE_URL, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` }, body: JSON.stringify({ message: text }) });
+        if (!res.ok) throw new Error(`Erro na requisição: ${res.statusText}`);
+        const result = await res.json();
+        addMessage(result.answer || "Não recebi uma resposta válida.", "bot");
+      } catch (error) {
+        console.error("Falha ao enviar mensagem:", error);
+        addMessage("❌ Erro ao enviar mensagem. Verifique sua conexão.", "bot");
+      } finally {
+        sendChatBtn.disabled = false;
+        sendChatBtn.textContent = 'Enviar';
+      }
+    }
+
+    // Função Principal de Inicialização da Aplicação
+    async function initializePageData(user) {
+        console.log("Usuário autenticado, inicializando a página...");
+        
+        // --- Referências aos elementos do DOM ---
+        const welcomeMsg = document.getElementById('welcome-msg');
+        if (welcomeMsg) welcomeMsg.textContent = `Bem-vindo(a), ${user.email}`;
+
+        // --- Busca de perfil e renderização condicional ---
+        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (error || !profile) {
+            console.error('Erro fatal ao buscar perfil:', error);
+            // Poderíamos mostrar uma mensagem de erro na tela aqui em vez de só logar
+            if (welcomeMsg) welcomeMsg.textContent = 'Erro ao carregar seus dados.';
+            return;
+        }
+
+        if (profile.goal_end_date) {
+            // (Funções de lógica como displayProgress precisam ser definidas também)
+            // displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
+            document.getElementById('prompt-output').textContent = profile.goal_prompt;
+            if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
+             document.getElementById('form-wrapper').style.display='none'; 
+             document.getElementById('results-wrapper').style.display='block';
+        } else {
+            document.getElementById('form-wrapper').style.display = 'block';
+            document.getElementById('results-wrapper').style.display='none';
+        }
+
+        // --- Carregar Componentes e Event Listeners ---
+        loadChatHistory();
+        setupEventListeners(user, profile); // Função separada para organizar os listeners
+    }
+
+    // Função para organizar todos os addEventListener
+    function setupEventListeners(user, profile) {
+        // Chat
+        const sendChatBtn = document.getElementById("send-chat-btn");
+        const chatInput = document.getElementById("chat-input");
+        if (sendChatBtn) sendChatBtn.addEventListener("click", sendMessage);
+        if (chatInput) chatInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); sendMessage(); } });
+
+        // Menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const configBtn = document.getElementById('config-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        const closeMenu = () => {
+            if(menuToggle) menuToggle.classList.remove('open');
+            if(sidebar) sidebar.classList.remove('open');
+            if(overlay) overlay.classList.remove('show');
+        };
+
+        if(menuToggle) menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('open');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+        
+        if(overlay) overlay.addEventListener('click', closeMenu);
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = link.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                closeMenu();
+            });
+        });
+        
+        if(configBtn) configBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutBtn.classList.toggle('hidden');
+            resetBtn.classList.toggle('hidden');
+        });
+
+        if(logoutBtn) logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            // O onAuthStateChange vai detectar o logout e redirecionar automaticamente
+        });
+        // ... (Adicione aqui outros event listeners: resetBtn, iaFitForm, etc.)
+    }
 
 
-    // --- LÓGICA PRINCIPAL ---
+    // ===================================================================
+    // 3. PONTO DE ENTRADA DA APLICAÇÃO
+    // ===================================================================
     document.addEventListener('DOMContentLoaded', () => {
-
-        // --- INÍCIO DA MUDANÇA CRÍTICA ---
-        // O CÓDIGO ANTIGO TENTAVA VERIFICAR O USUÁRIO DIRETAMENTE.
-        // O CÓDIGO NOVO ESCUTA ATIVAMENTE POR MUDANÇAS DE LOGIN.
-
+        // A única coisa que fazemos ao carregar o DOM é começar a "escutar"
+        // o estado da autenticação. A lógica da página só roda DEPOIS
+        // que o Supabase confirma se o usuário está logado ou não.
+        
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Estado da autenticação mudou:', event);
-
+            console.log(`Auth event: ${event}`);
             if (session && session.user) {
-                // ESTADO: USUÁRIO LOGADO!
-                // A sessão é válida, então podemos carregar os dados da página.
+                // Usuário está logado, a sessão é válida.
                 initializePageData(session.user);
             } else {
-                // ESTADO: USUÁRIO NÃO LOGADO!
-                // Não há sessão válida, redireciona para a página de login.
-                console.log('Nenhum usuário logado, redirecionando para /login.html');
+                // Usuário não está logado ou a sessão expirou.
+                console.log("Sessão não encontrada, redirecionando para o login...");
                 window.location.replace('/login.html');
             }
         });
-        
-        // A função initializePageData agora recebe o usuário como parâmetro
-        // e não precisa mais buscá-lo.
-        async function initializePageData(user) {
-            
-            // O restante do seu código que estava dentro do DOMContentLoaded vem para cá.
-            // A diferença é que agora temos 100% de certeza que o 'user' existe.
-            
-            const menuToggle = document.getElementById('menu-toggle');
-            // ... (declare todas as suas outras constantes: sidebar, overlay, navLinks, etc.)
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const navLinks = document.querySelectorAll('.nav-link');
-            const configBtn = document.getElementById('config-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const resetBtn = document.getElementById('reset-btn');
-
-            document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-
-            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-            if (error || !profile) {
-                console.error('Erro ao buscar perfil:', error);
-                // Opcional: em vez de deslogar, você pode mostrar uma mensagem de erro.
-                // await supabase.auth.signOut();
-                // window.location.replace('/login.html');
-                return;
-            }
-
-            // ... (todo o resto do seu código de manipulação de formulário, chat, etc., continua aqui)
-            // A lógica do chat, menus, forms, etc., que já funcionava, permanece a mesma.
-            // Apenas certifique-se de que ela esteja DENTRO desta função 'initializePageData'.
-
-            // Exemplo:
-            loadChatHistory(); // Chamada para a função do chat
-            
-            // ... (Restante do código do addEventListener de forms, botões, etc.)
-        }
-        
-        // --- FIM DA MUDANÇA CRÍTICA ---
-
     });
-
-    // ... (cole aqui as declarações das suas funções: loadChatHistory, sendMessage, addMessage, etc)
-    // Elas podem ficar fora do 'DOMContentLoaded', mas a chamada inicial (como loadChatHistory)
-    // deve estar dentro de 'initializePageData'.
-
 </script>
