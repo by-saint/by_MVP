@@ -231,7 +231,6 @@
       position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 12px;
       overflow: visible;
     }
 
@@ -255,7 +254,7 @@
       position: relative;
       overflow: visible;
       transition: transform 160ms ease, box-shadow 160ms ease;
-      z-index: 2; /* botão na frente */
+      z-index: 2;
     }
     .paste-btn:active { transform: translateY(1px) scale(0.997); }
 
@@ -263,7 +262,6 @@
       cursor: default;
       opacity: 0.92;
       filter: saturate(0.95);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset 0 -3px 6px rgba(0,0,0,0.28);
     }
 
     /* "furo" (o círculo) */
@@ -277,18 +275,8 @@
       box-shadow: 0 0 0 4px rgba(0,0,0,0.25), inset 0 -2px 6px rgba(255,255,255,0.04);
       transform-origin: center;
       transform: translateX(0) scale(1);
-      transition: transform 420ms cubic-bezier(.2,.9,.2,1), left 420ms cubic-bezier(.2,.9,.2,1), background 220ms;
+      transition: transform 420ms cubic-bezier(.2,.9,.2,1), left 420ms cubic-bezier(.2,.9,.2,1);
       z-index: 3;
-    }
-
-    .paste-btn .hole::after {
-      content: "";
-      position: absolute;
-      inset: 4px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.8));
-      transform: scale(1);
-      transition: transform 320ms ease;
     }
 
     .paste-btn .label {
@@ -309,17 +297,12 @@
       background: #000;
       animation: hole-pulse 900ms ease;
     }
-    .paste-btn.pasted .hole::after {
-      transform: scale(0.6);
-    }
-    .paste-btn.pasted .label { transform: translateX(14px); }
 
     .paste-btn.done {
       background: linear-gradient(90deg, #7a0f18, #3e0610);
       color: #ffecec;
       box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4);
     }
-    .paste-btn.done .label { letter-spacing: 0.2px; }
 
     @keyframes hole-pulse {
       0% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
@@ -340,14 +323,14 @@
       border-radius: 50%;
       background: linear-gradient(145deg, #fff, #ddd);
       position: absolute;
-      left: -8px; /* metade do tamanho para ficar "colado" */
+      left: -8px;
       top: 50%;
       transform: translate(0, -50%);
       cursor: grab;
       box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
       touch-action: none;
-      z-index: 1; /* atrás do botão */
-      transition: box-shadow 180ms ease, transform 220ms ease;
+      z-index: 1;
+      transition: box-shadow 180ms ease;
       pointer-events: auto;
     }
     .pull-handle:active {
@@ -357,7 +340,6 @@
       box-shadow: 0 8px 18px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.6);
     }
 
-    /* Animação jelly quando soltar */
     @keyframes jelly {
       0% { transform: translate(0, -50%) scaleX(1) scaleY(1); }
       30% { transform: translate(-8px, -50%) scaleX(1.12) scaleY(0.92); }
@@ -374,7 +356,7 @@
       .pull-handle { left: -6px; width: 14px; height: 14px; }
     }
 
-    .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
+    .small-note { font-size: 13px; color: #9cf; opacity: 0.8; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -410,7 +392,7 @@
         <p id="welcome-msg">Demo — Botão com Handle Elástico</p>
     </div>
 
-    <!-- Conteúdo IA (simplificado para demo) -->
+    <!-- Conteúdo IA -->
     <div id="ia-planejamento" class="tab-content active">
         <div class="results-wrapper" style="display: block;">
              <div class="results-container">
@@ -422,16 +404,17 @@ Teste o comportamento do botão na aba Percurso!</pre>
         </div>
     </div>
 
-    <!-- Videoaulas (oculto para demo) -->
+    <!-- Videoaulas -->
     <div id="video-aulas" class="tab-content">
         <h2>Nossas Aulas</h2>
+        <p style="text-align: center; color: #888;">Conteúdo de vídeo aqui...</p>
     </div>
 
     <!-- PERCURSO com os botões + handles -->
     <div id="percurso" class="tab-content">
         <div class="percurso-container">
             <h2>Meu Percurso</h2>
-            <p style="text-align: center; color: #bbb;">Teste o botão "Colar plano" e depois puxe a bolinha circular à esquerda para desfazer!</p>
+            <p style="text-align: center; color: #bbb; margin-bottom: 30px;">Teste o botão "Colar plano" e depois puxe a bolinha circular à esquerda para desfazer!</p>
 
             <div class="percurso-forms">
               <!-- FORMULÁRIO TREINO -->
@@ -446,16 +429,14 @@ Teste o comportamento do botão na aba Percurso!</pre>
                   <input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4">
                 </div>
                 
-                <!-- Wrapper com handle ATRÁS do botão -->
-                <div style="margin-top: 12px; position: relative;">
-                  <div class="paste-wrapper">
+                <div style="margin-top: 12px;">
+                  <div class="paste-wrapper" id="wrapper-treino">
                     <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido">
                       <span class="hole" aria-hidden="true"></span>
                       <span class="label">Colar plano</span>
                     </button>
-                    <!-- A handle será inserida via JS antes do botão -->
                   </div>
-                  <div class="small-note" style="margin-left: 12px; display: inline-block;">Puxe a bolinha à esquerda para desfazer</div>
+                  <div class="small-note" style="margin-left: 0;">↖ Puxe a bolinha à esquerda para desfazer</div>
                 </div>
               </div>
 
@@ -471,48 +452,53 @@ Teste o comportamento do botão na aba Percurso!</pre>
                   <input id="orcamento_dieta" type="text" placeholder="Ex: 500">
                 </div>
                 
-                <div style="margin-top: 12px; position: relative;">
-                  <div class="paste-wrapper">
+                <div style="margin-top: 12px;">
+                  <div class="paste-wrapper" id="wrapper-dieta">
                     <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido">
                       <span class="hole" aria-hidden="true"></span>
                       <span class="label">Colar plano</span>
                     </button>
                   </div>
-                  <div class="small-note" style="margin-left: 12px; display: inline-block;">Puxe a bolinha à esquerda para desfazer</div>
+                  <div class="small-note" style="margin-left: 0;">↖ Puxe a bolinha à esquerda para desfazer</div>
                 </div>
               </div>
             </div>
 
-            <p style="text-align:center; color:#888; margin-top:24px; font-size: 14px;">
-              💡 <strong>Como usar:</strong> Clique em "Colar plano" para colar o conteúdo. 
-              Depois, puxe a bolinha circular à esquerda do botão para desfazer com animação elástica!
+            <p style="text-align:center; color:#888; margin-top:30px; font-size: 14px; line-height: 1.6;">
+              💡 <strong>Como usar:</strong> Clique em "Colar plano" para colar o conteúdo. <br>
+              Depois, puxe a bolinha circular branca à esquerda do botão (arraste para esquerda) para desfazer com animação elástica!
             </p>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     // ========== NAVEGAÇÃO BÁSICA ==========
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     const navLinks = document.querySelectorAll('.nav-link');
 
-    const switchTab = (tabId) => {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(function(tab) {
+            tab.classList.remove('active');
+        });
         document.getElementById(tabId).classList.add('active');
-        navLinks.forEach(link => link.classList.remove('active'));
-        document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active');
-    };
+        
+        navLinks.forEach(function(link) {
+            link.classList.remove('active');
+        });
+        document.querySelector('.nav-link[data-tab="' + tabId + '"]').classList.add('active');
+    }
     
-    const closeMenu = () => {
+    function closeMenu() {
         menuToggle.classList.remove('open');
         sidebar.classList.remove('open');
         overlay.classList.remove('show');
-    };
+    }
 
-    menuToggle.addEventListener('click', () => {
+    menuToggle.addEventListener('click', function() {
         menuToggle.classList.toggle('open');
         sidebar.classList.toggle('open');
         overlay.classList.toggle('show');
@@ -520,39 +506,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     overlay.addEventListener('click', closeMenu);
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            switchTab(link.dataset.tab);
+            var tabId = link.getAttribute('data-tab');
+            switchTab(tabId);
             closeMenu();
         });
     });
 
     // ========== PASTE BUTTONS + UNDO HANDLES ==========
-    const pasteTreino = document.getElementById('paste-treino');
-    const pasteDieta = document.getElementById('paste-dieta');
+    var pasteTreino = document.getElementById('paste-treino');
+    var pasteDieta = document.getElementById('paste-dieta');
 
-    // Função para simular o paste
     function simulatePaste(buttonEl, targetTextareaId) {
-      const txtOutput = document.getElementById('prompt-output').textContent || '';
-      const target = document.getElementById(targetTextareaId);
-      const label = buttonEl.querySelector('.label');
+      var txtOutput = document.getElementById('prompt-output').textContent || '';
+      var target = document.getElementById(targetTextareaId);
+      var label = buttonEl.querySelector('.label');
 
       if (buttonEl.disabled) return;
 
-      // Efeito visual de entrada
       buttonEl.classList.remove('appearing');
       void buttonEl.offsetWidth;
       buttonEl.classList.add('appearing');
 
-      // Cola o conteúdo
       if (txtOutput.trim() && target) {
         target.value = txtOutput;
       } else if (target) {
         target.value = '[Sem conteúdo gerado]';
       }
 
-      // Atualiza visual
       if (label) label.textContent = 'Formulário pronto ✓';
       buttonEl.classList.add('pasted', 'done');
       buttonEl.setAttribute('aria-pressed', 'true');
@@ -560,10 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
       buttonEl.setAttribute('aria-disabled', 'true');
     }
 
-    // Função para desfazer o paste
     function undoPaste(buttonEl, targetTextareaId) {
-      const target = document.getElementById(targetTextareaId);
-      const label = buttonEl.querySelector('.label');
+      var target = document.getElementById(targetTextareaId);
+      var label = buttonEl.querySelector('.label');
 
       if (target) target.value = '';
       if (label) label.textContent = 'Colar plano';
@@ -573,66 +555,58 @@ document.addEventListener('DOMContentLoaded', () => {
       buttonEl.removeAttribute('aria-disabled');
       buttonEl.setAttribute('aria-pressed', 'false');
       
-      // Efeito jelly no botão
       buttonEl.classList.add('jelly-release');
-      setTimeout(() => buttonEl.classList.remove('jelly-release'), 700);
+      setTimeout(function() {
+        buttonEl.classList.remove('jelly-release');
+      }, 700);
       
-      // Reseta transforms
       buttonEl.style.transform = '';
-      const hole = buttonEl.querySelector('.hole');
+      var hole = buttonEl.querySelector('.hole');
       if (hole) hole.style.transform = '';
     }
 
-    // Criar handle puxável para cada botão
     function attachPullHandle(buttonEl, targetTextareaId) {
-      const wrapper = buttonEl.closest('.paste-wrapper');
+      var wrapper = buttonEl.closest('.paste-wrapper');
       if (!wrapper) return;
 
-      const handle = document.createElement('div');
+      var handle = document.createElement('div');
       handle.className = 'pull-handle';
       handle.setAttribute('role', 'button');
       handle.setAttribute('aria-label', 'Puxe para desfazer o colar');
       handle.tabIndex = 0;
 
-      // Posiciona o wrapper como relative
       wrapper.style.position = 'relative';
-      
-      // Insere ANTES do botão para ficar atrás (z-index menor)
       wrapper.insertBefore(handle, buttonEl);
 
-      let active = false;
-      let startX = 0;
-      let currentX = 0;
-      const THRESHOLD = -50; // px para ativar undo
-      const MIN_DRAG = -140;
-      const MAX_DRAG = 20;
+      var active = false;
+      var startX = 0;
+      var currentX = 0;
+      var THRESHOLD = -50;
+      var MIN_DRAG = -140;
+      var MAX_DRAG = 20;
 
       function setTransforms(dx) {
         dx = Math.max(MIN_DRAG, Math.min(MAX_DRAG, dx));
         
-        // Escala elástica no handle
-        const scaleX = 1 + Math.min(1.4, Math.abs(dx) / 80);
-        handle.style.transform = `translate(${dx}px, -50%) scaleX(${scaleX.toFixed(3)})`;
+        var scaleX = 1 + Math.min(1.4, Math.abs(dx) / 80);
+        handle.style.transform = 'translate(' + dx + 'px, -50%) scaleX(' + scaleX.toFixed(3) + ')';
         
-        // Move o botão sutilmente junto
-        const btnDx = Math.round(dx * 0.25);
-        buttonEl.style.transform = `translateX(${btnDx}px)`;
+        var btnDx = Math.round(dx * 0.25);
+        buttonEl.style.transform = 'translateX(' + btnDx + 'px)';
         
-        // Move o hole interno também
-        const hole = buttonEl.querySelector('.hole');
+        var hole = buttonEl.querySelector('.hole');
         if (hole) {
-          const holeShift = Math.round(btnDx * -0.5);
-          const holeScale = 1 + Math.min(0.15, Math.abs(dx) / 250);
-          hole.style.transform = `translateX(${holeShift}px) scale(${holeScale.toFixed(3)})`;
+          var holeShift = Math.round(btnDx * -0.5);
+          var holeScale = 1 + Math.min(0.15, Math.abs(dx) / 250);
+          hole.style.transform = 'translateX(' + holeShift + 'px) scale(' + holeScale.toFixed(3) + ')';
         }
       }
 
       function pointerDown(e) {
-        // Se o botão não está disabled/done, apenas faz feedback visual
         if (!(buttonEl.disabled || buttonEl.classList.contains('done'))) {
           handle.classList.add('dragging');
           handle.classList.add('jelly-release');
-          setTimeout(() => {
+          setTimeout(function() {
             handle.classList.remove('jelly-release');
             handle.classList.remove('dragging');
           }, 320);
@@ -653,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
       function pointerMove(e) {
         if (!active) return;
         currentX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || currentX;
-        let dx = currentX - startX;
+        var dx = currentX - startX;
         dx = Math.max(MIN_DRAG, Math.min(MAX_DRAG, dx));
         setTransforms(dx);
       }
@@ -663,73 +637,72 @@ document.addEventListener('DOMContentLoaded', () => {
         active = false;
         handle.classList.remove('dragging');
 
-        const dx = currentX - startX;
+        var dx = currentX - startX;
 
         if (dx < THRESHOLD) {
-          // Animação de "snap" para o undo
           handle.style.transition = 'transform 320ms cubic-bezier(.2, .9, .2, 1)';
-          handle.style.transform = `translate(${MIN_DRAG - 20}px, -50%) scaleX(1.1)`;
+          handle.style.transform = 'translate(' + (MIN_DRAG - 20) + 'px, -50%) scaleX(1.1)';
           
-          setTimeout(() => {
+          setTimeout(function() {
             undoPaste(buttonEl, targetTextareaId);
             
-            // Volta com efeito jelly
             handle.style.transition = 'transform 600ms cubic-bezier(.2, .9, .2, 1)';
             handle.classList.add('jelly-release');
             handle.style.transform = 'translate(0, -50%) scaleX(1)';
             
-            setTimeout(() => {
+            setTimeout(function() {
               handle.classList.remove('jelly-release');
               handle.style.transition = '';
             }, 650);
           }, 180);
         } else {
-          // Volta ao normal
           handle.style.transition = 'transform 420ms cubic-bezier(.2, .9, .2, 1)';
           handle.style.transform = 'translate(0, -50%) scaleX(1)';
           
           buttonEl.style.transition = 'transform 420ms cubic-bezier(.2, .9, .2, 1)';
           buttonEl.style.transform = 'translateX(0)';
           
-          const hole = buttonEl.querySelector('.hole');
+          var hole = buttonEl.querySelector('.hole');
           if (hole) hole.style.transform = '';
           
-          setTimeout(() => {
+          setTimeout(function() {
             handle.style.transition = '';
             buttonEl.style.transition = '';
           }, 430);
         }
       }
 
-      // Event listeners
       handle.addEventListener('pointerdown', pointerDown);
       window.addEventListener('pointermove', pointerMove);
       window.addEventListener('pointerup', pointerUp);
       
-      // Suporte a touch
       handle.addEventListener('touchstart', pointerDown, { passive: false });
       window.addEventListener('touchmove', pointerMove, { passive: false });
       window.addEventListener('touchend', pointerUp);
 
-      // Suporte a teclado (Enter/Space para desfazer quando disabled)
-      handle.addEventListener('keydown', (ev) => {
+      handle.addEventListener('keydown', function(ev) {
         if ((ev.key === 'Enter' || ev.key === ' ') && (buttonEl.disabled || buttonEl.classList.contains('done'))) {
           ev.preventDefault();
           handle.classList.add('jelly-release');
-          setTimeout(() => handle.classList.remove('jelly-release'), 650);
+          setTimeout(function() {
+            handle.classList.remove('jelly-release');
+          }, 650);
           undoPaste(buttonEl, targetTextareaId);
         }
       });
     }
 
-    // Event listeners dos botões paste
     if (pasteTreino) {
-      pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino'));
+      pasteTreino.addEventListener('click', function() {
+        simulatePaste(pasteTreino, 'objetivo_treino');
+      });
       attachPullHandle(pasteTreino, 'objetivo_treino');
     }
     
     if (pasteDieta) {
-      pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
+      pasteDieta.addEventListener('click', function() {
+        simulatePaste(pasteDieta, 'objetivo_dieta');
+      });
       attachPullHandle(pasteDieta, 'objetivo_dieta');
     }
 });
