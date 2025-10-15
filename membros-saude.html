@@ -500,10 +500,10 @@
     // ====== CONFIGURAÇÃO SUPABASE & EDGE FUNCTION ======
     const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
-    
-    // ATUALIZADO: URL da Edge Function foi trocada conforme solicitado.
-    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action"; 
-    
+
+    // ==== AQUI está o novo URL da Edge Function que você mandou ====
+    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/hyper-endpoint";
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- FUNÇÕES DE LÓGICA (mantidas do código original) ---
@@ -666,7 +666,6 @@
           }
         });
         // --- FIM: LÓGICA DO NOVO CHATBOT ---
-
 
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
