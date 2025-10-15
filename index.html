@@ -1,55 +1,83 @@
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8">
-  <title>Carregando...</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-  </style>
-</head>
-<body>
-  <p>Carregando sua área de membros...</p>
+<script type="module">
+    // Importa o cliente Supabase do CDN recomendado
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    // ====== CONFIGURAÇÃO CORRIGIDA ======
-    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
+    // ... (toda a sua configuração e funções auxiliares como getEaster, calculateEndDate, etc. continuam aqui, sem alterações) ...
+    // ====== CONFIGURAÇÃO SUPABASE & EDGE FUNCTION ======
+    const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIJWTJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
+    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action"; 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ===================================
 
-    (async function checkSessionAndRedirect() {
-      const { data: { session } } = await supabase.auth.getSession();
+    // --- FUNÇÕES DE LÓGICA (mantidas do código original) ---
+    // (cole aqui todas as suas funções: getEaster, calculateEndDate, displayProgress, analyzeGoal, reorderVideos, etc.)
 
-      if (!session) {
-        window.location.replace('/login.html');
-        return;
-      }
 
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('niche')
-        .eq('id', session.user.id)
-        .single();
+    // --- LÓGICA PRINCIPAL ---
+    document.addEventListener('DOMContentLoaded', () => {
 
-      if (error || !profile) {
-        await supabase.auth.signOut();
-        window.location.replace('/login.html');
-        return;
-      }
+        // --- INÍCIO DA MUDANÇA CRÍTICA ---
+        // O CÓDIGO ANTIGO TENTAVA VERIFICAR O USUÁRIO DIRETAMENTE.
+        // O CÓDIGO NOVO ESCUTA ATIVAMENTE POR MUDANÇAS DE LOGIN.
 
-      if (profile.niche === 'saude') {
-        window.location.replace('/membros-saude.html');
-      } else if (profile.niche === 'estudos') {
-        // Futuramente, redirecionar para 'membros-estudos.html'
-        window.location.replace('/login.html'); 
-      } else {
-        window.location.replace('/login.html');
-      }
-    })();
-  </script>
-</body>
-</html>
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Estado da autenticação mudou:', event);
 
+            if (session && session.user) {
+                // ESTADO: USUÁRIO LOGADO!
+                // A sessão é válida, então podemos carregar os dados da página.
+                initializePageData(session.user);
+            } else {
+                // ESTADO: USUÁRIO NÃO LOGADO!
+                // Não há sessão válida, redireciona para a página de login.
+                console.log('Nenhum usuário logado, redirecionando para /login.html');
+                window.location.replace('/login.html');
+            }
+        });
+        
+        // A função initializePageData agora recebe o usuário como parâmetro
+        // e não precisa mais buscá-lo.
+        async function initializePageData(user) {
+            
+            // O restante do seu código que estava dentro do DOMContentLoaded vem para cá.
+            // A diferença é que agora temos 100% de certeza que o 'user' existe.
+            
+            const menuToggle = document.getElementById('menu-toggle');
+            // ... (declare todas as suas outras constantes: sidebar, overlay, navLinks, etc.)
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const configBtn = document.getElementById('config-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
+
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            if (error || !profile) {
+                console.error('Erro ao buscar perfil:', error);
+                // Opcional: em vez de deslogar, você pode mostrar uma mensagem de erro.
+                // await supabase.auth.signOut();
+                // window.location.replace('/login.html');
+                return;
+            }
+
+            // ... (todo o resto do seu código de manipulação de formulário, chat, etc., continua aqui)
+            // A lógica do chat, menus, forms, etc., que já funcionava, permanece a mesma.
+            // Apenas certifique-se de que ela esteja DENTRO desta função 'initializePageData'.
+
+            // Exemplo:
+            loadChatHistory(); // Chamada para a função do chat
+            
+            // ... (Restante do código do addEventListener de forms, botões, etc.)
+        }
+        
+        // --- FIM DA MUDANÇA CRÍTICA ---
+
+    });
+
+    // ... (cole aqui as declarações das suas funções: loadChatHistory, sendMessage, addMessage, etc)
+    // Elas podem ficar fora do 'DOMContentLoaded', mas a chamada inicial (como loadChatHistory)
+    // deve estar dentro de 'initializePageData'.
+
+</script>
