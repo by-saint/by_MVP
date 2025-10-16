@@ -426,7 +426,7 @@
                         <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
                         <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
                         <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-                        </div>
+                    </div>
              </div>
         </div>
     </div>
@@ -619,25 +619,36 @@
                 document.getElementById('form-wrapper').style.display = 'block';
             }
 
-            // ---- INÍCIO DA MODIFICAÇÃO PARA O CHAT DIFY ----
-            // O código antigo que usava 'conversation_id' foi removido.
-            // Este novo código cria um chat novo e descartável a cada carregamento da página.
-            const difyContainer = document.getElementById('dify-container');
-            if (difyContainer) {
+            // ---- INÍCIO DA IMPLEMENTAÇÃO AGRESSIVA DO CHAT ----
+            // Esta função garante que um chat 100% novo e isolado seja criado a cada carregamento.
+            function loadFreshDifyChat() {
+                const difyContainer = document.getElementById('dify-container');
+                if (!difyContainer) return; // Se o container não existir, não faz nada.
+
+                // 1. Destruir: Limpa completamente qualquer conteúdo antigo no container (remove o iframe antigo).
+                difyContainer.innerHTML = '';
+
+                // 2. Criar: Cria um elemento iframe totalmente novo na memória.
                 const iframe = document.createElement('iframe');
-                
-                // A URL agora usa /chat/ e um parâmetro 'user' aleatório para isolar a sessão.
-                const randomSessionId = Math.random().toString(36).substring(2);
-                iframe.src = `https://udify.app/chat/${DIFY_APP_TOKEN}?user=${randomSessionId}`;
-                
-                iframe.style.cssText = 'width:100%;height:100%;border:none;';
+
+                // 3. Gerar ID Único: Cria uma ID de sessão aleatória para garantir que a conversa seja única.
+                const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+                const difyUrl = `https://udify.app/chat/${DIFY_APP_TOKEN}?user=${randomSessionId}`;
+
+                // 4. Configurar: Aplica as configurações necessárias ao novo iframe.
+                iframe.src = difyUrl;
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
                 iframe.allow = 'microphone';
-                
-                // Limpa o container (caso algo exista) e adiciona o novo iframe.
-                difyContainer.innerHTML = ''; 
+
+                // 5. Reconstruir: Adiciona o iframe recém-criado e limpo à página.
                 difyContainer.appendChild(iframe);
             }
-            // ---- FIM DA MODIFICAÇÃO PARA O CHAT DIFY ----
+
+            // Chama a função para carregar o chat assim que os dados da página são inicializados.
+            loadFreshDifyChat();
+            // ---- FIM DA IMPLEMENTAÇÃO AGRESSIVA DO CHAT ----
             
             const objetivoInput = document.getElementById('objetivo');
             if (objetivoInput) {
