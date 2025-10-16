@@ -343,7 +343,6 @@
 </head>
 <body>
 
-<!-- Elementos do Menu -->
 <button class="menu-toggle" id="menu-toggle">
     <span class="bar"></span>
     <span class="bar"></span>
@@ -363,80 +362,75 @@
             <span>⚙️</span>
             <span>Configurações</span>
         </button>
-        <!-- BOTÕES DE AÇÃO ESCONDIDOS -->
         <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
         <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
     </div>
 </div>
 
 <div class="overlay" id="overlay"></div>
-<!-- Fim dos Elementos do Menu -->
-
 <div class="container">
     <div class="header">
         <p id="welcome-msg">A carregar...</p>
     </div>
 
-    <!-- Conteúdo IA -->
     <div id="ia-planejamento" class="tab-content active">
         <div class="form-wrapper" id="form-wrapper" style="display: none;">
               <div class="form-container">
-                  <h1>Crie a sua Meta</h1>
-                  <form id="ia-fit-form">
-                      <div class="goal-section">
-                          <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
-                          <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea>
-                          <div id="prazo-group" class="form-group" style="margin-top: 20px; text-align: left; display: none;">
-                              <label for="prazo">Qual o prazo para esta meta?</label>
-                              <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required>
-                          </div>
-                      </div>
-                      <h3>Informações Básicas e Realidade Atual</h3>
-                      <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
-                      <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
-                      <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
-                      <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
-                      <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
-                      <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
-                      <div class="form-group">
-                          <label for="orcamento">Orçamento mensal para dieta (R$)</label>
-                          <input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required>
-                      </div>
-                      <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
-                      <div class="form-group" id="suplementos-detalhes-group" style="display: none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
-                      <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
-                      <button type="submit">Crie seu próprio caminho</button>
-                  </form>
+                    <h1>Crie a sua Meta</h1>
+                    <form id="ia-fit-form">
+                        <div class="goal-section">
+                            <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
+                            <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea>
+                            <div id="prazo-group" class="form-group" style="margin-top: 20px; text-align: left; display: none;">
+                                <label for="prazo">Qual o prazo para esta meta?</label>
+                                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required>
+                            </div>
+                        </div>
+                        <h3>Informações Básicas e Realidade Atual</h3>
+                        <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
+                        <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
+                        <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
+                        <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
+                        <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
+                        <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
+                        <div class="form-group">
+                            <label for="orcamento">Orçamento mensal para dieta (R$)</label>
+                            <input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required>
+                        </div>
+                        <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+                        <div class="form-group" id="suplementos-detalhes-group" style="display: none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
+                        <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
+                        <button type="submit">Crie seu próprio caminho</button>
+                    </form>
               </div>
         </div>
         <div class="results-wrapper" id="results-wrapper" style="display: none;">
              <div class="results-container">
-                  <h2>Seu Plano de Ação</h2>
-                  <pre id="prompt-output"></pre>
-                  <button id="copy-btn" class="copy-button">Copiar Pedido</button>
-                
-                  <h3>Comece sua Conversa com a IA</h3>
-                  <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
-                  <div id="dify-container" class="iframe-container"></div>
+                    <h2>Seu Plano de Ação</h2>
+                    <pre id="prompt-output"></pre>
+                    <button id="copy-btn" class="copy-button">Copiar Pedido</button>
+                  
+                    <h3>Comece sua Conversa com a IA</h3>
+                    <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 
-                  <div class="playlist-section" id="playlist-section" style="display: none;">
-                      <h4>Roteiro de Aulas Sugerido</h4>
-                      <p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
-                      <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
-                  </div>
-                
-                  <div class="progress-section">
-                      <h3>Sua Jornada</h3>
-                      <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
-                      <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
-                      <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-                      <!-- BOTÃO "DEFINIR NOVA META" FOI MOVIDO PARA O MENU LATERAL -->
-                  </div>
+                    <div id="dify-container" class="iframe-container"></div>
+
+                    <div class="playlist-section" id="playlist-section" style="display: none;">
+                        <h4>Roteiro de Aulas Sugerido</h4>
+                        <p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
+                        <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
+                    </div>
+                  
+                    <div class="progress-section">
+                        <h3>Sua Jornada</h3>
+                        <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
+                        <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
+                        <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
+                        </div>
              </div>
         </div>
     </div>
 
-    <!-- Conteúdo Videoaulas -->
     <div id="video-aulas" class="tab-content">
         <h2>Nossas Aulas</h2>
         <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
@@ -444,15 +438,12 @@
         <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
     </div>
 
-    <!-- Conteúdo da Nova Aba "Percurso" -->
     <div id="percurso" class="tab-content">
         <div class="percurso-container">
             <h2>Meu Percurso</h2>
             <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
 
-            <!-- Novos formulários de Treino e Dieta -->
             <div class="percurso-forms">
-              <!-- FORMULÁRIO TREINO -->
               <div class="percurso-card" id="treino-card">
                 <h4>Formulário: Treino</h4>
                 <div class="form-group">
@@ -472,7 +463,6 @@
                 </div>
               </div>
 
-              <!-- FORMULÁRIO DIETA -->
               <div class="percurso-card" id="dieta-card">
                 <h4>Formulário: Dieta</h4>
                 <div class="form-group">
@@ -629,19 +619,25 @@
                 document.getElementById('form-wrapper').style.display = 'block';
             }
 
+            // ---- INÍCIO DA MODIFICAÇÃO PARA O CHAT DIFY ----
+            // O código antigo que usava 'conversation_id' foi removido.
+            // Este novo código cria um chat novo e descartável a cada carregamento da página.
             const difyContainer = document.getElementById('dify-container');
-            if (difyContainer && profile.conversation_id) {
+            if (difyContainer) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://udify.app/chatbot/${DIFY_APP_TOKEN}`;
+                
+                // A URL agora usa /chat/ e um parâmetro 'user' aleatório para isolar a sessão.
+                const randomSessionId = Math.random().toString(36).substring(2);
+                iframe.src = `https://udify.app/chat/${DIFY_APP_TOKEN}?user=${randomSessionId}`;
+                
                 iframe.style.cssText = 'width:100%;height:100%;border:none;';
                 iframe.allow = 'microphone';
+                
+                // Limpa o container (caso algo exista) e adiciona o novo iframe.
+                difyContainer.innerHTML = ''; 
                 difyContainer.appendChild(iframe);
-                iframe.onload = () => {
-                  iframe.contentWindow.postMessage({
-                    type: 'dify-chatbot-set-system-variable', data: { conversation_id: profile.conversation_id }
-                  }, 'https://udify.app');
-                };
             }
+            // ---- FIM DA MODIFICAÇÃO PARA O CHAT DIFY ----
             
             const objetivoInput = document.getElementById('objetivo');
             if (objetivoInput) {
@@ -702,54 +698,39 @@
             }
 
             // ------------------- PASTE BUTTONS BEHAVIOR (Percurso) -------------------
-            // Agora: ao clicar, cola O CONTEÚDO COMPLETO DO #prompt-output, muda label para "Formulário pronto ✓" e desativa o botão.
             const pasteTreino = document.getElementById('paste-treino');
             const pasteDieta = document.getElementById('paste-dieta');
 
             function simulatePaste(buttonEl, targetTextareaId) {
-              const txtOutput = document.getElementById('prompt-output').textContent || '';
-              const target = document.getElementById(targetTextareaId);
-              const label = buttonEl.querySelector('.label');
-
-              // Se já estiver disabled, não faz nada (proteção)
-              if (buttonEl.disabled) return;
-
-              // pequeno efeito visual de entrada
-              buttonEl.classList.remove('appearing');
-              void buttonEl.offsetWidth;
-              buttonEl.classList.add('appearing');
-
-              // Se houver conteúdo, cola o conteúdo inteiro no campo destino
-              if (txtOutput.trim() && target) {
-                target.value = txtOutput;
-              } else if (target) {
-                // Se não houver conteúdo no prompt-output, insere placeholder explicativo
-                target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]';
-              }
-
-              // Atualiza visual do botão: texto, estado e estilo final
-              if (label) label.textContent = 'Formulário pronto ✓';
-              buttonEl.classList.add('pasted', 'done');
-              buttonEl.setAttribute('aria-pressed', 'true');
-
-              // Desativa o botão para evitar múltiplos cliques/desfazer
-              buttonEl.disabled = true;
-              buttonEl.setAttribute('aria-disabled', 'true');
-
-              // (Opcional) foco visual na área preenchida
-              if (target) {
-                try { target.focus(); } catch (e) {}
-              }
+                const txtOutput = document.getElementById('prompt-output').textContent || '';
+                const target = document.getElementById(targetTextareaId);
+                const label = buttonEl.querySelector('.label');
+                if (buttonEl.disabled) return;
+                buttonEl.classList.remove('appearing');
+                void buttonEl.offsetWidth;
+                buttonEl.classList.add('appearing');
+                if (txtOutput.trim() && target) {
+                    target.value = txtOutput;
+                } else if (target) {
+                    target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]';
+                }
+                if (label) label.textContent = 'Formulário pronto ✓';
+                buttonEl.classList.add('pasted', 'done');
+                buttonEl.setAttribute('aria-pressed', 'true');
+                buttonEl.disabled = true;
+                buttonEl.setAttribute('aria-disabled', 'true');
+                if (target) {
+                    try { target.focus(); } catch (e) {}
+                }
             }
 
             if (pasteTreino) {
-              pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino'));
+                pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino'));
             }
             if (pasteDieta) {
-              pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
+                pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
             }
             // ----------------------------------------------------------------------
-
         }
         initializePageData();
     });
