@@ -1,66 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Plataforma de IA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #121212; color: #E0E0E0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .auth-container { background-color: #1E1E1E; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; }
-        h1 { margin-bottom: 25px; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #BBBBBB; }
-        input { width: 100%; padding: 12px; background-color: #2C2C2C; border: 1px solid #444; border-radius: 8px; color: #E0E0E0; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
-        #error-msg { color: #ff4757; margin-top: 15px; font-weight: 600; min-height: 24px; }
-        .switch-form { margin-top: 20px; }
-        .switch-form a { color: #007BFF; text-decoration: none; font-weight: 600; }
-    </style>
+  <meta charset="utf-8">
+  <title>Criar Conta</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h1 { text-align: center; color: #333; }
+    label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+    input, select { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    .btn { background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px; }
+    .link { text-align: center; margin-top: 15px; }
+    .link a { color: #0b74de; text-decoration: none; }
+    #msg { color: red; margin-top: 10px; text-align: center; min-height: 18px; }
+  </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h1>Acessar Plataforma</h1>
-        <form id="login-form">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit">Entrar</button>
-        </form>
-        <p id="error-msg"></p>
-        <div class="switch-form">
-            <p>Não tem uma conta? <a href="/criar-conta.html">Crie agora</a></p>
-        </div>
+  <div class="container">
+    <h1>Crie sua Conta</h1>
+    <p style="text-align: center; font-size: 14px; color: #666;">Use o mesmo e-mail do checkout da Kiwify.</p>
+    <div id="signup-form">
+      <label for="su-email">Email</label>
+      <input id="su-email" type="email" placeholder="seu@email.com" />
+
+      <label for="su-password">Senha (mínimo 6 caracteres)</label>
+      <input id="su-password" type="password" />
+
+      <label for="su-niche">Escolha seu objetivo principal</label>
+      <select id="su-niche">
+        <option value="saude">Saúde e Estética</option>
+        <option value="estudos">Estudos e Performance</option>
+      </select>
+
+      <button id="signup-btn" class="btn">Cadastrar e Entrar</button>
+      <div id="msg"></div>
+      <div class="link">
+        <p>Já tem uma conta? <a href="/login.html">Entre aqui</a></p>
+      </div>
     </div>
+  </div>
 
-    <script type="module">
-        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-        const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        const loginForm = document.getElementById('login-form');
-        const errorMsg = document.getElementById('error-msg');
+    // ====== CONFIGURAÇÃO CORRIGIDA ======
+    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ===================================
 
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    const el = id => document.getElementById(id);
 
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
+    el('signup-btn').onclick = async () => {
+      el('msg').innerText = '';
+      const email = el('su-email').value.trim();
+      const password = el('su-password').value;
+      const niche = el('su-niche').value;
 
-            if (error) {
-                errorMsg.textContent = 'Email ou senha inválidos.';
-            } else {
-                // SUCESSO! REDIRECIONA PARA A PÁGINA DO NICHO.
-                window.location.replace('/index.html');
-            }
-        });
-    </script>
+      if (!email || !password || !niche) {
+        el('msg').innerText = 'Por favor, preencha todos os campos.';
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { niche: niche }
+        }
+      });
+      
+      if (error) {
+        el('msg').innerText = 'Erro: ' + error.message;
+        return;
+      }
+      
+      window.location.replace('/');
+    };
+  </script>
 </body>
 </html>
