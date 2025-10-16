@@ -243,7 +243,8 @@
         right: 15px;        /* Distância da direita */
         width: 150px;       /* Largura para cobrir o texto */
         height: 30px;       /* Altura para cobrir o texto */
-        background-color: #1E1E1E; /* COR DE FUNDO DO CONTAINER - AJUSTE SE NECESSÁRIO */
+        /* CORREÇÃO: Cor exata do fundo do chat para camuflagem perfeita. */
+        background-color: #26262B; 
         z-index: 99;        /* Garante que fique por cima do iframe */
     }
 
@@ -304,17 +305,15 @@
             
             // Lógica para mostrar o formulário ou os resultados
             if (profile.goal_end_date && profile.goal_prompt) {
-                // Se o usuário JÁ TEM uma meta, mostra a tela de resultados
                 displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
                 document.getElementById('prompt-output').textContent = profile.goal_prompt;
                 if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
             } else {
-                // Se o usuário NÃO TEM uma meta, mostra o formulário para criar uma
                 document.getElementById('form-wrapper').style.display = 'block';
                 document.getElementById('results-wrapper').style.display = 'none';
             }
 
-            // O chat é carregado independentemente, pronto para ser exibido quando necessário
+            // O chat é carregado uma vez, pronto para ser exibido.
             loadFreshDifyChat();
             
             // Resto da lógica...
@@ -325,7 +324,6 @@
             if(iaFitForm) {
                 iaFitForm.addEventListener('submit', async function(event) {
                     event.preventDefault();
-                    // Adiciona um feedback visual ao botão para o usuário saber que algo está acontecendo
                     const submitButton = this.querySelector('button[type="submit"]');
                     submitButton.textContent = 'A processar...';
                     submitButton.disabled = true;
@@ -358,7 +356,6 @@
                         submitButton.textContent = 'Crie seu próprio caminho';
                         submitButton.disabled = false;
                     } else {
-                        // Sucesso! Agora mostramos a tela de resultados
                         document.getElementById('prompt-output').textContent = initialMessage;
                         if(goalType) document.getElementById('playlist-section').style.display = 'block';
                         displayProgress(startDate, endDate);
@@ -380,7 +377,7 @@
             difyContainer.innerHTML = ''; // Destruir iframe antigo
             const iframe = document.createElement('iframe'); // Criar novo
             const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-            // URL Final e Corrigida
+            // URL Final com cache buster
             const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&v=${Date.now()}`;
             iframe.src = difyUrl;
             iframe.style.width = '100%';
