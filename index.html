@@ -1,290 +1,55 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <title>Plataforma de IA — Saúde & Estética</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <title>Carregando...</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    :root { --color-ia-specialist: #007BFF; --color-video-lessons: #8A2BE2; --color-journey: #DC143C; --journey-red-1: #ff2646; --journey-red-2: #be123c; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Poppins', sans-serif; background-color: #121212; color: #E0E0E0; margin: 0; padding: 40px 20px; visibility: hidden; }
-    .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-    h1, h2, h3 { color: #f0f0f0; text-align: center; margin-top: 30px; margin-bottom: 15px; }
-    .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; padding: 0; }
-    .menu-toggle .bar { width: 24px; height: 3px; background-color: #fff; border-radius: 2px; transition: all 0.3s ease-in-out; }
-    .menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
-    .menu-toggle.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-    .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #1E1E1E; transition: left 0.3s ease-in-out; z-index: 1000; border-right: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
-    .sidebar.open { left: 0; }
-    .sidebar nav { padding-top: 100px; }
-    .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar nav a { display: block; padding: 15px 30px; text-decoration: none; font-size: 1.1em; font-weight: 700; border-left: 5px solid transparent; transition: background-color 0.2s, border-left 0.2s; }
-    .sidebar nav a:hover { background-color: #2c2c2c; }
-    .link-ia, .link-aulas, .link-percurso { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); }
-    .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); }
-    .link-percurso { background-image: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); }
-    .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); }
-    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
-    .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
-    .sidebar-footer { padding: 20px 30px; text-align: center; }
-    .sidebar-config-btn { width: 100%; background: transparent; border: 1px solid #444; color: #aaa; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 0.95em; font-weight: 600; transition: all 0.2s ease-in-out; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .sidebar-config-btn:hover { background-color: #333; color: #fff; }
-    .sidebar-action-btn { width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 0.9em; font-weight: 600; transition: all 0.2s ease-in-out; margin-top: 10px; }
-    .sidebar-reset-btn { background-color: transparent; border: 1px solid var(--color-ia-specialist); color: var(--color-ia-specialist); }
-    .sidebar-logout-btn { background-color: #be123c; border: 1px solid #be123c; color: #fff; }
-    .hidden { display: none; }
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
-    .overlay.show { opacity: 1; visibility: visible; }
-    .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; }
-    #welcome-msg { color: #bbb; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .form-wrapper, .results-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
-    .form-container, .results-container, .percurso-container { background-color: #1E1E1E; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid #333; }
-    .form-group { margin-bottom: 25px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #BBBBBB; }
-    input, select, textarea { width: 100%; padding: 12px; background-color: #2C2C2C; border: 1px solid #444; border-radius: 8px; color: #E0E0E0; font-size: 16px; box-sizing: border-box; }
-    textarea { resize: vertical; min-height: 100px; }
-    .goal-section { background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border: 1px solid #444; padding: 30px; margin-bottom: 40px; border-radius: 10px; text-align: center; }
-    .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
-    #prompt-output { background-color: #2c2c2c; border: 1px solid #444; padding: 20px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; border-radius: 8px; }
-    .copy-button { display: block; width: 200px; margin: 20px auto 0 auto; padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 8px; cursor: pointer; }
-    .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
-    .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
-    .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
-    .progress-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px; }
-    .countdown-container { text-align: center; margin-top: 20px; }
-    .countdown-days { font-size: 4rem; font-weight: 700; color: #fff; line-height: 1; }
-    .countdown-label { font-size: 1rem; color: #aaa; }
-    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 25px; border-radius: 12px; }
-    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
   </style>
 </head>
 <body>
+  <p>Carregando sua área de membros...</p>
 
-<button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-<div class="sidebar" id="sidebar">
-    <nav>
-        <ul>
-            <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
-            <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
-            <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
-        </ul>
-    </nav>
-    <div class="sidebar-footer">
-        <button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button>
-        <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
-        <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
-    </div>
-</div>
-<div class="overlay" id="overlay"></div>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-<div class="container">
-    <div class="header"><p id="welcome-msg">A carregar...</p></div>
-
-    <div id="ia-planejamento" class="tab-content active">
-        <div class="form-wrapper" id="form-wrapper" style="display: none;">
-            <div class="form-container">
-                <h1>Crie a sua Meta</h1>
-                <form id="ia-fit-form">
-                    <div class="goal-section"><h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2><textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea><div id="prazo-group" class="form-group" style="margin-top:20px;text-align:left;display:none;"><label for="prazo">Qual o prazo para esta meta?</label><input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required></div></div>
-                    <h3>Informações Básicas e Realidade Atual</h3>
-                    <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
-                    <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
-                    <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
-                    <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
-                    <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
-                    <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
-                    <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
-                    <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
-                    <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
-                    <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
-                    <button type="submit">Crie seu próprio caminho</button>
-                </form>
-            </div>
-        </div>
-        <div class="results-wrapper" id="results-wrapper" style="display: none;">
-            <div class="results-container">
-                <h2>Seu Plano de Ação</h2>
-                <pre id="prompt-output"></pre>
-                <button id="copy-btn" class="copy-button">Copiar Pedido</button>
-                <h3>Converse com a IA</h3>
-                <p style="text-align:center;margin-top:-10px;margin-bottom:20px;color:#bbb;">Use o chat abaixo para tirar dúvidas e pedir seu plano personalizado.</p>
-                <div id="chatbox" style="background:#1E1E1E;border:1px solid #333;border-radius:12px;padding:20px;margin-top:20px;max-width:700px;margin-inline:auto;">
-                    <div id="chat-messages" style="height:400px;overflow-y:auto;padding:10px;background:#121212;border-radius:8px;margin-bottom:10px;border:1px solid #2c2c2c;"></div>
-                    <div style="display:flex;gap:10px;">
-                        <input id="chat-input" type="text" placeholder="Digite sua mensagem..." style="flex:1;padding:12px;background:#333;border:1px solid #555;border-radius:8px;color:#fff;" disabled>
-                        <button id="send-chat-btn" style="padding:12px 20px;background:#007BFF;color:white;border:none;border-radius:8px;cursor:pointer;opacity:0.5;" disabled>Enviar</button>
-                    </div>
-                </div>
-                <div class="progress-section">
-                    <h3>Sua Jornada</h3>
-                    <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
-                    <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
-                    <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="video-aulas" class="tab-content">
-        <h2>Nossas Aulas</h2>
-        <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
-        <div id="video-block-2"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen></iframe></div></div>
-        <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
-    </div>
-    <div id="percurso" class="tab-content">
-        <div class="percurso-container"><h2>Meu Percurso</h2><p style="text-align:center;color:#bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p></div>
-    </div>
-</div>
-
-<script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
+    // ====== CONFIGURAÇÃO CORRIGIDA ======
+    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action";
+    // ===================================
 
-    async function checkAuthAndRunApp() {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            window.location.replace('/login.html');
-        } else {
-            document.body.style.visibility = 'visible';
-            runApp(session.user);
-        }
-    }
+    (async function checkSessionAndRedirect() {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    function runApp(user) {
-        // --- FUNÇÕES AUXILIARES ---
-        function calculateEndDate(prazoText) {
-            const now = new Date(); let p = prazoText.toLowerCase();
-            let match = p.match(/(\d+)\s+mes(es)?/);
-            if (match) { let d = new Date(); d.setMonth(d.getMonth() + parseInt(match[1], 10)); return d; }
-            if (p.includes('verao') || p.includes('verão')) return new Date(now.getFullYear(), 11, 21);
-            return null;
-        }
-        function displayProgress(startDate, endDate) {
-            const sDate = new Date(startDate), eDate = new Date(endDate), now = new Date();
-            const totalDur = eDate.getTime() - sDate.getTime(), elapsedDur = now.getTime() - sDate.getTime();
-            let progress = Math.min(100, Math.max(0, (elapsedDur / totalDur) * 100));
-            const daysRemaining = Math.ceil((eDate - now) / (1000 * 60 * 60 * 24));
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
-            document.getElementById('end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
-            document.getElementById('countdown-days').textContent = daysRemaining >= 0 ? daysRemaining : 0;
-        }
+      if (!session) {
+        window.location.replace('/login.html');
+        return;
+      }
 
-        // --- LÓGICA DO CHAT ---
-        const chatMessages = document.getElementById("chat-messages");
-        const chatInput = document.getElementById("chat-input");
-        const sendChatBtn = document.getElementById("send-chat-btn");
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('niche')
+        .eq('id', session.user.id)
+        .single();
 
-        function addMessage(text, sender = "bot") {
-            const msg = document.createElement("div"); msg.textContent = text;
-            Object.assign(msg.style, { margin: "8px 0", padding: "10px 14px", borderRadius: "10px", maxWidth: "85%", alignSelf: sender === "user" ? "flex-end" : "flex-start", background: sender === "user" ? "#007BFF" : "#333", color: "#fff" });
-            if (chatMessages) { chatMessages.appendChild(msg); chatMessages.scrollTop = chatMessages.scrollHeight; }
-        }
-        async function loadChatHistory() {
-            const { data: { session } } = await supabase.auth.getSession(); if (!session) return;
-            chatInput.disabled = false; sendChatBtn.disabled = false; sendChatBtn.style.opacity = '1';
-            try {
-                const res = await fetch(EDGE_URL, { headers: { "Authorization": `Bearer ${session.access_token}` } });
-                if(!res.ok) throw new Error("Falha na rede");
-                const result = await res.json();
-                if (chatMessages) chatMessages.innerHTML = '';
-                if (result.history && result.history.length > 0) {
-                    result.history.forEach(m => addMessage(m.text, m.sender));
-                } else { addMessage("Olá! Como posso te ajudar?", "bot"); }
-            } catch (e) { console.error(e); addMessage("Erro ao carregar histórico.", "bot"); }
-        }
-        async function sendMessage() {
-            const text = chatInput.value.trim(); if (!text) return; addMessage(text, "user"); chatInput.value = ""; sendChatBtn.disabled = true;
-            const { data: { session } } = await supabase.auth.getSession(); if (!session) return;
-            try {
-                const res = await fetch(EDGE_URL, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` }, body: JSON.stringify({ message: text }) });
-                if(!res.ok) throw new Error("Falha no envio");
-                const result = await res.json(); addMessage(result.answer || "...", "bot");
-            } catch (e) { console.error(e); addMessage("Erro ao enviar mensagem.", "bot"); }
-            finally { sendChatBtn.disabled = false; }
-        }
+      if (error || !profile) {
+        await supabase.auth.signOut();
+        window.location.replace('/login.html');
+        return;
+      }
 
-        // --- INICIALIZAÇÃO E EVENT LISTENERS ---
-        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-
-        supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data: profile, error }) => {
-            if (error || !profile) { document.getElementById('form-wrapper').style.display = 'block'; return; }
-            if (profile.goal_end_date) {
-                document.getElementById('form-wrapper').style.display = 'none';
-                document.getElementById('results-wrapper').style.display = 'block';
-                document.getElementById('prompt-output').textContent = profile.goal_prompt;
-                displayProgress(profile.goal_start_date, profile.goal_end_date);
-            } else {
-                document.getElementById('form-wrapper').style.display = 'block';
-                document.getElementById('results-wrapper').style.display = 'none';
-            }
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', async () => { await supabase.auth.signOut(); });
-        supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') { window.location.replace('/login.html'); } });
-        
-        sendChatBtn.addEventListener("click", sendMessage);
-        chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") {e.preventDefault(); sendMessage();} });
-
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const navLinks = document.querySelectorAll('.nav-link');
-        
-        const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
-        menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
-        overlay.addEventListener('click', closeMenu);
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tabId = link.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                document.getElementById(tabId).classList.add('active');
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                closeMenu();
-            });
-        });
-        
-        document.getElementById('config-btn').addEventListener('click', () => {
-            document.getElementById('reset-btn').classList.toggle('hidden');
-            document.getElementById('logout-btn').classList.toggle('hidden');
-        });
-        
-        document.getElementById('reset-btn').addEventListener('click', async () => {
-            if (!user) return;
-            const { error } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null }).eq('id', user.id);
-            if (error) { alert("Erro ao resetar a meta."); } else { window.location.reload(); }
-        });
-
-        document.getElementById('ia-fit-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const prazoText = formData.get('prazo');
-            const endDate = calculateEndDate(prazoText);
-            if (!endDate) { alert("Prazo inválido."); return; }
-            const prompt = `**GERAR PLANO...`; // Prompt simplificado
-            const updates = { goal_prompt: prompt, goal_start_date: new Date().toISOString(), goal_end_date: endDate.toISOString() };
-            const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
-            if (error) { alert("Erro ao salvar meta."); } else { window.location.reload(); }
-        });
-
-        loadChatHistory();
-    }
-
-    checkAuthAndRunApp();
-</script>
+      if (profile.niche === 'saude') {
+        window.location.replace('/membros-saude.html');
+      } else if (profile.niche === 'estudos') {
+        // Futuramente, redirecionar para 'membros-estudos.html'
+        window.location.replace('/login.html'); 
+      } else {
+        window.location.replace('/login.html');
+      }
+    })();
+  </script>
 </body>
 </html>
+
