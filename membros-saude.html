@@ -506,6 +506,9 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // --- ADICIONE ESTA LINHA: header que usaremos para chamar a função (anon key) ---
+    const AUTH_HEADER = `Bearer ${SUPABASE_ANON_KEY}`;
+
     // --- FUNÇÕES DE LÓGICA (mantidas do código original) ---
     function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
     function calculateEndDate(prazoText) {
@@ -582,7 +585,7 @@
           chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // 3. Função para carregar o histórico de conversas
+        // --- SUBSTITUIÇÃO: função para carregar o histórico de conversas
         async function loadChatHistory() {
           const { data: { session } } = await supabase.auth.getSession();
           if (!session) {
@@ -597,19 +600,27 @@
 
           try {
             const res = await fetch(EDGE_URL, {
-              headers: { "Authorization": `Bearer ${session.access_token}` }
+              method: 'GET',
+              headers: {
+                "Authorization": AUTH_HEADER,            // usamos a anon key para chamar a função
+                "apikey": SUPABASE_ANON_KEY,            // redundante mas útil para certas validações
+                "Content-Type": "application/json"
+              }
             });
 
-            if (!res.ok) throw new Error(`Erro na requisição: ${res.statusText}`);
+            if (!res.ok) {
+              const bodyText = await res.text();
+              console.error('EDGE FUNCTION (load) ERROR', res.status, res.statusText, bodyText);
+              addMessage(`❌ Erro ao carregar histórico (${res.status}). Veja console para detalhes.`, "bot");
+              return;
+            }
 
             const result = await res.json();
-            // Limpa mensagens antigas antes de carregar o histórico
             chatMessages.innerHTML = '';
-            // Renderiza o histórico (se existir)
             if (result.history && result.history.length > 0) {
-                result.history.forEach(msg => addMessage(msg.text, msg.sender));
+              result.history.forEach(msg => addMessage(msg.text, msg.sender));
             } else {
-                addMessage("Olá! Como posso te ajudar a atingir sua meta hoje?", "bot");
+              addMessage("Olá! Como posso te ajudar a atingir sua meta hoje?", "bot");
             }
           } catch (error) {
             console.error("Falha ao carregar histórico:", error);
@@ -617,14 +628,14 @@
           }
         }
 
-        // 4. Função para enviar uma nova mensagem
+        // --- SUBSTITUIÇÃO: função para enviar uma nova mensagem
         async function sendMessage() {
           const text = chatInput.value.trim();
           if (!text) return;
 
           addMessage(text, "user");
           chatInput.value = "";
-          sendChatBtn.disabled = true; // Desabilita enquanto espera a resposta
+          sendChatBtn.disabled = true;
           sendChatBtn.textContent = '...';
 
           const { data: { session } } = await supabase.auth.getSession();
@@ -638,12 +649,18 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${session.access_token}`
+                "Authorization": AUTH_HEADER,            // usamos a anon key para chamar a função
+                "apikey": SUPABASE_ANON_KEY
               },
               body: JSON.stringify({ message: text })
             });
 
-            if (!res.ok) throw new Error(`Erro na requisição: ${res.statusText}`);
+            if (!res.ok) {
+              const bodyText = await res.text();
+              console.error('EDGE FUNCTION (send) ERROR', res.status, res.statusText, bodyText);
+              addMessage(`❌ Erro ao enviar mensagem (${res.status}). Veja console para detalhes.`, "bot");
+              return;
+            }
 
             const result = await res.json();
             addMessage(result.answer || "Não recebi uma resposta válida.", "bot");
@@ -652,7 +669,7 @@
             console.error("Falha ao enviar mensagem:", error);
             addMessage("❌ Erro ao enviar mensagem. Verifique sua conexão.", "bot");
           } finally {
-            sendChatBtn.disabled = false; // Reabilita o botão
+            sendChatBtn.disabled = false;
             sendChatBtn.textContent = 'Enviar';
           }
         }
@@ -835,10 +852,10 @@
             }
 
             if (pasteTreino) {
-              pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino'));
+              pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino'));
             }
             if (pasteDieta) {
-              pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
+              pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta'));
             }
         }
         
