@@ -103,7 +103,7 @@
     .link-percurso { background-image: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); }
     
     .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); }
-    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-ia-specialist); } /* Corrigido para a cor de IA */
+    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
     .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
 
     /* ESTILOS ATUALIZADOS PARA O RODAPÉ DO MENU */
@@ -232,28 +232,20 @@
     .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
     /* ======================================================= */
-    /* CÓDIGO PARA ESCONDER E SUBSTITUIR A MARCA D'ÁGUA DO DIFY */
+    /* CÓDIGO PARA ESCONDER A MARCA D'ÁGUA DO DIFY (USE COM CAUTELA) */
     /* ======================================================= */
     .dify-wrapper {
         position: relative; /* Essencial para posicionar o "adesivo" dentro dele */
     }
     .dify-brand-cover {
         position: absolute; /* Permite posicionar livremente sobre o iframe */
-        top: 15px;         /* Distância do topo (ajuste se a logo estiver em outro lugar) */
-        right: 15px;        /* Distância da direita (ajuste se a logo estiver em outro lugar) */
-        width: 150px;       /* Largura para cobrir a logo e mostrar o texto */
-        height: 30px;       /* Altura para cobrir a logo e mostrar o texto */
-        background-color: #26262B; /* Cor exata do fundo do chat para camuflagem perfeita */
-        color: #E0E0E0;     /* Cor do texto "YourMVP" */
-        font-family: 'Poppins', sans-serif; /* A mesma fonte do seu site */
-        font-size: 14px;    /* Tamanho do texto */
-        font-weight: 600;   /* Peso da fonte para visibilidade */
-        border-radius: 5px; /* Bordas levemente arredondadas, se desejar */
-        display: flex;      /* Para centralizar o texto */
-        align-items: center; /* Centraliza verticalmente */
-        justify-content: center; /* Centraliza horizontalmente */
+        top: 15px;         /* Distância do topo */
+        right: 15px;        /* Distância da direita */
+        width: 150px;       /* Largura para cobrir o texto */
+        height: 30px;       /* Altura para cobrir o texto */
+        /* CORREÇÃO: Cor exata do fundo do chat para camuflagem perfeita. */
+        background-color: #26262B; 
         z-index: 99;        /* Garante que fique por cima do iframe */
-        pointer-events: none; /* Impede que ele bloqueie interações com o iframe por baixo */
     }
 
   </style>
@@ -267,7 +259,7 @@
 <div id="ia-planejamento" class="tab-content active"><div class="form-wrapper" id="form-wrapper" style="display: none;"><div class="form-container"><h1>Crie a sua Meta</h1><form id="ia-fit-form"><div class="goal-section"><h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2><textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea><div id="prazo-group" class="form-group" style="margin-top: 20px; text-align: left; display: none;"><label for="prazo">Qual o prazo para esta meta?</label><input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required></div></div><h3>Informações Básicas e Realidade Atual</h3><div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div><div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div><div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div><div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div><div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div><div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div><div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div><div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div><div class="form-group" id="suplementos-detalhes-group" style="display: none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div><div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div><button type="submit">Crie seu próprio caminho</button></form></div></div><div class="results-wrapper" id="results-wrapper" style="display: none;"><div class="results-container"><h2>Seu Plano de Ação</h2><pre id="prompt-output"></pre><button id="copy-btn" class="copy-button">Copiar Pedido</button><h3>Comece sua Conversa com a IA</h3><p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 <div class="iframe-container dify-wrapper">
     <div id="dify-container" style="width:100%; height:100%;"></div>
-    <div class="dify-brand-cover">YourMVP</div>
+    <div class="dify-brand-cover"></div>
 </div>
 <div class="playlist-section" id="playlist-section" style="display: none;"><h4>Roteiro de Aulas Sugerido</h4><p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p><button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button></div><div class="progress-section"><h3>Sua Jornada</h3><div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div><div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div><div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div></div></div></div></div>
 <div id="video-aulas" class="tab-content"><h2>Nossas Aulas</h2><div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div><div id="video-block-2"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen></iframe></div></div><div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div></div>
@@ -279,7 +271,7 @@
     
     // ====== CONFIGURAÇÃO ======
     const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImexCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
