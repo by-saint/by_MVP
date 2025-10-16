@@ -8,12 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* -------------------- STYLES (mantidos do seu template) -------------------- */
+    /* -------------------- SEU CSS (mantido) -------------------- */
     :root { --color-ia-specialist: #007BFF; --color-video-lessons: #8A2BE2; --color-journey: #DC143C; --journey-red-1: #ff2646; --journey-red-2: #be123c; --journey-dark: #2a0a12; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Poppins', sans-serif; background-color: #121212; color: #E0E0E0; margin: 0; padding: 40px 20px; }
     .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
     h1,h2,h3 { color: #f0f0f0; text-align: center; margin-top: 30px; margin-bottom: 15px; }
+
     /* --- MENU E SIDEBAR --- */
     .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; padding: 0; }
     .menu-toggle .bar { width: 24px; height: 3px; background-color: #fff; border-radius: 2px; transition: all 0.3s ease-in-out; }
@@ -26,14 +27,13 @@
     .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar nav a { display: block; padding: 15px 30px; text-decoration: none; font-size: 1.1em; font-weight: 700; border-left: 5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color: #ddd; }
     .sidebar nav a:hover { background-color: #2c2c2c; }
-    /* TÍTULOS COM DEGRADÊ */
     .link-ia, .link-aulas, .link-percurso { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); }
     .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); }
     .link-percurso { background-image: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); }
-    .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); color: white; -webkit-text-fill-color: unset; }
-    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); color: white; -webkit-text-fill-color: unset; }
-    .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); color: white; -webkit-text-fill-color: unset; }
+    .sidebar .link-ia.active, .sidebar .link-ia:hover { border-left-color: var(--color-ia-specialist); color: white; -webkit-text-fill-color: unset; }
+    .sidebar .link-aulas.active, .sidebar .link-aulas:hover { border-left-color: var(--color-video-lessons); color: white; -webkit-text-fill-color: unset; }
+    .sidebar .link-percurso.active, .sidebar .link-percurso:hover { border-left-color: var(--color-journey); color: white; -webkit-text-fill-color: unset; }
     .sidebar-footer { padding: 20px 30px; text-align: center; }
     .sidebar-config-btn { width: 100%; background: transparent; border: 1px solid #444; color: #aaa; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 0.95em; font-weight: 600; transition: all 0.2s ease-in-out; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .sidebar-config-btn:hover { background-color: #333; color: #fff; }
@@ -59,7 +59,7 @@
     .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
     .iframe-container { border-radius: 12px; overflow: hidden; height: 700px; }
-    #prompt-output { background-color: #2c2c2c; border: 1px solid #444; padding: 20px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; border-radius: 8px; min-height: 120px;}
+    #prompt-output { background-color: #2c2c2c; border: 1px solid #444; padding: 20px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; border-radius: 8px; min-height: 120px; }
     .copy-button { display: block; width: 200px; margin: 20px auto 0 auto; padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 8px; cursor: pointer; }
     .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
     .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
@@ -73,7 +73,8 @@
     .playlist-btn { background-color: #007BFF; color: white; border: none; padding: 12px 24px; font-size: 1.1em; cursor: pointer; border-radius: 8px; }
     .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 25px; border-radius: 12px; }
     .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-    /* PERCURSO forms + paste button styles (mantidos) */
+
+    /* Percurso styles */
     .percurso-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
     .percurso-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border: 1px solid rgba(190,18,60,0.12); padding: 20px; border-radius: 12px; }
     .percurso-card h4 { margin-top: 0; color: white; }
@@ -97,9 +98,7 @@
 <body>
   <!-- SIDEBAR / MENU -->
   <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
+    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
   </button>
 
   <div class="sidebar" id="sidebar" aria-hidden="true">
@@ -110,12 +109,8 @@
         <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
       </ul>
     </nav>
-
     <div class="sidebar-footer">
-      <button id="config-btn" class="sidebar-config-btn">
-        <span>⚙️</span>
-        <span>Configurações</span>
-      </button>
+      <button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button>
       <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
       <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
     </div>
@@ -123,15 +118,14 @@
 
   <div class="overlay" id="overlay"></div>
 
-  <!-- CONTEÚDO PRINCIPAL -->
   <div class="container">
     <div class="header">
       <p id="welcome-msg">A carregar...</p>
     </div>
 
-    <!-- IA PLANEJAMENTO (FORM + RESULTADOS + CHAT) -->
+    <!-- IA PLANEJAMENTO -->
     <div id="ia-planejamento" class="tab-content active">
-      <div class="form-wrapper" id="form-wrapper" style="display: none;">
+      <div class="form-wrapper" id="form-wrapper" style="display:none;">
         <div class="form-container">
           <h1>Crie a sua Meta</h1>
           <form id="ia-fit-form">
@@ -139,15 +133,16 @@
               <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
               <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea>
 
-              <div id="prazo-group" class="form-group" style="margin-top: 20px; text-align: left; display: none;">
+              <div id="prazo-group" class="form-group" style="margin-top:20px;text-align:left;display:none;">
                 <label for="prazo">Qual o prazo para esta meta?</label>
-                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." >
+                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão...">
               </div>
             </div>
 
             <h3>Informações Básicas e Realidade Atual</h3>
 
-            <div class="form-group"><label for="sexo">Sexo</label>
+            <div class="form-group">
+              <label for="sexo">Sexo</label>
               <select id="sexo" name="sexo" required>
                 <option value="" disabled selected>Selecione...</option>
                 <option value="masculino">Masculino</option>
@@ -172,7 +167,8 @@
               <input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required>
             </div>
 
-            <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
+            <div class="form-group">
+              <label for="uso_suplemento">Pretende usar suplementos?</label>
               <select id="uso_suplemento" name="uso_suplemento" required>
                 <option value="" disabled selected>Selecione...</option>
                 <option value="Sim">Sim</option>
@@ -180,7 +176,7 @@
               </select>
             </div>
 
-            <div class="form-group" id="suplementos-detalhes-group" style="display: none;">
+            <div class="form-group" id="suplementos-detalhes-group" style="display:none;">
               <label for="quais_suplementos">Quais suplementos?</label>
               <textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea>
             </div>
@@ -199,27 +195,26 @@
         </div>
       </div>
 
-      <div class="results-wrapper" id="results-wrapper" style="display: none;">
+      <div class="results-wrapper" id="results-wrapper" style="display:none;">
         <div class="results-container">
           <h2>Seu Plano de Ação</h2>
           <pre id="prompt-output"></pre>
           <button id="copy-btn" class="copy-button">Copiar Pedido</button>
 
           <h3>Converse com a IA</h3>
-          <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Use o chat abaixo para tirar dúvidas e pedir seu plano personalizado.</p>
+          <p style="text-align:center;margin-top:-10px;margin-bottom:20px;color:#bbb;">Use o chat abaixo para tirar dúvidas e pedir seu plano personalizado.</p>
 
           <div id="chatbox" style="background:#1E1E1E;border:1px solid #333;border-radius:12px;padding:20px;margin-top:20px;max-width:700px;margin-inline:auto;display:flex;flex-direction:column;">
-            <div id="chat-messages" style="height:400px;overflow-y:auto;padding:10px;background:#121212;border-radius:8px;margin-bottom:10px; border: 1px solid #2c2c2c;"></div>
-
+            <div id="chat-messages" style="height:400px;overflow-y:auto;padding:10px;background:#121212;border-radius:8px;margin-bottom:10px;border:1px solid #2c2c2c;"></div>
             <div id="chat-input-container" style="display:flex;gap:10px;">
               <input id="chat-input" type="text" placeholder="Digite sua mensagem..." style="flex:1;padding:12px;background:#333;border:1px solid #555;border-radius:8px;color:#fff;" disabled>
-              <button id="send-chat-btn" style="padding:12px 20px;background:#007BFF;color:white;border:none;border-radius:8px;cursor:pointer; opacity: 0.5;" disabled>Enviar</button>
+              <button id="send-chat-btn" style="padding:12px 20px;background:#007BFF;color:white;border:none;border-radius:8px;cursor:pointer;opacity:0.5;" disabled>Enviar</button>
             </div>
           </div>
 
-          <div class="playlist-section" id="playlist-section" style="display: none;">
+          <div class="playlist-section" id="playlist-section" style="display:none;">
             <h4>Roteiro de Aulas Sugerido</h4>
-            <p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
+            <p style="color:#bbb;margin-top:-10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
             <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
           </div>
 
@@ -245,7 +240,7 @@
     <div id="percurso" class="tab-content">
       <div class="percurso-container">
         <h2>Meu Percurso</h2>
-        <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
+        <p style="text-align:center;color:#bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
 
         <div class="percurso-forms">
           <div class="percurso-card" id="treino-card">
@@ -254,98 +249,72 @@
               <label for="objetivo_treino">Objetivo de Treino</label>
               <textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea>
             </div>
-            <div class="form-group">
-              <label for="frequencia_treino">Frequência semanal</label>
-              <input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4">
-            </div>
+            <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
 
             <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-              <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido">
-                <span class="hole" aria-hidden="true"></span>
-                <span class="label">Colar plano</span>
-              </button>
+              <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
               <div class="small-note">Clique para colar (simulação)</div>
             </div>
           </div>
 
           <div class="percurso-card" id="dieta-card">
             <h4>Formulário: Dieta</h4>
-            <div class="form-group">
-              <label for="objetivo_dieta">Objetivo de Dieta</label>
-              <textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea>
-            </div>
-            <div class="form-group">
-              <label for="orcamento_dieta">Orçamento mensal (R$)</label>
-              <input id="orcamento_dieta" type="text" placeholder="Ex: 500">
-            </div>
+            <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta</label><textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea></div>
+            <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
 
             <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-              <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido">
-                <span class="hole" aria-hidden="true"></span>
-                <span class="label">Colar plano</span>
-              </button>
+              <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
               <div class="small-note">Clique para colar (simulação)</div>
             </div>
           </div>
         </div>
 
-        <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). Eles apenas alternam o estado visual por enquanto.</p>
+        <p style="text-align:center;color:#888;margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). Eles apenas alternam o estado visual por enquanto.</p>
       </div>
     </div>
   </div>
 
-  <!-- -------------------- SCRIPTS -------------------- -->
+  <!-- SCRIPT -->
   <script type="module">
-    // Import Supabase client (ESM)
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    // ====== CONFIGURAÇÃO: troque apenas se necessário =======
-    // Esses valores foram fornecidos no seu código; mantenho aqui para você copiar/colar.
+    // -------- CONFIG - atualize somente se necessário --------
     const SUPABASE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs";
-    // EDGE_URL: substitua se usar outro slug / projeto
-    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/hyper-endpoint";
-    // =================================================================
+    // URL da Edge Function (substitua se for outro slug)
+    const EDGE_URL = "https://edxsgmchmwtpgnoxgrkb.supabase.co/functions/v1/super-action";
+    // -------------------------------------------------------
 
-    // Cria cliente Supabase no front-end
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
 
-    /* -------------------- Helpers UI -------------------- */
-    function qs(sel) { return document.querySelector(sel); }
-    function qsa(sel) { return Array.from(document.querySelectorAll(sel)); }
+    // DOM references
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+    const configBtn = document.getElementById('config-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const resetBtn = document.getElementById('reset-btn');
 
-    // DOM principais
-    const menuToggle = qs('#menu-toggle');
-    const sidebar = qs('#sidebar');
-    const overlay = qs('#overlay');
-    const navLinks = qsa('.nav-link');
-    const configBtn = qs('#config-btn');
-    const logoutBtn = qs('#logout-btn');
-    const resetBtn = qs('#reset-btn');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendChatBtn = document.getElementById('send-chat-btn');
 
-    // Chat DOM
-    const chatMessages = qs('#chat-messages');
-    const chatInput = qs('#chat-input');
-    const sendChatBtn = qs('#send-chat-btn');
+    const formWrapper = document.getElementById('form-wrapper');
+    const resultsWrapper = document.getElementById('results-wrapper');
+    const promptOutput = document.getElementById('prompt-output');
+    const copyBtn = document.getElementById('copy-btn');
+    const playlistSection = document.getElementById('playlist-section');
 
-    // Form/result DOM
-    const formWrapper = qs('#form-wrapper');
-    const resultsWrapper = qs('#results-wrapper');
-    const promptOutput = qs('#prompt-output');
-    const copyBtn = qs('#copy-btn');
-    const playlistSection = qs('#playlist-section');
+    const pasteTreino = document.getElementById('paste-treino');
+    const pasteDieta = document.getElementById('paste-dieta');
 
-    // Percurso paste buttons
-    const pasteTreino = qs('#paste-treino');
-    const pasteDieta = qs('#paste-dieta');
-
-    // Global state
     let currentUser = null;
     let profileGlobal = null;
 
-    /* -------------------- UI helper: adicionar mensagem no chat -------------------- */
+    // ---------- helpers ----------
     function addMessage(text, sender = "bot") {
-      const msg = document.createElement("div");
+      const msg = document.createElement('div');
       msg.textContent = text;
       Object.assign(msg.style, {
         margin: "8px 0",
@@ -365,60 +334,28 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    /* -------------------- Funções de data / progresso -------------------- */
     function getEaster(year) {
-      const a = year % 19;
-      const b = Math.floor(year / 100);
-      const c = year % 100;
-      const d = Math.floor(b / 4);
-      const e = b % 4;
-      const f = Math.floor((b + 8) / 25);
-      const g = Math.floor((b - f + 1) / 3);
-      const h = (19 * a + b - d - g + 15) % 30;
-      const i = Math.floor(c / 4);
-      const k = c % 4;
-      const l = (32 + 2 * e + 2 * i - h - k) % 7;
-      const m = Math.floor((a + 11 * h + 22 * l) / 451);
-      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const a = year % 19; const b = Math.floor(year / 100); const c = year % 100;
+      const d = Math.floor(b / 4); const e = b % 4; const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3); const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4); const k = c % 4; const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451); const month = Math.floor((h + l - 7 * m + 114) / 31);
       const day = ((h + l - 7 * m + 114) % 31) + 1;
       return new Date(year, month - 1, day);
     }
 
     function calculateEndDate(prazoText) {
-      const now = new Date();
-      const year = now.getFullYear();
-      if (!prazoText) return null;
-      let prazoLower = prazoText.toLowerCase();
-      if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) {
-        return new Date(year, 11, 31);
-      }
+      if (!prazoText || !prazoText.trim()) return null;
+      const now = new Date(); const year = now.getFullYear(); const prazoLower = prazoText.toLowerCase();
       let match = prazoLower.match(/(\d+)\s+mes(es)?/);
-      if (match) {
-        let d = new Date();
-        d.setMonth(d.getMonth() + parseInt(match[1], 10));
-        return d;
-      }
+      if (match) { const d = new Date(); d.setMonth(d.getMonth() + parseInt(match[1], 10)); return d; }
       match = prazoLower.match(/(\d+)\s+dia(s)?/);
-      if (match) {
-        let d = new Date();
-        d.setDate(d.getDate() + parseInt(match[1], 10));
-        return d;
-      }
-      if (prazoLower.includes('verao') || prazoLower.includes('verão')) {
-        const s = new Date(year, 11, 21);
-        return now < s ? s : new Date(year + 1, 11, 21);
-      }
-      if (prazoLower.includes('natal')) {
-        const c = new Date(year, 11, 25);
-        return now < c ? c : new Date(year + 1, 11, 25);
-      }
-      if (prazoLower.includes('ano novo')) {
-        return new Date(year + 1, 0, 1);
-      }
-      if (prazoLower.includes('pascoa') || prazoLower.includes('páscoa')) {
-        const e = getEaster(year);
-        return now < e ? e : getEaster(year + 1);
-      }
+      if (match) { const d = new Date(); d.setDate(d.getDate() + parseInt(match[1], 10)); return d; }
+      if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) return new Date(year, 11, 31);
+      if (prazoLower.includes('verao') || prazoLower.includes('verão')) { const s = new Date(year, 11, 21); return now < s ? s : new Date(year + 1, 11, 21); }
+      if (prazoLower.includes('natal')) { const c = new Date(year, 11, 25); return now < c ? c : new Date(year + 1, 11, 25); }
+      if (prazoLower.includes('ano novo')) return new Date(year + 1, 0, 1);
+      if (prazoLower.includes('pascoa') || prazoLower.includes('páscoa')) { const e = getEaster(year); return now < e ? e : getEaster(year + 1); }
       return null;
     }
 
@@ -432,10 +369,10 @@
       let progressPercentage = totalDuration > 0 ? (elapsedDuration / totalDuration) * 100 : 0;
       if (progressPercentage < 0) progressPercentage = 0;
       if (progressPercentage > 100) progressPercentage = 100;
-      qs('#progress-bar').style.width = progressPercentage + '%';
-      qs('#start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
-      qs('#end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
-      qs('#countdown-days').textContent = daysRemaining;
+      document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+      document.getElementById('start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
+      document.getElementById('end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
+      document.getElementById('countdown-days').textContent = daysRemaining;
       formWrapper.style.display = 'none';
       resultsWrapper.style.display = 'block';
     }
@@ -443,8 +380,8 @@
     function analyzeGoal(text) {
       if (!text) return 'ambos';
       const lowerText = text.toLowerCase();
-      const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento'];
-      const musculoKeywords = ['ganhar musculo', 'hipertrofia', 'shape', 'crescer', 'massa muscular', 'ficar forte', 'músculo', 'musculo'];
+      const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento'];
+      const musculoKeywords = ['ganhar musculo','hipertrofia','shape','crescer','massa muscular','ficar forte','músculo','musculo'];
       const hasEmagrecer = emagrecerKeywords.some(k => lowerText.includes(k));
       const hasMusculo = musculoKeywords.some(k => lowerText.includes(k));
       if (hasEmagrecer && !hasMusculo) return 'emagrecer';
@@ -453,34 +390,31 @@
     }
 
     function reorderVideos(order) {
-      const c = qs('#video-aulas');
+      const c = document.getElementById('video-aulas');
       const v = {
-        1: qs('#video-block-1'),
-        2: qs('#video-block-2'),
-        3: qs('#video-block-3')
+        1: document.getElementById('video-block-1'),
+        2: document.getElementById('video-block-2'),
+        3: document.getElementById('video-block-3')
       };
-      // remove existing (if present)
       Object.values(v).forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
       order.forEach(i => { if (v[i]) c.appendChild(v[i]); });
     }
 
-    /* -------------------- CHAT: carregar histórico (GET) -------------------- */
+    // ---------- Chat: carregar histórico (GET) ----------
     async function loadChatHistory() {
-      // Pega sessão atual para obter access_token (JWT do usuário)
+      chatMessages.innerHTML = '';
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData?.session ?? null;
       if (!session) {
         addMessage("⚠️ Você precisa estar logado para conversar.", "bot");
         return;
       }
-
-      // habilita input
+      // habilita inputs
       chatInput.disabled = false;
       sendChatBtn.disabled = false;
       sendChatBtn.style.opacity = '1';
 
       const userToken = session.access_token;
-
       try {
         const res = await fetch(EDGE_URL, {
           method: 'GET',
@@ -500,12 +434,11 @@
         }
 
         const result = await res.json();
-        chatMessages.innerHTML = '';
         const history = result.history ?? [];
         if (history.length > 0) {
           history.forEach(msg => {
-            const sender = (msg.role === 'user') ? 'user' : 'bot';
-            addMessage(msg.content ?? msg.text ?? '[mensagem sem conteúdo]', sender);
+            const sender = msg.role === 'user' ? 'user' : 'bot';
+            addMessage(msg.content ?? '[sem conteúdo]', sender);
           });
         } else {
           addMessage("Olá! Como posso te ajudar a atingir sua meta hoje?", "bot");
@@ -516,11 +449,11 @@
       }
     }
 
-    /* -------------------- CHAT: enviar mensagem (POST) -------------------- */
+    // ---------- Chat: enviar mensagem (POST) ----------
     async function sendMessageToEdge(text) {
       if (!text || !text.trim()) return;
       addMessage(text, "user");
-      chatInput.value = "";
+      chatInput.value = '';
       sendChatBtn.disabled = true;
       sendChatBtn.textContent = '...';
 
@@ -554,7 +487,7 @@
         }
 
         const result = await res.json();
-        const answer = result.answer ?? result.data ?? result.raw_dify ?? JSON.stringify(result);
+        const answer = result.answer ?? result.data ?? JSON.stringify(result);
         addMessage(answer, "bot");
       } catch (error) {
         console.error("Falha ao enviar mensagem:", error);
@@ -565,23 +498,19 @@
       }
     }
 
-    // event listeners para envio
-    sendChatBtn.addEventListener("click", () => {
+    // ---------- Events do chat ----------
+    sendChatBtn.addEventListener('click', () => {
       const text = chatInput.value.trim();
       if (text) sendMessageToEdge(text);
     });
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if (text) sendMessageToEdge(text);
-      }
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); const text = chatInput.value.trim(); if (text) sendMessageToEdge(text); }
     });
 
-    /* -------------------- UI: eventos de navegação / menu -------------------- */
+    // ---------- UI: menu e navegação ----------
     const switchTab = (tabId) => {
-      qsa('.tab-content').forEach(tab => tab.classList.remove('active'));
-      const t = qs('#' + tabId);
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      const t = document.getElementById(tabId);
       if (t) t.classList.add('active');
       navLinks.forEach(link => link.classList.remove('active'));
       const activeLink = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
@@ -592,7 +521,7 @@
       menuToggle.classList.remove('open');
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
-      sidebar.setAttribute('aria-hidden', 'true');
+      sidebar.setAttribute('aria-hidden','true');
     };
 
     menuToggle.addEventListener('click', () => {
@@ -602,6 +531,7 @@
       const open = sidebar.classList.contains('open');
       sidebar.setAttribute('aria-hidden', (!open).toString());
     });
+
     overlay.addEventListener('click', closeMenu);
     navLinks.forEach(link => {
       link.addEventListener('click', (e) => {
@@ -612,7 +542,7 @@
       });
     });
 
-    /* -------------------- CONFIG / LOGOUT / RESET -------------------- */
+    // ---------- Config / Logout / Reset ----------
     configBtn.addEventListener('click', (e) => {
       e.preventDefault();
       logoutBtn.classList.toggle('hidden');
@@ -628,43 +558,39 @@
     resetBtn.addEventListener('click', async () => {
       if (!currentUser) return;
       const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null }).eq('id', currentUser.id);
-      if (resetError) {
-        console.error('Erro ao resetar a meta: ' + resetError.message);
-      } else {
-        window.location.reload();
-      }
+      if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); }
+      else window.location.reload();
     });
 
-    /* -------------------- FORM: criar meta e salvar no perfil -------------------- */
+    // ---------- FORM: criar meta ----------
     (function attachFormHandlers(){
-      const objetivoInput = qs('#objetivo');
+      const objetivoInput = document.getElementById('objetivo');
       if (objetivoInput) {
         objetivoInput.addEventListener('input', function(){
-          qs('#prazo-group').style.display = this.value.trim() !== '' ? 'block' : 'none';
+          document.getElementById('prazo-group').style.display = this.value.trim() !== '' ? 'block' : 'none';
         });
       }
 
-      const usoSuplementoSelect = qs('#uso_suplemento');
+      const usoSuplementoSelect = document.getElementById('uso_suplemento');
       if (usoSuplementoSelect) {
         usoSuplementoSelect.addEventListener('change', function(){
-          qs('#suplementos-detalhes-group').style.display = this.value === 'Sim' ? 'block' : 'none';
-          if (this.value !== 'Sim') qs('#quais_suplementos').value = '';
+          document.getElementById('suplementos-detalhes-group').style.display = this.value === 'Sim' ? 'block' : 'none';
+          if (this.value !== 'Sim') document.getElementById('quais_suplementos').value = '';
         });
       }
 
-      const iaFitForm = qs('#ia-fit-form');
+      const iaFitForm = document.getElementById('ia-fit-form');
       if (iaFitForm) {
         iaFitForm.addEventListener('submit', async function(event) {
           event.preventDefault();
           const fe = event.target.elements;
           const prazoText = fe.prazo?.value?.trim();
-          const endDate = calculateEndDate(prazoText) || (function(){ let d = new Date(); d.setMonth(d.getMonth()+3); return d; })(); // padrão 3 meses
+          const endDate = calculateEndDate(prazoText) || (function(){ const d = new Date(); d.setMonth(d.getMonth()+3); return d; })();
           const startDate = new Date(); startDate.setHours(0,0,0,0);
           const objetivoText = fe.objetivo.value.trim();
           const goalType = analyzeGoal(objetivoText);
           const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-          const prazoOtimizado = `${daysRemaining} dias (meta original: ${prazoText || '3 meses'})`;
-
+          const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText || '3 meses'})`;
           const orcamentoValue = (fe.orcamento.value || '').replace(',', '.');
 
           const formData = {
@@ -706,10 +632,7 @@
           ].join("\n");
 
           // salva em profiles (assume tabela profiles com id = user id)
-          if (!currentUser) {
-            console.error('Usuário não identificado para salvar a meta.');
-            return;
-          }
+          if (!currentUser) { console.error('Usuário não identificado para salvar a meta.'); return; }
 
           const { error: updateError } = await supabase.from('profiles').update({
             goal_start_date: startDate.toISOString(),
@@ -718,9 +641,8 @@
             goal_type: goalType
           }).eq('id', currentUser.id);
 
-          if (updateError) {
-            console.error("Erro ao salvar a meta: " + updateError.message);
-          } else {
+          if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); }
+          else {
             promptOutput.textContent = initialMessage;
             playlistSection.style.display = 'block';
             displayProgress(startDate, endDate);
@@ -728,7 +650,6 @@
         });
       }
 
-      // copiar pedido
       if (copyBtn) {
         copyBtn.addEventListener('click', function() {
           const textToCopy = promptOutput.textContent || '';
@@ -740,15 +661,12 @@
             document.execCommand('copy');
             copyBtn.textContent = 'Copiado!';
             setTimeout(()=> { copyBtn.textContent = 'Copiar Pedido'; }, 2000);
-          } catch (err) {
-            console.error('Erro ao copiar', err);
-          }
+          } catch (err) { console.error('Erro ao copiar', err); }
           ta.remove();
         });
       }
 
-      // playlistBtn usa profileGlobal (definido na inicialização)
-      const playlistBtn = qs('#playlist-btn');
+      const playlistBtn = document.getElementById('playlist-btn');
       if (playlistBtn) {
         playlistBtn.addEventListener('click', function() {
           if (!profileGlobal) return;
@@ -758,15 +676,15 @@
           else videoOrder = [1,2,3];
           reorderVideos(videoOrder);
           switchTab('video-aulas');
-          qs('#video-aulas').scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
         });
       }
 
-      // paste buttons (simulação visual)
+      // simulate paste
       function simulatePaste(buttonEl, targetTextareaId) {
         if (!buttonEl) return;
         const txtOutput = promptOutput.textContent || '';
-        const target = qs(`#${targetTextareaId}`);
+        const target = document.getElementById(targetTextareaId);
         const label = buttonEl.querySelector('.label');
         if (buttonEl.disabled) return;
         buttonEl.classList.remove('appearing');
@@ -784,50 +702,44 @@
       if (pasteDieta) pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
     })();
 
-    /* -------------------- Inicialização da página: sessão / perfil / histórico -------------------- */
+    // ---------- Inicialização: sessão / perfil / histórico ----------
     async function initializePageData() {
-      // Pega o usuário logado (se não houver, redireciona para login)
+      // pega sessão
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData?.session ?? null;
       if (!session) {
-        // se você tem uma página de login, redirecione. Aqui apenas mostra msg.
-        qs('#welcome-msg').textContent = 'Faça login para continuar';
-        // opcional: window.location.replace('/login.html');
-        // deixa a interface pronta para login (formulário escondido)
+        document.getElementById('welcome-msg').textContent = 'Faça login para continuar';
         formWrapper.style.display = 'none';
         resultsWrapper.style.display = 'none';
+        // não redirecionamos automaticamente — apenas exibe instrução
         return;
       }
 
-      // obtém o usuário via supabase (id, email)
       const { data: userData, error: userErr } = await supabase.auth.getUser();
       if (userErr || !userData?.user) {
         console.error('Erro ao obter usuário:', userErr);
-        qs('#welcome-msg').textContent = 'Erro a obter usuário — faça login novamente';
+        document.getElementById('welcome-msg').textContent = 'Erro a obter usuário — faça login novamente';
         return;
       }
       currentUser = userData.user;
-      qs('#welcome-msg').textContent = `Bem-vindo(a), ${currentUser.email ?? currentUser.id}`;
+      document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${currentUser.email ?? currentUser.id}`;
 
-      // busca perfil na tabela 'profiles'
+      // busca perfil
       const { data: profile, error: profileErr } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
       if (profileErr) {
         console.error('Erro ao buscar perfil:', profileErr);
-      } else {
-        profileGlobal = profile || null;
-      }
+      } else profileGlobal = profile || null;
 
-      // se já existir meta no profile, mostra resultados; senão mostra formulário
       if (profileGlobal && profileGlobal.goal_end_date) {
         displayProgress(new Date(profileGlobal.goal_start_date), new Date(profileGlobal.goal_end_date));
-        promptOutput.textContent = profileGlobal.goal_prompt || '';
+        promptOutput.textContent = profileGlobal.goal_prompt ?? '';
         if (profileGlobal.goal_type) playlistSection.style.display = 'block';
       } else {
         formWrapper.style.display = 'block';
         resultsWrapper.style.display = 'none';
       }
 
-      // carregar histórico do chat (habilita chat se usuário estiver logado)
+      // carrega histórico do chat
       await loadChatHistory();
     }
 
