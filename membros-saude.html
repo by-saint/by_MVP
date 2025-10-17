@@ -486,7 +486,7 @@
                 // cria e adiciona o iframe
                 const iframe = document.createElement('iframe');
                 const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-                const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark`;
+                const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000`;
                 iframe.src = difyUrl;
                 iframe.allow = 'microphone';
                 // append iframe dentro da moldura
