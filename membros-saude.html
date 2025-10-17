@@ -232,8 +232,8 @@
     .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
     /* =============================================
-       MAIOR E MAIS NATURAL: BORDA & FAIXA DO CHAT
-       ============================================= */
+        MAIOR E MAIS NATURAL: BORDA & FAIXA DO CHAT
+        ============================================= */
 
     /* container externo */
     #dify-container {
@@ -271,10 +271,10 @@
     /* faixa superior maior e integrada */
     .dify-top-strip {
       position: absolute;
-      top: 14px;                 /* mais afastamento para 'flutuar' dentro da moldura */
+      top: 14px;              /* mais afastamento para 'flutuar' dentro da moldura */
       left: 14px;
       right: 14px;
-      height: 64px;             /* maior, conforme pedido */
+      height: 64px;            /* maior, conforme pedido */
       background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
       z-index: 90;
       display: flex;
@@ -376,7 +376,6 @@
       <h3>Comece sua Conversa com a IA</h3>
       <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 
-      <!-- container onde o iframe do chat será injetado -->
       <div id="dify-container" class="iframe-container"></div>
 
       <div class="playlist-section" id="playlist-section" style="display: none;">
@@ -432,9 +431,7 @@
   </div>
 </div>
 
-</div> <!-- container -->
-
-<script type="module">
+</div> <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     
     // ====== CONFIGURAÇÃO ======
@@ -489,7 +486,7 @@
                 // cria e adiciona o iframe
                 const iframe = document.createElement('iframe');
                 const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-                const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}`;
+                const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark`;
                 iframe.src = difyUrl;
                 iframe.allow = 'microphone';
                 // append iframe dentro da moldura
