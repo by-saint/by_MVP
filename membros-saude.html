@@ -232,33 +232,21 @@
     .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
     /* =============================================
-        MAIOR E MAIS NATURAL: BORDA & FAIXA DO CHAT
+        MAIOR E MAIS ESCURO: BORDA & FAIXA DO CHAT (VERSÃO ATUALIZADA)
         ============================================= */
 
-    /* container externo */
-    #dify-container {
-      position: relative;
-      width: 100%;
-      margin: 18px auto 0 auto;
-      padding: 0;
-    }
+    #dify-container { position: relative; width: 100%; margin: 18px auto 0 auto; padding: 0; }
 
-    /* moldura grande e natural ao redor do chat */
     .dify-frame {
       position: relative;
       border-radius: 16px;
       overflow: hidden;
       background: linear-gradient(180deg, #0b0b0b, #121212);
-      /* borda mais marcante mas ainda "natural" */
       border: 3px solid rgba(0,0,0,0.9);
-      /* sombra maior para destacar da página */
-      box-shadow:
-        0 30px 60px rgba(0,0,0,0.7),
-        inset 0 2px 0 rgba(255,255,255,0.02);
-      min-height: 780px; /* maior por pedido */
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
+      min-height: 780px;
     }
 
-    /* iframe preenche a moldura */
     .dify-frame iframe {
       display: block;
       width: 100%;
@@ -268,7 +256,6 @@
       background: transparent;
     }
 
-    /* badge / faixa superior */
     .dify-top-strip {
       position: absolute;
       top: 14px;
@@ -276,7 +263,7 @@
       right: 14px;
       height: 64px;
       background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
-      z-index: 90;
+      z-index: 200; /* elevado */
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -315,88 +302,42 @@
       font-size: 14px;
       font-weight: 700;
       pointer-events: none;
-      z-index: 91;
+      z-index: 201;
     }
 
-    /* Faz a máscara invisível por padrão (desktop) */
-    .dify-bottom-mask {
-      display: none;
-    }
+    /* por padrão nada visível (desktop) */
+    .dify-bottom-mask { display: none; }
 
-    /* quando a tela for pequena, reduzimos proporcionalmente e aplicamos as mudanças mobile */
     @media (max-width: 900px) {
-      /* ************************************************
-         OVERIDES MOBILE — só aqui alteramos o mobile
-         ************************************************ */
-
-      /* page padding/container */
-      body {
-        padding: 20px 12px;
-      }
-      .container {
-        padding: 0 12px;
-      }
-
-      /* menu-toggle mais compacto e mais perto */
-      .menu-toggle {
-        top: 14px;
-        left: 14px;
-        width: 44px;
-        height: 44px;
-      }
-      .menu-toggle .bar {
-        width: 20px;
-        height: 3px;
-      }
-
-      /* sidebar mais ajustado no mobile (quando aberto) */
-      .sidebar {
-        width: 260px;
-        left: -260px;
-      }
+      /* ajustes mobile gerais */
+      body { padding: 20px 12px; }
+      .container { padding: 0 12px; }
+      .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
+      .menu-toggle .bar { width: 20px; height: 3px; }
+      .sidebar { width: 260px; left: -260px; }
       .sidebar.open { left: 0; }
       .sidebar nav { padding-top: 84px; }
       .sidebar nav a { padding: 12px 20px; font-size: 1em; }
-
-      /* reduzir paddings das caixas para caber melhor */
-      .form-container, .results-container, .percurso-container {
-        padding: 18px;
-        border-radius: 10px;
-        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
-      }
+      .form-container, .results-container, .percurso-container { padding: 18px; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
       .goal-section { padding: 18px; margin-bottom: 28px; }
       .goal-title { font-size: 22px; }
-
-      /* inputs e labels menores */
       label { font-size: 14px; margin-bottom: 6px; }
       input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
       textarea { min-height: 90px; }
-
-      /* botões menores e com menor padding */
       button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
       .copy-button { width: 180px; padding: 9px 12px; font-size: 14px; }
-
-      /* reduzir altura do contador */
       .countdown-days { font-size: 2.5rem; }
-
-      /* playlist e progress mais compactos */
       .progress-section { padding: 14px; }
       .progress-bar { height: 16px; }
-
-      /* video container e iframes já responsivos, apenas ajuste margens */
       .video-container { margin-top: 18px; border-radius: 10px; }
-
-      /* Percurso e paste buttons menores */
       .percurso-forms { gap: 14px; }
       .percurso-card { padding: 14px; border-radius: 10px; }
       .paste-btn { --h: 32px; min-width: 120px; padding: 6px 18px; font-size: 14px; }
       .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
       .paste-btn .hole::after { inset: 3px; }
 
-      /* ======= Ajustes mobile para deixar o chat mais longo ======= */
+      /* deixa o chat mais alto no mobile */
       .dify-frame {
-        /* ocupar a maior parte da viewport no mobile,
-           mantendo espaço para cabeçalho e a faixa preta do rodapé */
         height: calc(100vh - 140px);
         min-height: 420px;
         max-height: calc(100vh - 120px);
@@ -404,14 +345,10 @@
         border: 2px solid rgba(0,0,0,0.85);
         box-shadow: 0 18px 36px rgba(0,0,0,0.55);
       }
-
-      /* iframe ocupa toda a moldura (altura definida pelo .dify-frame) */
       .dify-frame iframe {
         height: 100%;
         min-height: 380px;
       }
-
-      /* faixa superior integrada do chat reduzida */
       .dify-top-strip {
         top: 8px;
         left: 8px;
@@ -424,56 +361,46 @@
       .dify-top-strip .mvp-label { font-size: 12px; }
       .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
 
-      /* diminue espaçamentos gerais */
       .header { margin-bottom: 12px; }
       h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
-
-      /* resultados e pre tags mais compactos */
       #prompt-output { padding: 12px; font-size: 13px; }
-
-      /* garantir que grid vira 1 coluna (se houver) */
       .percurso-forms { grid-template-columns: 1fr; }
-
-      /* ajustar o botão do playlist */
       .playlist-btn { padding: 10px 18px; font-size: 14px; }
-
-      /* reduzir offsets de overlays para evitar overflow */
       .overlay { background-color: rgba(0,0,0,0.65); }
-
-      /* toque-friendly: aumentar hit area mínima para elementos clicáveis (quando necessário) */
+      .small-note { font-size: 12px; }
       .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
 
-      /* ajustar pequenas tipografias */
-      .small-note { font-size: 12px; }
-
-      /* ======= Faixa preta fixa DENTRO da moldura (mobile-only)
-         - posicionada levemente para fora (bottom: -8px) para NÃO cobrir o campo branco do chat
-         - altura reduzida para cobrir apenas o texto do credit
+      /*
+        NOVA MÁSCARA (mais escura, maior e responsiva)
+        - full-width responsivo (cobre a área do credit + eventual logo)
+        - totalmente opaca na parte inferior para esconder o azul
+        - posicionada levemente para fora (bottom negative) para NÃO cobrir a caixa branca do input
       */
       .dify-frame .dify-bottom-mask {
         display: block;
         position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        width: min(420px, calc(100% - 48px)); /* largura responsiva */
-        height: 56px;               /* altura reduzida: cobre apenas o credit */
-        bottom: -8px;               /* posicionado um pouco fora para não sobrepor a caixa branca */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.95) 65%, rgba(0,0,0,1) 100%);
-        border-radius: 999px;       /* cantos arredondados para ficar natural com a moldura */
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        pointer-events: none;       /* não interfere nos cliques do chat */
-        z-index: 86;                /* acima do iframe, abaixo da faixa superior */
+        left: 12px;
+        right: 12px;
+        width: calc(100% - 24px);
+        /* altura responsiva: garante cobertura em telas maiores e menores */
+        height: clamp(72px, 12vh, 160px);
+        bottom: -22px; /* posicionado um pouco para fora para evitar sobrepor o input branco */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.98) 40%, rgba(0,0,0,1) 100%);
+        border-radius: 24px;  /* cantos arredondados para um look natural */
+        box-shadow: 0 -12px 36px rgba(0,0,0,0.75), inset 0 6px 18px rgba(0,0,0,0.6);
+        pointer-events: none;
+        z-index: 220; /* acima do iframe e acima de quase tudo dentro da moldura */
         backdrop-filter: blur(2px) saturate(120%);
       }
 
-      /* fallback para telas muito pequenas: aumenta a altura para cobrir melhor o credit */
+      /* fallback para telas muito pequenas: torna ainda mais alto para cobrir logos grandes */
       @media (max-height: 620px) and (max-width: 420px) {
         .dify-frame .dify-bottom-mask {
-          height: 110px;
-          bottom: -10px;
-          width: calc(100% - 20px);
-          border-radius: 12px;
-          transform: none;
+          height: clamp(96px, 18vh, 220px);
+          bottom: -26px;
+          left: 10px;
+          right: 10px;
+          border-radius: 20px;
         }
       }
     }
@@ -620,69 +547,52 @@
             if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
 
             // =========================================================================
-            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e faixa inferior (grudada)
+            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e máscara inferior
             // =========================================================================
             function loadFreshDifyChat() {
                 const difyContainer = document.getElementById('dify-container');
                 if (!difyContainer) return;
 
-                // limpa o container (remove iframe antigo e strip antigo)
                 difyContainer.innerHTML = '';
 
-                // cria a moldura que envolve o iframe
                 const frameWrap = document.createElement('div');
                 frameWrap.className = 'dify-frame';
 
-                // cria e adiciona o iframe
                 const iframe = document.createElement('iframe');
                 const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-                
-                // FINAL ATTEMPT: Add cache buster at the end
                 const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
 
                 iframe.src = difyUrl;
                 iframe.allow = 'microphone';
-                // append iframe dentro da moldura
                 frameWrap.appendChild(iframe);
 
-                // cria a faixa preta maior e natural para o topo do chat
+                // faixa superior
                 const strip = document.createElement('div');
                 strip.className = 'dify-top-strip';
                 strip.setAttribute('aria-hidden', 'true');
-
-                // badge esquerda
                 const badge = document.createElement('div');
                 badge.className = 'dify-top-badge';
                 badge.textContent = 'Fale com a IA';
-
-                // label direita
                 const label = document.createElement('span');
                 label.className = 'mvp-label';
                 label.textContent = 'MVPia';
-
-                // apende badge e label dentro da faixa superior
                 strip.appendChild(badge);
                 strip.appendChild(label);
 
-                // cria a faixa que tapa o credit (será posicionada DENTRO da moldura,
-                // colada ao fundo — mas ligeiramente fora para NÃO cobrir o input branco)
+                // máscara inferior (cobre o credit dentro da moldura)
                 const bottomMask = document.createElement('div');
                 bottomMask.className = 'dify-bottom-mask';
                 bottomMask.setAttribute('aria-hidden', 'true');
 
-                // apende a faixa superior e a máscara dentro da moldura
                 frameWrap.appendChild(strip);
                 frameWrap.appendChild(bottomMask);
-
-                // apende a moldura no container por último para garantir ordem correta
                 difyContainer.appendChild(frameWrap);
             }
 
-            // chama o carregamento do chat
             loadFreshDifyChat();
             // =========================================================================
 
-            // Lógica restante da página (sem alterações)
+            // restante da lógica (sem alterações)
             const objetivoInput = document.getElementById('objetivo'); if (objetivoInput) { objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; }); }
             const usoSuplementoSelect = document.getElementById('uso_suplemento'); if (usoSuplementoSelect) { usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; }); }
             const iaFitForm = document.getElementById('ia-fit-form'); if(iaFitForm) { iaFitForm.addEventListener('submit', async function(event) {
@@ -736,8 +646,8 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
         }
         initializePageData();
     });
