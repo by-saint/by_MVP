@@ -371,10 +371,10 @@
       .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
 
       /*
-        NOVA MÁSCARA (mais escura, maior e responsiva)
-        - full-width responsivo (cobre a área do credit + eventual logo)
-        - totalmente opaca na parte inferior para esconder o azul
-        - posicionada levemente para fora (bottom negative) para NÃO cobrir a caixa branca do input
+        NOVA MÁSCARA (ajustada): 
+        - mais escura para esconder o credit
+        - menor altura e menos deslocamento (não cobre a área branca do input)
+        - somente mobile
       */
       .dify-frame .dify-bottom-mask {
         display: block;
@@ -382,25 +382,25 @@
         left: 12px;
         right: 12px;
         width: calc(100% - 24px);
-        /* altura responsiva: garante cobertura em telas maiores e menores */
-        height: clamp(72px, 12vh, 160px);
-        bottom: -22px; /* posicionado um pouco para fora para evitar sobrepor o input branco */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.98) 40%, rgba(0,0,0,1) 100%);
-        border-radius: 24px;  /* cantos arredondados para um look natural */
-        box-shadow: 0 -12px 36px rgba(0,0,0,0.75), inset 0 6px 18px rgba(0,0,0,0.6);
+        height: clamp(48px, 7.5vh, 110px); /* menor: minimiza cobertura do chat */
+        bottom: -8px; /* menos negativo para não invadir o input branco */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,1) 100%); /* gradiente mais abrupto */
+        border-radius: 20px;  /* cantos arredondados */
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.85), inset 0 6px 18px rgba(0,0,0,0.6);
         pointer-events: none;
         z-index: 220; /* acima do iframe e acima de quase tudo dentro da moldura */
         backdrop-filter: blur(2px) saturate(120%);
+        transition: height 180ms ease, bottom 180ms ease, background 180ms ease;
       }
 
-      /* fallback para telas muito pequenas: torna ainda mais alto para cobrir logos grandes */
+      /* fallback para telas muito pequenas: aumenta levemente sem cobrir o input */
       @media (max-height: 620px) and (max-width: 420px) {
         .dify-frame .dify-bottom-mask {
-          height: clamp(96px, 18vh, 220px);
-          bottom: -26px;
+          height: clamp(64px, 12vh, 140px);
+          bottom: -10px;
           left: 10px;
           right: 10px;
-          border-radius: 20px;
+          border-radius: 18px;
         }
       }
     }
@@ -646,8 +646,8 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
         }
         initializePageData();
     });
