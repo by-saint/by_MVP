@@ -318,7 +318,8 @@
       z-index: 91;
     }
 
-    /* Faz a máscara invisível por padrão (desktop) */
+    /* por padrão a máscara global fica escondida; vamos mostrar apenas a versão
+       posicionada dentro da moldura (.dify-frame .dify-bottom-mask) */
     .dify-bottom-mask {
       display: none;
     }
@@ -446,33 +447,62 @@
       /* ajustar pequenas tipografias */
       .small-note { font-size: 12px; }
 
-      /* ======= Faixa preta fixa DENTRO da moldura (mobile-only)
-         - agora a máscara fica dentro de .dify-frame, posicionada
-         - absoluta em relação à moldura para "grudar" em cima do credit
+      /* ======= Faixa preta pequena dentro da moldura
+         - cobre apenas o credit normalmente situado no canto inferior direito
+         - pointer-events: none para não interferir
       */
       .dify-frame .dify-bottom-mask {
         display: block;
         position: absolute;
-        left: 12px;                 /* pequeno padding interno para casar com cantos */
-        right: 12px;
-        height: 104px;              /* altura da faixa que cobre a area do credit */
-        bottom: 12px;               /* colada na borda interna da moldura */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.93) 60%, rgba(0,0,0,1) 100%);
-        border-radius: 12px;        /* cantos arredondados para ficar natural com a moldura */
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        pointer-events: none;       /* não bloqueia cliques */
-        z-index: 85;                /* acima do iframe, abaixo da faixa superior */
+        /* dimensões pequenas: cobrem apenas o "feito por dify" */
+        width: 160px;
+        height: 36px;
+        right: 16px;               /* distância do canto direito interno da moldura */
+        bottom: 14px;              /* distância do canto inferior interno da moldura */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,1) 100%);
+        border-radius: 10px;
+        box-shadow: 0 -6px 18px rgba(0,0,0,0.6);
+        pointer-events: none;
+        z-index: 95;               /* acima do iframe, abaixo da faixa superior */
         backdrop-filter: blur(2px) saturate(120%);
+        border: 1px solid rgba(255,255,255,0.02);
       }
 
-      /* se quiser que a faixa cubra um pouco mais em telas extremamente pequenas */
-      @media (max-height: 620px) and (max-width: 420px) {
-        .dify-frame .dify-bottom-mask { height: 140px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; }
+      /* versão ainda mais compacta em telas bem pequenas */
+      @media (max-width: 420px) {
+        .dify-frame .dify-bottom-mask {
+          width: 120px;
+          height: 34px;
+          right: 12px;
+          bottom: 10px;
+          border-radius: 10px;
+        }
       }
-
-      /* Conteúdo que ficaria muito grande no mobile, esconder se necessário (ex: elementos complementares) */
-      /* .some-desktop-only { display: none; }  -- descomente se quiser ocultar algo apenas no mobile */
     }
+
+    /* Desktop: queremos também mostrar a máscara pequena no canto inferior direito,
+       porque o credit por vezes aparece em desktop; por isso adicionamos regras fora do media
+       para a versão dentro da moldura (apenas pequena e discreta). */
+    .dify-frame .dify-bottom-mask {
+      /* por padrão desktop: pequena máscara (não tapa a área de input) */
+      display: block;
+      position: absolute;
+      width: 160px;
+      height: 36px;
+      right: 16px;
+      bottom: 16px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.88) 60%, rgba(0,0,0,1) 100%);
+      border-radius: 10px;
+      box-shadow: 0 -6px 18px rgba(0,0,0,0.6);
+      pointer-events: none;
+      z-index: 95;
+      backdrop-filter: blur(2px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+
+    /* se quiser esconder a máscara em desktop por padrão, comente a regra acima.
+       mas a pedido, deixei-a ativa para cobrir o crédito sem tapar a área de escrever. */
+
   </style>
 </head>
 <body>
@@ -616,7 +646,7 @@
             if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
 
             // =========================================================================
-            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e faixa inferior (grudada)
+            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e máscara pequena no canto inferior direito
             // =========================================================================
             function loadFreshDifyChat() {
                 const difyContainer = document.getElementById('dify-container');
@@ -633,7 +663,7 @@
                 const iframe = document.createElement('iframe');
                 const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
                 
-                // FINAL ATTEMPT: Add cache buster at the end
+                // Add cache buster at the end
                 const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
 
                 iframe.src = difyUrl;
@@ -641,7 +671,7 @@
                 // append iframe dentro da moldura
                 frameWrap.appendChild(iframe);
 
-                // cria a faixa preta maior e natural para o topo do chat
+                // cria a faixa superior (visível)
                 const strip = document.createElement('div');
                 strip.className = 'dify-top-strip';
                 strip.setAttribute('aria-hidden', 'true');
@@ -660,13 +690,12 @@
                 strip.appendChild(badge);
                 strip.appendChild(label);
 
-                // cria a faixa que tapa o credit (será posicionada DENTRO da moldura,
-                // colada ao fundo — assim fica "grudada" sobre o texto 'feito por dify')
+                // cria a máscara pequena que tapa apenas o credit (posição: canto inferior direito interno da moldura)
                 const bottomMask = document.createElement('div');
                 bottomMask.className = 'dify-bottom-mask';
                 bottomMask.setAttribute('aria-hidden', 'true');
 
-                // apende a faixa superior e a máscara dentro da moldura
+                // apende a faixa superior e a máscara dentro da moldura (a máscara fica acima do iframe)
                 frameWrap.appendChild(strip);
                 frameWrap.appendChild(bottomMask);
 
@@ -732,8 +761,8 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
         }
         initializePageData();
     });
