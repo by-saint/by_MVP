@@ -447,34 +447,35 @@
       .small-note { font-size: 12px; }
 
       /* ======= Faixa preta fixa DENTRO da moldura (mobile-only)
-         - agora a máscara fica dentro de .dify-frame, posicionada
-         - absoluta em relação à moldura para "grudar" em cima do credit
-         - posicionamento centralizado, largura responsiva e altura ajustada
+         - posicionada levemente para fora (bottom: -8px) para NÃO cobrir o campo branco do chat
+         - altura reduzida para cobrir apenas o texto do credit
       */
       .dify-frame .dify-bottom-mask {
         display: block;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        /* largura responsiva: não fica muito larga em telas pequenas, nem muito estreita em telas maiores */
-        width: min(420px, calc(100% - 80px));
-        height: 56px;               /* ajuste a altura se precisar cobrir mais/menos texto */
-        bottom: 12px;               /* distância da borda interna da moldura */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.93) 60%, rgba(0,0,0,1) 100%);
+        width: min(420px, calc(100% - 48px)); /* largura responsiva */
+        height: 56px;               /* altura reduzida: cobre apenas o credit */
+        bottom: -8px;               /* posicionado um pouco fora para não sobrepor a caixa branca */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.95) 65%, rgba(0,0,0,1) 100%);
         border-radius: 999px;       /* cantos arredondados para ficar natural com a moldura */
         box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        pointer-events: none;       /* não bloqueia cliques */
-        z-index: 85;                /* acima do iframe, abaixo da faixa superior */
+        pointer-events: none;       /* não interfere nos cliques do chat */
+        z-index: 86;                /* acima do iframe, abaixo da faixa superior */
         backdrop-filter: blur(2px) saturate(120%);
       }
 
-      /* se quiser que a faixa cubra um pouco mais em telas extremamente pequenas */
+      /* fallback para telas muito pequenas: aumenta a altura para cobrir melhor o credit */
       @media (max-height: 620px) and (max-width: 420px) {
-        .dify-frame .dify-bottom-mask { height: 110px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; transform: none; width: calc(100% - 20px); }
+        .dify-frame .dify-bottom-mask {
+          height: 110px;
+          bottom: -10px;
+          width: calc(100% - 20px);
+          border-radius: 12px;
+          transform: none;
+        }
       }
-
-      /* Conteúdo que ficaria muito grande no mobile, esconder se necessário (ex: elementos complementares) */
-      /* .some-desktop-only { display: none; }  -- descomente se quiser ocultar algo apenas no mobile */
     }
   </style>
 </head>
@@ -664,7 +665,7 @@
                 strip.appendChild(label);
 
                 // cria a faixa que tapa o credit (será posicionada DENTRO da moldura,
-                // colada ao fundo — assim fica "grudada" sobre o texto 'feito por dify')
+                // colada ao fundo — mas ligeiramente fora para NÃO cobrir o input branco)
                 const bottomMask = document.createElement('div');
                 bottomMask.className = 'dify-bottom-mask';
                 bottomMask.setAttribute('aria-hidden', 'true');
@@ -735,8 +736,8 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
         }
         initializePageData();
     });
