@@ -446,25 +446,28 @@
       /* ajustar pequenas tipografias */
       .small-note { font-size: 12px; }
 
-      /* ======= Faixa preta fixa no rodapé para “tapar” o credit Dify ======= */
-      .dify-bottom-mask {
+      /* ======= Faixa preta fixa DENTRO da moldura (mobile-only)
+         - agora a máscara fica dentro de .dify-frame, posicionada
+         - absoluta em relação à moldura para "grudar" em cima do credit
+      */
+      .dify-frame .dify-bottom-mask {
         display: block;
-        position: fixed;
-        left: 12px;                 /* alinha com o padding .container no mobile */
+        position: absolute;
+        left: 12px;                 /* pequeno padding interno para casar com cantos */
         right: 12px;
         height: 104px;              /* altura da faixa que cobre a area do credit */
-        bottom: 12px;               /* distância da borda do viewport */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,1) 100%);
-        border-radius: 14px;        /* cantos arredondados para ficar natural com a moldura */
+        bottom: 12px;               /* colada na borda interna da moldura */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.93) 60%, rgba(0,0,0,1) 100%);
+        border-radius: 12px;        /* cantos arredondados para ficar natural com a moldura */
         box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
         pointer-events: none;       /* não bloqueia cliques */
-        z-index: 995;               /* acima do conteúdo, mas abaixo do sidebar/overlay (se necessário ajuste) */
+        z-index: 85;                /* acima do iframe, abaixo da faixa superior */
         backdrop-filter: blur(2px) saturate(120%);
       }
 
       /* se quiser que a faixa cubra um pouco mais em telas extremamente pequenas */
       @media (max-height: 620px) and (max-width: 420px) {
-        .dify-bottom-mask { height: 140px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; }
+        .dify-frame .dify-bottom-mask { height: 140px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; }
       }
 
       /* Conteúdo que ficaria muito grande no mobile, esconder se necessário (ex: elementos complementares) */
@@ -519,8 +522,6 @@
       <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 
       <div id="dify-container" class="iframe-container"></div>
-      <!-- Faixa visual fixa (mobile-only). Mantém pointer-events:none para não interferir. -->
-      <div class="dify-bottom-mask" aria-hidden="true"></div>
 
       <div class="playlist-section" id="playlist-section" style="display: none;">
         <h4>Roteiro de Aulas Sugerido</h4>
@@ -575,7 +576,8 @@
   </div>
 </div>
 
-</div> <script type="module">
+</div> 
+<script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     
     // ====== CONFIGURAÇÃO ======
@@ -614,7 +616,7 @@
             if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
 
             // =========================================================================
-            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura e adiciona a faixa "MVPia"
+            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e faixa inferior (grudada)
             // =========================================================================
             function loadFreshDifyChat() {
                 const difyContainer = document.getElementById('dify-container');
@@ -654,12 +656,21 @@
                 label.className = 'mvp-label';
                 label.textContent = 'MVPia';
 
-                // apende badge e label dentro da faixa
+                // apende badge e label dentro da faixa superior
                 strip.appendChild(badge);
                 strip.appendChild(label);
 
-                // apende a moldura no container por último para garantir ordem correta
+                // cria a faixa que tapa o credit (será posicionada DENTRO da moldura,
+                // colada ao fundo — assim fica "grudada" sobre o texto 'feito por dify')
+                const bottomMask = document.createElement('div');
+                bottomMask.className = 'dify-bottom-mask';
+                bottomMask.setAttribute('aria-hidden', 'true');
+
+                // apende a faixa superior e a máscara dentro da moldura
                 frameWrap.appendChild(strip);
+                frameWrap.appendChild(bottomMask);
+
+                // apende a moldura no container por último para garantir ordem correta
                 difyContainer.appendChild(frameWrap);
             }
 
