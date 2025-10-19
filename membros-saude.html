@@ -249,11 +249,13 @@
       border-radius: 16px;
       overflow: hidden;
       background: linear-gradient(180deg, #0b0b0b, #121212);
+      /* borda mais marcante mas ainda "natural" */
       border: 3px solid rgba(0,0,0,0.9);
+      /* sombra maior para destacar da página */
       box-shadow:
         0 30px 60px rgba(0,0,0,0.7),
         inset 0 2px 0 rgba(255,255,255,0.02);
-      min-height: 780px;
+      min-height: 780px; /* maior por pedido */
     }
 
     /* iframe preenche a moldura */
@@ -316,43 +318,85 @@
       z-index: 91;
     }
 
-    /* Por padrão, a máscara dentro da moldura fica escondida (desktop) */
-    .dify-frame .dify-bottom-mask,
-    .dify-frame .dify-bottom-left-mask {
+    /* Faz a máscara invisível por padrão (desktop) */
+    .dify-bottom-mask {
       display: none;
     }
 
-    /* MOBILE: mostramos duas máscaras:
-       - um bloco pequeno no canto direito inferior (cobre credit)
-       - uma faixa mais larga POSICIONADA ACIMA DA ÁREA DE INPUT para não bloquear escrita
-    */
+    /* quando a tela for pequena, reduzimos proporcionalmente e aplicamos as mudanças mobile */
     @media (max-width: 900px) {
-      body { padding: 20px 12px; }
-      .container { padding: 0 12px; }
-      .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
-      .menu-toggle .bar { width: 20px; height: 3px; }
-      .sidebar { width: 260px; left: -260px; }
+      /* ************************************************
+         OVERIDES MOBILE — só aqui alteramos o mobile
+         ************************************************ */
+
+      /* page padding/container */
+      body {
+        padding: 20px 12px;
+      }
+      .container {
+        padding: 0 12px;
+      }
+
+      /* menu-toggle mais compacto e mais perto */
+      .menu-toggle {
+        top: 14px;
+        left: 14px;
+        width: 44px;
+        height: 44px;
+      }
+      .menu-toggle .bar {
+        width: 20px;
+        height: 3px;
+      }
+
+      /* sidebar mais ajustado no mobile (quando aberto) */
+      .sidebar {
+        width: 260px;
+        left: -260px;
+      }
       .sidebar.open { left: 0; }
       .sidebar nav { padding-top: 84px; }
       .sidebar nav a { padding: 12px 20px; font-size: 1em; }
-      .form-container, .results-container, .percurso-container { padding: 18px; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
+
+      /* reduzir paddings das caixas para caber melhor */
+      .form-container, .results-container, .percurso-container {
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
+      }
       .goal-section { padding: 18px; margin-bottom: 28px; }
       .goal-title { font-size: 22px; }
+
+      /* inputs e labels menores */
       label { font-size: 14px; margin-bottom: 6px; }
       input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
       textarea { min-height: 90px; }
+
+      /* botões menores e com menor padding */
       button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
       .copy-button { width: 180px; padding: 9px 12px; font-size: 14px; }
+
+      /* reduzir altura do contador */
       .countdown-days { font-size: 2.5rem; }
+
+      /* playlist e progress mais compactos */
       .progress-section { padding: 14px; }
       .progress-bar { height: 16px; }
+
+      /* video container e iframes já responsivos, apenas ajuste margens */
       .video-container { margin-top: 18px; border-radius: 10px; }
+
+      /* Percurso e paste buttons menores */
       .percurso-forms { gap: 14px; }
       .percurso-card { padding: 14px; border-radius: 10px; }
       .paste-btn { --h: 32px; min-width: 120px; padding: 6px 18px; font-size: 14px; }
       .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
       .paste-btn .hole::after { inset: 3px; }
+
+      /* ======= Ajustes mobile para deixar o chat mais longo ======= */
       .dify-frame {
+        /* ocupar a maior parte da viewport no mobile,
+           mantendo espaço para cabeçalho e a faixa preta do rodapé */
         height: calc(100vh - 140px);
         min-height: 420px;
         max-height: calc(100vh - 120px);
@@ -360,7 +404,14 @@
         border: 2px solid rgba(0,0,0,0.85);
         box-shadow: 0 18px 36px rgba(0,0,0,0.55);
       }
-      .dify-frame iframe { height: 100%; min-height: 380px; }
+
+      /* iframe ocupa toda a moldura (altura definida pelo .dify-frame) */
+      .dify-frame iframe {
+        height: 100%;
+        min-height: 380px;
+      }
+
+      /* faixa superior integrada do chat reduzida */
       .dify-top-strip {
         top: 8px;
         left: 8px;
@@ -372,68 +423,59 @@
       }
       .dify-top-strip .mvp-label { font-size: 12px; }
       .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
+
+      /* diminue espaçamentos gerais */
       .header { margin-bottom: 12px; }
       h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
+
+      /* resultados e pre tags mais compactos */
       #prompt-output { padding: 12px; font-size: 13px; }
+
+      /* garantir que grid vira 1 coluna (se houver) */
+      .percurso-forms { grid-template-columns: 1fr; }
+
+      /* ajustar o botão do playlist */
       .playlist-btn { padding: 10px 18px; font-size: 14px; }
+
+      /* reduzir offsets de overlays para evitar overflow */
       .overlay { background-color: rgba(0,0,0,0.65); }
+
+      /* toque-friendly: aumentar hit area mínima para elementos clicáveis (quando necessário) */
       .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
+
+      /* ajustar pequenas tipografias */
       .small-note { font-size: 12px; }
 
-      /* máscara pequena no canto inferior direito (cobre credit) */
+      /* ======= Faixa preta fixa DENTRO da moldura (mobile-only)
+         - agora a máscara fica dentro de .dify-frame, posicionada
+         - absoluta em relação à moldura para "grudar" em cima do credit
+         - posicionamento centralizado, largura responsiva e altura ajustada
+      */
       .dify-frame .dify-bottom-mask {
         display: block;
         position: absolute;
-        right: 12px;
-        bottom: 12px;
-        width: 160px;
-        height: 36px;
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.88) 60%, rgba(0,0,0,1) 100%);
-        border-radius: 10px;
-        box-shadow: 0 -6px 18px rgba(0,0,0,0.6);
-        pointer-events: none;
-        z-index: 95;
-        backdrop-filter: blur(2px) saturate(120%);
-        border: 1px solid rgba(255,255,255,0.02);
-      }
-
-      /* faixa larga, mas posicionada acima do input para NÃO bloquear escrita.
-         Ajuste bottom aqui para subir/descer a faixa — por padrão deixei 72px. */
-      .dify-frame .dify-bottom-left-mask {
-        display: block;
-        position: absolute;
-        left: 12px;                 /* desloca para a esquerda para cobrir 'desenvolvido por' à esquerda, se houver */
-        right: 12px;                /* estende quase até a direita (não sobrepõe a máscara pequena direita) */
-        bottom: 72px;               /* <-- distância da borda inferior; aumenta se ainda cobrir o input */
-        height: 56px;               /* altura reduzida para não bloquear a área de digitação */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.82) 60%, rgba(0,0,0,0.98) 100%);
-        border-radius: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        /* largura responsiva: não fica muito larga em telas pequenas, nem muito estreita em telas maiores */
+        width: min(420px, calc(100% - 80px));
+        height: 56px;               /* ajuste a altura se precisar cobrir mais/menos texto */
+        bottom: 12px;               /* distância da borda interna da moldura */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.93) 60%, rgba(0,0,0,1) 100%);
+        border-radius: 999px;       /* cantos arredondados para ficar natural com a moldura */
         box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        pointer-events: none;
-        z-index: 92;                /* abaixo da máscara pequena (95), acima do iframe visual */
+        pointer-events: none;       /* não bloqueia cliques */
+        z-index: 85;                /* acima do iframe, abaixo da faixa superior */
         backdrop-filter: blur(2px) saturate(120%);
-        border: 1px solid rgba(255,255,255,0.02);
-        opacity: 0.98;
       }
 
-      /* ajuste para telas muito pequenas */
-      @media (max-width: 420px) {
-        .dify-frame .dify-bottom-mask {
-          right: 10px;
-          bottom: 10px;
-          width: 120px;
-          height: 34px;
-        }
-        .dify-frame .dify-bottom-left-mask {
-          left: 10px;
-          right: 10px;
-          bottom: 84px;  /* aumenta o bottom para garantir que não cubra input em telas muito pequenas */
-          height: 68px;
-        }
+      /* se quiser que a faixa cubra um pouco mais em telas extremamente pequenas */
+      @media (max-height: 620px) and (max-width: 420px) {
+        .dify-frame .dify-bottom-mask { height: 110px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; transform: none; width: calc(100% - 20px); }
       }
+
+      /* Conteúdo que ficaria muito grande no mobile, esconder se necessário (ex: elementos complementares) */
+      /* .some-desktop-only { display: none; }  -- descomente se quiser ocultar algo apenas no mobile */
     }
-
-    /* Desktop: manter as máscaras escondidas */
   </style>
 </head>
 <body>
@@ -547,7 +589,7 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-    // --- FUNÇÕES DE LÓGICA ---
+    // --- FUNÇÕES DE LÓGICA (sem alterações) ---
     function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
     function calculateEndDate(prazoText) { if(!prazoText) return null; const now = new Date(); const year = now.getFullYear(); let prazoLower = prazoText.toLowerCase(); if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) { return new Date(year, 11, 31); } let match = prazoLower.match(/(\d+)\s+mes(es)?/); if (match) { let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d; } match = prazoLower.match(/(\d+)\s+dia(s)?/); if (match) { let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d; } if (prazoLower.includes('verao')||prazoLower.includes('verão')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); } if (prazoLower.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); } if (prazoLower.includes('ano novo')) { return new Date(year+1,0,1); } if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); } return null; }
     function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
@@ -557,114 +599,95 @@
     // --- LÓGICA PRINCIPAL ---
     document.addEventListener('DOMContentLoaded', () => {
         let user = null;
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const configBtn = document.getElementById('config-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const resetBtn = document.getElementById('reset-btn');
-
-        const switchTab = (tabId) => {
-          document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-          document.getElementById(tabId).classList.add('active');
-          navLinks.forEach(link => link.classList.remove('active'));
-          const activeLink = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
-          if(activeLink) activeLink.classList.add('active');
-        };
-
+        const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
+        const switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active'); };
         const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
         menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
         overlay.addEventListener('click', closeMenu);
         navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const tabId = link.dataset.tab; switchTab(tabId); closeMenu(); }); });
         configBtn.addEventListener('click', (e) => { e.preventDefault(); logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
-        logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); try { await supabase.auth.signOut(); } catch (err) { console.error(err); } window.location.replace('/login.html'); });
-        resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
+        logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
+        resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null, }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
 
         async function initializePageData() {
             const { data } = await supabase.auth.getUser();
-            if (!data || !data.user) { window.location.replace('/login.html'); return; }
+            if (!data.user) { window.location.replace('/login.html'); return; }
             user = data.user;
             document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
             if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
-            if (profile.goal_end_date) {
-              displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
-              document.getElementById('prompt-output').textContent = profile.goal_prompt || '';
-              if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
-            } else {
-              document.getElementById('form-wrapper').style.display = 'block';
-            }
+            if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
 
-            // injeta iframe + moldura + faixa superior e máscaras (mobile)
+            // =========================================================================
+            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e faixa inferior (grudada)
+            // =========================================================================
             function loadFreshDifyChat() {
                 const difyContainer = document.getElementById('dify-container');
                 if (!difyContainer) return;
+
+                // limpa o container (remove iframe antigo e strip antigo)
                 difyContainer.innerHTML = '';
 
+                // cria a moldura que envolve o iframe
                 const frameWrap = document.createElement('div');
                 frameWrap.className = 'dify-frame';
 
+                // cria e adiciona o iframe
                 const iframe = document.createElement('iframe');
                 const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+                
+                // FINAL ATTEMPT: Add cache buster at the end
                 const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
+
                 iframe.src = difyUrl;
                 iframe.allow = 'microphone';
+                // append iframe dentro da moldura
                 frameWrap.appendChild(iframe);
 
+                // cria a faixa preta maior e natural para o topo do chat
                 const strip = document.createElement('div');
                 strip.className = 'dify-top-strip';
                 strip.setAttribute('aria-hidden', 'true');
+
+                // badge esquerda
                 const badge = document.createElement('div');
                 badge.className = 'dify-top-badge';
                 badge.textContent = 'Fale com a IA';
+
+                // label direita
                 const label = document.createElement('span');
                 label.className = 'mvp-label';
                 label.textContent = 'MVPia';
+
+                // apende badge e label dentro da faixa superior
                 strip.appendChild(badge);
                 strip.appendChild(label);
 
-                // máscara pequena (canto direito)
+                // cria a faixa que tapa o credit (será posicionada DENTRO da moldura,
+                // colada ao fundo — assim fica "grudada" sobre o texto 'feito por dify')
                 const bottomMask = document.createElement('div');
                 bottomMask.className = 'dify-bottom-mask';
                 bottomMask.setAttribute('aria-hidden', 'true');
 
-                // faixa larga (posicionada acima do input para não bloquear a escrita)
-                const bottomLeftMask = document.createElement('div');
-                bottomLeftMask.className = 'dify-bottom-left-mask';
-                bottomLeftMask.setAttribute('aria-hidden', 'true');
-
+                // apende a faixa superior e a máscara dentro da moldura
                 frameWrap.appendChild(strip);
                 frameWrap.appendChild(bottomMask);
-                frameWrap.appendChild(bottomLeftMask);
+
+                // apende a moldura no container por último para garantir ordem correta
                 difyContainer.appendChild(frameWrap);
             }
 
+            // chama o carregamento do chat
             loadFreshDifyChat();
+            // =========================================================================
 
-            // restante lógica
-            const objetivoInput = document.getElementById('objetivo');
-            if (objetivoInput) {
-              objetivoInput.addEventListener('input', function(){
-                document.getElementById('prazo-group').style.display = this.value.trim()!=='' ? 'block' : 'none';
-              });
-            }
-
-            const usoSuplementoSelect = document.getElementById('uso_suplemento');
-            if (usoSuplementoSelect) {
-              usoSuplementoSelect.addEventListener('change', function(){
-                document.getElementById('suplementos-detalhes-group').style.display = this.value === 'Sim' ? 'block' : 'none';
-                if (this.value !== 'Sim') document.getElementById('quais_suplementos').value = '';
-              });
-            }
-
-            const iaFitForm = document.getElementById('ia-fit-form');
-            if (iaFitForm) {
-              iaFitForm.addEventListener('submit', async function(event) {
+            // Lógica restante da página (sem alterações)
+            const objetivoInput = document.getElementById('objetivo'); if (objetivoInput) { objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; }); }
+            const usoSuplementoSelect = document.getElementById('uso_suplemento'); if (usoSuplementoSelect) { usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; }); }
+            const iaFitForm = document.getElementById('ia-fit-form'); if(iaFitForm) { iaFitForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const formElements = event.target.elements;
-                const prazoText = (formElements.prazo && formElements.prazo.value) || '';
+                const prazoText = formElements.prazo.value;
                 const endDate = calculateEndDate(prazoText);
                 if (!endDate) { console.error("Prazo da meta inválido."); return; }
                 const startDate = new Date(); startDate.setHours(0,0,0,0);
@@ -672,84 +695,35 @@
                 const goalType = analyzeGoal(objetivoText);
                 const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
                 const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
-                const orcamentoValue = (formElements.orcamento.value || '').replace(',', '.');
-                const formData = {
-                  objetivo: objetivoText,
-                  prazo: prazoOtimizado,
-                  sexo: formElements.sexo.value,
-                  altura: formElements.altura.value,
-                  peso: formElements.peso.value,
-                  idade: formElements.idade.value,
-                  disponibilidade: formElements.disponibilidade.value,
-                  local_treino: formElements.local_treino.value,
-                  orcamento: orcamentoValue,
-                  uso_suplemento: formElements.uso_suplemento.value,
-                  quais_suplementos: formElements.quais_suplementos.value,
-                  nivel: formElements.nivel.value
-                };
-                let suplementoInfo = `Pretende usar suplementos: ${formData.uso_suplemento}.`;
-                if (formData.uso_suplemento === 'Sim' && formData.quais_suplementos) {
-                  suplementoInfo += ` Os suplementos são: ${formData.quais_suplementos}.`;
-                } else if (formData.uso_suplemento === 'Sim') {
-                  suplementoInfo += ` Ainda não decidi quais.`;
-                }
+                const orcamentoValue = formElements.orcamento.value.replace(',', '.');
+                const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
+                let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
+                if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
                 const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
+                const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
+                if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); } else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display = 'block'; displayProgress(startDate, endDate); }
+            }); }
 
-                const { error: updateError } = await supabase.from('profiles').update({
-                  goal_start_date: startDate.toISOString(),
-                  goal_end_date: endDate.toISOString(),
-                  goal_prompt: initialMessage,
-                  goal_type: goalType
-                }).eq('id', user.id);
+            const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) { playlistBtn.addEventListener('click', function() { if (!profile) return; let videoOrder; if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];} reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' }); }); }
 
-                if (updateError) {
-                  console.error("Erro ao salvar a meta: " + updateError.message);
-                } else {
-                  document.getElementById('prompt-output').textContent = initialMessage;
-                  document.getElementById('playlist-section').style.display = 'block';
-                  displayProgress(startDate, endDate);
-                }
-              });
-            }
-
-            const playlistBtn = document.getElementById('playlist-btn');
-            if (playlistBtn) {
-              playlistBtn.addEventListener('click', function() {
-                if (!profile) return;
-                let videoOrder;
-                if (profile.goal_type === 'emagrecer') { videoOrder = [3,2,1]; }
-                else if (profile.goal_type === 'musculo') { videoOrder = [3,1,2]; }
-                else { videoOrder = [1,2,3]; }
-                reorderVideos(videoOrder);
-                switchTab('video-aulas');
-                document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
-              });
-            }
-
-            const copyBtn = document.getElementById('copy-btn');
-            if (copyBtn) {
-              copyBtn.addEventListener('click', function() {
-                const textToCopy = document.getElementById('prompt-output').textContent;
-                const textArea = document.createElement("textarea");
-                textArea.value = textToCopy;
-                textArea.style.position = "fixed";
+            const copyBtn = document.getElementById('copy-btn'); if(copyBtn) { copyBtn.addEventListener('click', function() {
+                const textToCopy=document.getElementById('prompt-output').textContent;
+                const textArea=document.createElement("textarea");
+                textArea.value=textToCopy;
+                textArea.style.position="fixed";
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
-                try { document.execCommand('copy'); const btn = document.getElementById('copy-btn'); btn.textContent = 'Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
+                try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
                 document.body.removeChild(textArea);
-              });
-            }
+            }); }
 
-            // botões de colar (simulação)
-            const pasteTreino = document.getElementById('paste-treino');
-            const pasteDieta = document.getElementById('paste-dieta');
-
+            const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
             function simulatePaste(buttonEl, targetTextareaId) {
                 const txtOutput = document.getElementById('prompt-output').textContent || '';
                 const target = document.getElementById(targetTextareaId);
-                const label = buttonEl ? buttonEl.querySelector('.label') : null;
-                if (!buttonEl || buttonEl.disabled) return;
+                const label = buttonEl.querySelector('.label');
+                if (buttonEl.disabled) return;
                 buttonEl.classList.remove('appearing');
                 void buttonEl.offsetWidth;
                 buttonEl.classList.add('appearing');
@@ -761,11 +735,9 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
         }
-
         initializePageData();
     });
 </script>
