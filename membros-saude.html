@@ -371,10 +371,7 @@
       .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
 
       /*
-        NOVA MÁSCARA (ajustada): 
-        - mais escura para esconder o credit
-        - menor altura e menos deslocamento (não cobre a área branca do input)
-        - somente mobile
+        MÁSCARA MÓVEL: totalmente opaca/preta para esconder completamente a logo Dify
       */
       .dify-frame .dify-bottom-mask {
         display: block;
@@ -382,14 +379,16 @@
         left: 12px;
         right: 12px;
         width: calc(100% - 24px);
-        height: clamp(48px, 7.5vh, 110px); /* menor: minimiza cobertura do chat */
-        bottom: -8px; /* menos negativo para não invadir o input branco */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,1) 100%); /* gradiente mais abrupto */
-        border-radius: 20px;  /* cantos arredondados */
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.85), inset 0 6px 18px rgba(0,0,0,0.6);
+        height: clamp(48px, 7.5vh, 110px);
+        bottom: -8px;
+        background: #000;               /* totalmente preta e opaca */
+        background-color: #000;
+        opacity: 1;                     /* garante opacidade total */
+        border-radius: 20px;
+        box-shadow: 0 -10px 30px rgba(0,0,0,1), inset 0 6px 18px rgba(0,0,0,1);
         pointer-events: none;
-        z-index: 220; /* acima do iframe e acima de quase tudo dentro da moldura */
-        backdrop-filter: blur(2px) saturate(120%);
+        z-index: 9999;                  /* garantir que fique acima do iframe */
+        backdrop-filter: none;          /* remover blur/transparência */
         transition: height 180ms ease, bottom 180ms ease, background 180ms ease;
       }
 
