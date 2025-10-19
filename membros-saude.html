@@ -268,18 +268,18 @@
       background: transparent;
     }
 
-    /* faixa superior maior e integrada */
+    /* badge / faixa superior */
     .dify-top-strip {
       position: absolute;
-      top: 14px;              /* mais afastamento para 'flutuar' dentro da moldura */
+      top: 14px;
       left: 14px;
       right: 14px;
-      height: 64px;            /* maior, conforme pedido */
+      height: 64px;
       background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
       z-index: 90;
       display: flex;
       align-items: center;
-      justify-content: space-between; /* espaço entre badge e label */
+      justify-content: space-between;
       padding: 0 18px;
       border-radius: 12px;
       box-shadow: 0 18px 36px rgba(0,0,0,0.55);
@@ -293,7 +293,7 @@
       color: #fff;
       font-weight: 700;
       font-family: 'Poppins', sans-serif;
-      font-size: 15px; /* maior */
+      font-size: 15px;
       letter-spacing: 0.2px;
       background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0.85));
       -webkit-background-clip: text;
@@ -302,7 +302,6 @@
       filter: drop-shadow(0 1px 0 rgba(0,0,0,0.6));
     }
 
-    /* badge no lado esquerdo maior e mais legível */
     .dify-top-badge {
       display: inline-flex;
       align-items: center;
@@ -319,7 +318,12 @@
       z-index: 91;
     }
 
-    /* quando a tela for pequena, reduzimos proporcionalmente */
+    /* Faz a máscara invisível por padrão (desktop) */
+    .dify-bottom-mask {
+      display: none;
+    }
+
+    /* quando a tela for pequena, reduzimos proporcionalmente e aplicamos as mudanças mobile */
     @media (max-width: 900px) {
       /* ************************************************
          OVERIDES MOBILE — só aqui alteramos o mobile
@@ -349,10 +353,10 @@
       .sidebar {
         width: 260px;
         left: -260px;
-    }
-    .sidebar.open { left: 0; }
-    .sidebar nav { padding-top: 84px; }
-    .sidebar nav a { padding: 12px 20px; font-size: 1em; }
+      }
+      .sidebar.open { left: 0; }
+      .sidebar nav { padding-top: 84px; }
+      .sidebar nav a { padding: 12px 20px; font-size: 1em; }
 
       /* reduzir paddings das caixas para caber melhor */
       .form-container, .results-container, .percurso-container {
@@ -389,14 +393,23 @@
       .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
       .paste-btn .hole::after { inset: 3px; }
 
-      /* DIFY chat frame — tornar menor e mais leve no mobile */
+      /* ======= Ajustes mobile para deixar o chat mais longo ======= */
       .dify-frame {
-        border-radius: 12px;
+        /* ocupar a maior parte da viewport no mobile,
+           mantendo espaço para cabeçalho e a faixa preta do rodapé */
+        height: calc(100vh - 140px);
         min-height: 420px;
+        max-height: calc(100vh - 120px);
+        border-radius: 12px;
         border: 2px solid rgba(0,0,0,0.85);
         box-shadow: 0 18px 36px rgba(0,0,0,0.55);
       }
-      .dify-frame iframe { min-height: 380px; }
+
+      /* iframe ocupa toda a moldura (altura definida pelo .dify-frame) */
+      .dify-frame iframe {
+        height: 100%;
+        min-height: 380px;
+      }
 
       /* faixa superior integrada do chat reduzida */
       .dify-top-strip {
@@ -432,6 +445,27 @@
 
       /* ajustar pequenas tipografias */
       .small-note { font-size: 12px; }
+
+      /* ======= Faixa preta fixa no rodapé para “tapar” o credit Dify ======= */
+      .dify-bottom-mask {
+        display: block;
+        position: fixed;
+        left: 12px;                 /* alinha com o padding .container no mobile */
+        right: 12px;
+        height: 104px;              /* altura da faixa que cobre a area do credit */
+        bottom: 12px;               /* distância da borda do viewport */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,1) 100%);
+        border-radius: 14px;        /* cantos arredondados para ficar natural com a moldura */
+        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+        pointer-events: none;       /* não bloqueia cliques */
+        z-index: 995;               /* acima do conteúdo, mas abaixo do sidebar/overlay (se necessário ajuste) */
+        backdrop-filter: blur(2px) saturate(120%);
+      }
+
+      /* se quiser que a faixa cubra um pouco mais em telas extremamente pequenas */
+      @media (max-height: 620px) and (max-width: 420px) {
+        .dify-bottom-mask { height: 140px; bottom: 10px; left: 10px; right: 10px; border-radius: 12px; }
+      }
 
       /* Conteúdo que ficaria muito grande no mobile, esconder se necessário (ex: elementos complementares) */
       /* .some-desktop-only { display: none; }  -- descomente se quiser ocultar algo apenas no mobile */
@@ -485,6 +519,8 @@
       <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 
       <div id="dify-container" class="iframe-container"></div>
+      <!-- Faixa visual fixa (mobile-only). Mantém pointer-events:none para não interferir. -->
+      <div class="dify-bottom-mask" aria-hidden="true"></div>
 
       <div class="playlist-section" id="playlist-section" style="display: none;">
         <h4>Roteiro de Aulas Sugerido</h4>
@@ -685,8 +721,8 @@
                 buttonEl.setAttribute('aria-disabled', 'true');
                 if (target) { try { target.focus(); } catch (e) {} }
             }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(paste-treino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(paste-dieta, 'objetivo_dieta')); }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
         }
         initializePageData();
     });
