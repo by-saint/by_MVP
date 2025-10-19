@@ -317,20 +317,18 @@
     }
 
     /* Por padrão, a máscara dentro da moldura fica escondida (desktop) */
-    .dify-frame .dify-bottom-mask {
+    .dify-frame .dify-bottom-mask,
+    .dify-frame .dify-bottom-left-mask {
       display: none;
     }
 
-    /* quando a tela for pequena (mobile), mostramos UMA MÁSCARA mais larga
-       e deslocada para a esquerda, cobrindo 'feito/desenvolvido por' sem
-       bloquear os inputs (pointer-events:none) */
+    /* MOBILE: mostramos duas máscaras:
+       - um bloco pequeno no canto direito inferior (cobre credit)
+       - uma faixa mais larga POSICIONADA ACIMA DA ÁREA DE INPUT para não bloquear escrita
+    */
     @media (max-width: 900px) {
-      body {
-        padding: 20px 12px;
-      }
-      .container {
-        padding: 0 12px;
-      }
+      body { padding: 20px 12px; }
+      .container { padding: 0 12px; }
       .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
       .menu-toggle .bar { width: 20px; height: 3px; }
       .sidebar { width: 260px; left: -260px; }
@@ -382,39 +380,60 @@
       .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
       .small-note { font-size: 12px; }
 
-      /* MÁSCARA MOBILE AMPLIADA (aparece SOMENTE no mobile)
-         - left reduzido para cobrir mais à esquerda (coberturas dos créditos "desenvolvido por")
-         - altura limitada para não cobrir a área de escrita do chat
-      */
+      /* máscara pequena no canto inferior direito (cobre credit) */
       .dify-frame .dify-bottom-mask {
         display: block;
         position: absolute;
-        left: 12px;               /* desloca mais para a esquerda para cobrir "desenvolvido por" */
-        right: 12px;              /* estende até quase a borda direita */
+        right: 12px;
         bottom: 12px;
-        height: 110px;            /* cobre o rodapé/credit sem bloquear inputs visíveis */
-        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,1) 100%);
-        border-radius: 12px;
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        pointer-events: none;     /* não interfere em cliques / escrita */
+        width: 160px;
+        height: 36px;
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.88) 60%, rgba(0,0,0,1) 100%);
+        border-radius: 10px;
+        box-shadow: 0 -6px 18px rgba(0,0,0,0.6);
+        pointer-events: none;
         z-index: 95;
         backdrop-filter: blur(2px) saturate(120%);
         border: 1px solid rgba(255,255,255,0.02);
       }
 
+      /* faixa larga, mas posicionada acima do input para NÃO bloquear escrita.
+         Ajuste bottom aqui para subir/descer a faixa — por padrão deixei 72px. */
+      .dify-frame .dify-bottom-left-mask {
+        display: block;
+        position: absolute;
+        left: 12px;                 /* desloca para a esquerda para cobrir 'desenvolvido por' à esquerda, se houver */
+        right: 12px;                /* estende quase até a direita (não sobrepõe a máscara pequena direita) */
+        bottom: 72px;               /* <-- distância da borda inferior; aumenta se ainda cobrir o input */
+        height: 56px;               /* altura reduzida para não bloquear a área de digitação */
+        background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.82) 60%, rgba(0,0,0,0.98) 100%);
+        border-radius: 12px;
+        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+        pointer-events: none;
+        z-index: 92;                /* abaixo da máscara pequena (95), acima do iframe visual */
+        backdrop-filter: blur(2px) saturate(120%);
+        border: 1px solid rgba(255,255,255,0.02);
+        opacity: 0.98;
+      }
+
       /* ajuste para telas muito pequenas */
       @media (max-width: 420px) {
         .dify-frame .dify-bottom-mask {
-          left: 10px;
           right: 10px;
           bottom: 10px;
-          height: 140px; /* se necessário, aumentar um pouco em telas bem pequenas */
+          width: 120px;
+          height: 34px;
+        }
+        .dify-frame .dify-bottom-left-mask {
+          left: 10px;
+          right: 10px;
+          bottom: 84px;  /* aumenta o bottom para garantir que não cubra input em telas muito pequenas */
+          height: 68px;
         }
       }
     }
 
-    /* Desktop: manter a máscara interna escondida (ou pequena) — já definimos display:none acima,
-       então nada extra é mostrado no desktop */
+    /* Desktop: manter as máscaras escondidas */
   </style>
 </head>
 <body>
@@ -578,7 +597,7 @@
               document.getElementById('form-wrapper').style.display = 'block';
             }
 
-            // injeta iframe + moldura + faixa superior e máscara (mobile)
+            // injeta iframe + moldura + faixa superior e máscaras (mobile)
             function loadFreshDifyChat() {
                 const difyContainer = document.getElementById('dify-container');
                 if (!difyContainer) return;
@@ -606,13 +625,19 @@
                 strip.appendChild(badge);
                 strip.appendChild(label);
 
-                // máscara que só será visível no mobile via CSS
+                // máscara pequena (canto direito)
                 const bottomMask = document.createElement('div');
                 bottomMask.className = 'dify-bottom-mask';
                 bottomMask.setAttribute('aria-hidden', 'true');
 
+                // faixa larga (posicionada acima do input para não bloquear a escrita)
+                const bottomLeftMask = document.createElement('div');
+                bottomLeftMask.className = 'dify-bottom-left-mask';
+                bottomLeftMask.setAttribute('aria-hidden', 'true');
+
                 frameWrap.appendChild(strip);
                 frameWrap.appendChild(bottomMask);
+                frameWrap.appendChild(bottomLeftMask);
                 difyContainer.appendChild(frameWrap);
             }
 
