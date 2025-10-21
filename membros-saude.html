@@ -253,6 +253,64 @@
       .dieta-tabs { overflow:auto; }
     }
 
+    /* =============================================
+        DIFFY IFRAME SIZE FIX — garantir altura vertical estável
+       ============================================= */
+    .dify-frame {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0b0b0b, #121212);
+      border: 3px solid rgba(0,0,0,0.9);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
+      min-height: 780px;        /* desktop: altura mínima estável */
+      height: 780px;
+      max-height: calc(100vh - 120px);
+    }
+    .dify-frame iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+    }
+    .dify-top-strip {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      height: 64px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
+      z-index: 200; /* elevado */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-radius: 12px;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px) saturate(140%);
+      pointer-events: none;
+      opacity: 0.995;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .dify-top-badge { display:inline-flex; align-items:center; gap:10px; height:36px; padding:6px 14px; border-radius:999px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.02); color:#e6e6e6; font-size:14px; font-weight:700; pointer-events:none; z-index:201; }
+    .dify-bottom-mask { display: none; }
+
+    @media (max-width: 900px) {
+      .dify-frame {
+        height: calc(100vh - 140px);
+        min-height: 420px;
+        max-height: calc(100vh - 120px);
+        border-radius: 12px;
+        border: 2px solid rgba(0,0,0,0.85);
+      }
+      .dify-frame iframe { height: 100%; }
+      .dify-top-strip { top: 8px; left: 8px; right: 8px; height: 44px; padding: 0 10px; border-radius: 9px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
+      .dify-top-strip .mvp-label { font-size: 12px; }
+      .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
+      .dify-frame .dify-bottom-mask { display:block; position:absolute; left:12px; right:12px; width:calc(100% - 24px); height: clamp(48px, 7.5vh, 110px); bottom: -8px; background:#000; border-radius:20px; box-shadow:0 -10px 30px rgba(0,0,0,1); z-index:9999; }
+    }
+
   </style>
 </head>
 <body>
@@ -341,7 +399,7 @@
         </div>
       </div>
 
-      <!-- >>> ALTEREI ESTA ÁREA: substitui o conteúdo anterior por interface para colar/rodar o código compacto -->
+      <!-- Dieta: interface para colar/rodar o código compacto (sem botão de teste) -->
       <div class="percurso-card" id="dieta-card">
         <h4>Formulário: Dieta</h4>
 
@@ -352,7 +410,6 @@
 
         <div style="display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:8px;">
           <button class="paste-btn" id="run-code-btn" title="Rodar o código e gerar o formulário">Rodar Código</button>
-          <button class="paste-btn" id="test-code-btn" title="Inserir código de teste (2 abas / 2 dias / 4 refeições/dia)">Testar Código</button>
           <button class="paste-btn" id="clear-form-btn" title="Limpar formulário">Limpar</button>
         </div>
 
@@ -361,7 +418,7 @@
           <div id="dieta-form-render" class="dieta-panel"></div>
         </div>
 
-        <div class="small-note" style="margin-top:10px;">Dica: use o botão Testar para preencher um código exemplo e ver o formulário com 2 abas (Mês 1, Mês 2), 2 dias por aba e 4 refeições por dia.</div>
+        <div class="small-note" style="margin-top:10px;">Cole o código compacto e clique em "Rodar Código". Se houver erro, verá mensagem explicativa.</div>
       </div>
     </div>
 
@@ -387,7 +444,7 @@
     function reorderVideos(order) { const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
 
     // -------------- INTEGRAÇÃO DO SUPER ALGORITMO (parser + render) ---------------
-    // 1) KB text (usei a lista que você forneceu — o parser extrai id/name/preparo)
+    // KB text (use a lista que você forneceu — o parser extrai id/name/preparo)
     const kbText = `1\tAbóbora, cabotián\tcozida
 5\tAbóbora, moranga\trefogada
 7\tAbobrinha, italiana\tcozida
@@ -624,61 +681,75 @@
       return kb;
     }
 
-    // Parser utilities (compact format with groups 'G')
-    function digitAt(code,pos){
-      const c = code[pos];
-      if(!c || !/^\d$/.test(c)) throw new Error('expected digit at pos '+pos);
-      return parseInt(c,10);
-    }
+    // Parser utilities (mais tolerante): lê números com múltiplos dígitos, aceita espaços opcionais
+    function isDigit(ch){ return !!ch && /^[0-9]$/.test(ch); }
     function parseCompactWithGroups(code){
+      code = String(code || '').replace(/\s+/g,''); // remove espaços para segurança
+      if(!code || code.length < 3) throw new Error('Código muito curto.');
       let pos = 0;
       function peek(){ return code[pos]; }
       function next(){ return code[pos++]; }
-      function substr(n){ const s = code.substr(pos,n); pos += n; return s; }
-      const type = next();
-      const months = digitAt(code,pos); pos++;
-      const tabCount = digitAt(code,pos); pos++;
+      function readNumber(){ // lê sequência de dígitos (1..n)
+        if(!isDigit(peek())) throw new Error('Número esperado na posição ' + pos);
+        let s=''; while(isDigit(peek())) s += next();
+        return parseInt(s,10);
+      }
+      function readDigits(n){
+        if(n <= 0) return '';
+        const s = code.substr(pos, n);
+        if(s.length < n) throw new Error('Esperado ' + n + ' dígitos em pos ' + pos);
+        pos += n;
+        if(!/^\d+$/.test(s)) throw new Error('Caracteres não-numéricos onde esperava dígitos em pos ' + (pos - n));
+        return s;
+      }
+
+      const type = next(); // letra inicial (e.g., 'D')
+      if(!/^[A-Za-z]$/.test(type)) throw new Error('Tipo inválido (esperado letra) na posição 0');
+      // ler months (um ou mais dígitos)
+      const months = readNumber();
+      const tabCount = readNumber();
       const tabs = [];
       for(let t=0; t<tabCount; t++){
-        if(peek()!=='B') throw new Error("expected B at pos " + pos);
+        if(peek() !== 'B') throw new Error("Esperado 'B' antes do tab " + (t+1) + " na posição " + pos);
         next();
-        const monthStart = digitAt(code,pos); pos++;
-        const monthEnd = digitAt(code,pos); pos++;
-        const daysVar = digitAt(code,pos); pos++;
-        const mealsBitmap = parseInt(substr(2),10);
+        const monthStart = readNumber();
+        const monthEnd = readNumber();
+        const daysVar = readNumber();
+        // mealsBitmap — aceitamos 1-3 dígitos
+        const mealsBitmap = readNumber();
         const days = [];
         for(let d=0; d<daysVar; d++){
-          if(peek()!=='d') throw new Error("expected d at pos " + pos);
+          if(peek() !== 'd') throw new Error("Esperado 'd' antes do dia " + (d+1) + " na posição " + pos);
           next();
-          const dayIndex = digitAt(code,pos); pos++;
-          const mealEntryCount = digitAt(code,pos); pos++;
+          const dayIndex = readNumber();
+          const mealEntryCount = readNumber();
           const slots = [];
           for(let m=0; m<mealEntryCount; m++){
-            const mealCode = digitAt(code,pos); pos++;
-            const itemEntryCount = digitAt(code,pos); pos++;
+            const mealCode = readNumber();
+            const itemEntryCount = readNumber();
             const entries = [];
             for(let e=0; e<itemEntryCount; e++){
               if(peek() === 'G'){
                 next();
-                const groupCount = digitAt(code,pos); pos++;
+                const groupCount = readNumber();
                 const groupItems = [];
                 for(let g=0; g<groupCount; g++){
-                  const L = digitAt(code,pos); pos++;
-                  if(L<1||L>4) throw new Error('invalid L at pos '+pos);
-                  const id = substr(L);
-                  const qtyStr = substr(3);
-                  if(!/^\d{3}$/.test(qtyStr)) throw new Error('invalid qty at pos '+pos);
-                  const qty = parseInt(qtyStr,10);
+                  const L = readNumber(); // L: comprimento do id (1..4)
+                  if(L < 1 || L > 6) throw new Error('L inválido (comprimento id) na posição ' + pos);
+                  const id = readDigits(L);
+                  // qty: agora aceita 1..4 dígitos
+                  const qtyDigits = readNumber();
+                  // qtyDigits could be > 9 (not expected). If accidental, fall back to treat as qty number already read.
+                  // But grammar before used fixed digits; here we interpret 'qtyDigits' as numeric quantity directly.
+                  const qty = qtyDigits;
                   groupItems.push({ id, qty });
                 }
                 entries.push({ type:'group', items: groupItems });
               } else {
-                const L = digitAt(code,pos); pos++;
-                if(L<1||L>4) throw new Error('invalid L at pos '+pos);
-                const id = substr(L);
-                const qtyStr = substr(3);
-                if(!/^\d{3}$/.test(qtyStr)) throw new Error('invalid qty at pos '+pos);
-                const qty = parseInt(qtyStr,10);
+                const L = readNumber();
+                if(L < 1 || L > 6) throw new Error('L inválido (comprimento id) na posição ' + pos);
+                const id = readDigits(L);
+                const qty = readNumber();
                 entries.push({ type:'item', item: { id, qty }});
               }
             }
@@ -686,7 +757,7 @@
           }
           days.push({ dayIndex, slots });
         }
-        if(peek()!=='E') throw new Error("expected E at end of tab at pos "+pos);
+        if(peek() !== 'E') throw new Error("Esperado 'E' no final do tab " + (t+1) + " na posição " + pos);
         next();
         tabs.push({ monthStart, monthEnd, daysVar, mealsBitmap, days });
       }
@@ -704,7 +775,7 @@
                 entry.items.forEach(it=>{
                   const kbItem = kb[it.id] || null;
                   it.kb = kbItem;
-                  it.used_qty = (it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback) : it.qty);
+                  it.used_qty = (typeof it.qty === 'number' && it.qty > 0) ? it.qty : (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback);
                   it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty * 100 / kbItem.default_portion_g) : null;
                   it.kcal = (kbItem && kbItem.kcal_per_100g) ? Math.round((kbItem.kcal_per_100g) * it.used_qty / 100) : null;
                 });
@@ -713,7 +784,7 @@
                 const it = entry.item;
                 const kbItem = kb[it.id] || null;
                 it.kb = kbItem;
-                it.used_qty = (it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback) : it.qty);
+                it.used_qty = (typeof it.qty === 'number' && it.qty > 0) ? it.qty : (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback);
                 it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty * 100 / kbItem.default_portion_g) : null;
                 it.kcal = (kbItem && kbItem.kcal_per_100g) ? Math.round((kbItem.kcal_per_100g) * it.used_qty / 100) : null;
               }
@@ -881,48 +952,6 @@
       container.appendChild(actions);
     }
 
-    // ---------------- sample test code (2 abas, 2 dias, 4 refeições/dia) --------------
-    // built to follow the defined compact grammar (use it as default test)
-    const sampleCompact = 
-      // header: D 2 months, 2 tabs
-      'D22' +
-      // tab 1: month 1..1, daysVar 2, mealsBitmap 31
-      'B11231' +
-        // day1 (index1) with 4 meal entries
-        'd14' +
-          // meal1 (1) -> 2 entries: group (rice+beans) + banana
-          '12G2323410033830603103100' +
-          // meal2 (3) -> chicken
-          '313510120' +
-          // meal3 (4) -> alface
-          '41214030' +
-          // meal4 (5) -> pão
-          '513288050' +
-        // day2 (index2)
-        'd24' +
-          // meal1 (1) -> aveia
-          '113238040' +
-          // meal2 (2) -> ovo
-          '213567050' +
-          // meal3 (3) -> frango + alface
-          '323510120214030' +
-          // meal4 (4) -> abacaxi
-          '41290100' +
-      'E' +
-      // tab 2: month 2..2, same structure to test multi-aba
-      'B21231' +
-        'd14' +
-          '12G2323410033830603103100' +
-          '313510120' +
-          '41214030' +
-          '513288050' +
-        'd24' +
-          '113238040' +
-          '213567050' +
-          '323510120214030' +
-          '41290100' +
-      'E';
-
     // ---------------- DOM wiring inside initializePageData -----------------------
     document.addEventListener('DOMContentLoaded', () => {
         let user = null;
@@ -1048,10 +1077,9 @@
             }
             if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
 
-            // ---------------- DIETA: hook up run/test/clear and initialize KB ----------------
+            // ---------------- DIETA: hook up run/clear and initialize KB ----------------
             const codeInput = document.getElementById('code-input');
             const runCodeBtn = document.getElementById('run-code-btn');
-            const testCodeBtn = document.getElementById('test-code-btn');
             const clearFormBtn = document.getElementById('clear-form-btn');
             const renderContainer = document.getElementById('dieta-form-render');
             const kbInfo = document.getElementById('dieta-kb-info');
@@ -1060,10 +1088,11 @@
             const KB = parseKBText(kbText);
             kbInfo.textContent = `KB carregada: ${Object.keys(KB).length} itens (nomes extraídos).`;
 
-            // run code -> parse -> normalize -> render
+            // run code -> parse -> normalize -> render (com tratamento de erros)
             function runCompactCode(code){
+              renderContainer.innerHTML = '<div class="small-note" style="color:#aaa">Processando...</div>';
               try{
-                const plan = parseCompactWithGroups(code.trim());
+                const plan = parseCompactWithGroups(String(code || '').trim());
                 normalizePlan(plan, KB);
                 renderFormVertical(plan, KB, renderContainer);
                 window._lastPlan = plan;
@@ -1075,13 +1104,8 @@
 
             runCodeBtn.addEventListener('click', ()=>{
               const code = codeInput.value.trim();
-              if(!code){ alert('Cole o código compacto antes de rodar (ou use Testar Código).'); return; }
+              if(!code){ alert('Cole o código compacto antes de rodar.'); return; }
               runCompactCode(code);
-            });
-
-            testCodeBtn.addEventListener('click', ()=>{
-              codeInput.value = sampleCompact;
-              runCompactCode(sampleCompact);
             });
 
             clearFormBtn.addEventListener('click', ()=>{
@@ -1089,8 +1113,7 @@
               renderContainer.innerHTML = '';
             });
 
-            // If page has some prefilled scenario: you can auto-run sample (disabled by default)
-            // runCompactCode(sampleCompact); // <-- uncomment para auto-executar no load
+            // ready
         }
         initializePageData();
     });
