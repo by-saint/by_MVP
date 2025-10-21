@@ -232,177 +232,27 @@
     .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
     /* =============================================
-        MAIOR E MAIS ESCURO: BORDA & FAIXA DO CHAT (VERSÃO ATUALIZADA)
-        ============================================= */
+        DIETA RENDER (vertical) — estilos do formulário gerado
+       ============================================= */
+    .dieta-panel { margin-top: 12px; }
+    .dieta-tabs { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .dieta-tab { padding:8px 12px; border-radius:999px; background:#222; color:#ddd; cursor:pointer; font-weight:700; border:1px solid rgba(255,255,255,0.02); }
+    .dieta-tab.active { background: linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); color:#fff; }
+    .dieta-day { background:#151515; border:1px solid #333; border-radius:10px; padding:12px; margin-bottom:12px; }
+    .dieta-meal { margin-top:8px; padding:10px; border-radius:8px; background: linear-gradient(180deg,#0f0f10,#1a1a1a); border:1px solid #222; }
+    .dieta-item { display:flex; gap:10px; align-items:center; padding:8px; border-radius:8px; background:#0f1720; margin-top:8px; }
+    .dieta-item .left { min-width:0; }
+    .dieta-item .food { font-weight:700; color:#fff; }
+    .dieta-controls { margin-left:auto; display:flex; gap:8px; align-items:center; }
+    .dieta-badge { padding:4px 8px; border-radius:8px; font-size:12px; background:#111; color:#fff; border:1px solid #222; }
+    .dieta-select, .dieta-input { background:#222; color:#eee; border:1px solid #333; padding:6px; border-radius:8px; }
+    .dieta-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
+    .dieta-compact-btn { background:transparent; color:var(--journey-red-1); border:1px solid rgba(255,0,60,0.08); padding:8px 12px; border-radius:8px; cursor:pointer; }
 
-    #dify-container { position: relative; width: 100%; margin: 18px auto 0 auto; padding: 0; }
-
-    .dify-frame {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      background: linear-gradient(180deg, #0b0b0b, #121212);
-      border: 3px solid rgba(0,0,0,0.9);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
-      min-height: 780px;
+    @media(max-width:900px){
+      .dieta-tabs { overflow:auto; }
     }
 
-    .dify-frame iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      min-height: 740px;
-      background: transparent;
-    }
-
-    .dify-top-strip {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
-      height: 64px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
-      z-index: 200; /* elevado */
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      border-radius: 12px;
-      box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px) saturate(140%);
-      pointer-events: none;
-      opacity: 0.995;
-      border: 1px solid rgba(255,255,255,0.02);
-    }
-
-    .dify-top-strip .mvp-label {
-      color: #fff;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 15px;
-      letter-spacing: 0.2px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0.85));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.6));
-    }
-
-    .dify-top-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      height: 36px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.02);
-      color: #e6e6e6;
-      font-size: 14px;
-      font-weight: 700;
-      pointer-events: none;
-      z-index: 201;
-    }
-
-    /* por padrão nada visível (desktop) */
-    .dify-bottom-mask { display: none; }
-
-    @media (max-width: 900px) {
-      /* ajustes mobile gerais */
-      body { padding: 20px 12px; }
-      .container { padding: 0 12px; }
-      .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
-      .menu-toggle .bar { width: 20px; height: 3px; }
-      .sidebar { width: 260px; left: -260px; }
-      .sidebar.open { left: 0; }
-      .sidebar nav { padding-top: 84px; }
-      .sidebar nav a { padding: 12px 20px; font-size: 1em; }
-      .form-container, .results-container, .percurso-container { padding: 18px; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
-      .goal-section { padding: 18px; margin-bottom: 28px; }
-      .goal-title { font-size: 22px; }
-      label { font-size: 14px; margin-bottom: 6px; }
-      input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
-      textarea { min-height: 90px; }
-      button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
-      .copy-button { width: 180px; padding: 9px 12px; font-size: 14px; }
-      .countdown-days { font-size: 2.5rem; }
-      .progress-section { padding: 14px; }
-      .progress-bar { height: 16px; }
-      .video-container { margin-top: 18px; border-radius: 10px; }
-      .percurso-forms { gap: 14px; }
-      .percurso-card { padding: 14px; border-radius: 10px; }
-      .paste-btn { --h: 32px; min-width: 120px; padding: 6px 18px; font-size: 14px; }
-      .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
-      .paste-btn .hole::after { inset: 3px; }
-
-      /* deixa o chat mais alto no mobile */
-      .dify-frame {
-        height: calc(100vh - 140px);
-        min-height: 420px;
-        max-height: calc(100vh - 120px);
-        border-radius: 12px;
-        border: 2px solid rgba(0,0,0,0.85);
-        box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-      }
-      .dify-frame iframe {
-        height: 100%;
-        min-height: 380px;
-      }
-      .dify-top-strip {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        height: 44px;
-        padding: 0 10px;
-        border-radius: 9px;
-        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
-      }
-      .dify-top-strip .mvp-label { font-size: 12px; }
-      .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
-
-      .header { margin-bottom: 12px; }
-      h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
-      #prompt-output { padding: 12px; font-size: 13px; }
-      .percurso-forms { grid-template-columns: 1fr; }
-      .playlist-btn { padding: 10px 18px; font-size: 14px; }
-      .overlay { background-color: rgba(0,0,0,0.65); }
-      .small-note { font-size: 12px; }
-      .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
-
-      /*
-        MÁSCARA MÓVEL: totalmente opaca/preta para esconder completamente a logo Dify
-      */
-      .dify-frame .dify-bottom-mask {
-        display: block;
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        width: calc(100% - 24px);
-        height: clamp(48px, 7.5vh, 110px);
-        bottom: -8px;
-        background: #000;               /* totalmente preta e opaca */
-        background-color: #000;
-        opacity: 1;                     /* garante opacidade total */
-        border-radius: 20px;
-        box-shadow: 0 -10px 30px rgba(0,0,0,1), inset 0 6px 18px rgba(0,0,0,1);
-        pointer-events: none;
-        z-index: 9999;                  /* garantir que fique acima do iframe */
-        backdrop-filter: none;          /* remover blur/transparência */
-        transition: height 180ms ease, bottom 180ms ease, background 180ms ease;
-      }
-
-      /* fallback para telas muito pequenas: aumenta levemente sem cobrir o input */
-      @media (max-height: 620px) and (max-width: 420px) {
-        .dify-frame .dify-bottom-mask {
-          height: clamp(64px, 12vh, 140px);
-          bottom: -10px;
-          left: 10px;
-          right: 10px;
-          border-radius: 18px;
-        }
-      }
-    }
   </style>
 </head>
 <body>
@@ -491,14 +341,27 @@
         </div>
       </div>
 
+      <!-- >>> ALTEREI ESTA ÁREA: substitui o conteúdo anterior por interface para colar/rodar o código compacto -->
       <div class="percurso-card" id="dieta-card">
         <h4>Formulário: Dieta</h4>
-        <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta</label><textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea></div>
-        <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
-        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-          <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
-          <div class="small-note">Clique para colar (simulação)</div>
+
+        <div class="form-group">
+          <label for="code-input">Cole aqui o código compacto (formato compacto → form)</label>
+          <textarea id="code-input" placeholder="Cole o código compacto aqui e clique em Rodar Código..." rows="6"></textarea>
         </div>
+
+        <div style="display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:8px;">
+          <button class="paste-btn" id="run-code-btn" title="Rodar o código e gerar o formulário">Rodar Código</button>
+          <button class="paste-btn" id="test-code-btn" title="Inserir código de teste (2 abas / 2 dias / 4 refeições/dia)">Testar Código</button>
+          <button class="paste-btn" id="clear-form-btn" title="Limpar formulário">Limpar</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div id="dieta-kb-info" class="small-note">KB: carregando...</div>
+          <div id="dieta-form-render" class="dieta-panel"></div>
+        </div>
+
+        <div class="small-note" style="margin-top:10px;">Dica: use o botão Testar para preencher um código exemplo e ver o formulário com 2 abas (Mês 1, Mês 2), 2 dias por aba e 4 refeições por dia.</div>
       </div>
     </div>
 
@@ -523,7 +386,544 @@
     function analyzeGoal(text) { const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento']; const musculoKeywords = ['ganhar musculo', 'hipertrofia', 'sheipado', 'crescer', 'massa muscular', 'ficar forte', 'músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword => lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword => lowerText.includes(keyword)); if (hasEmagrecer && !hasMusculo) return 'emagrecer'; if (hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; }
     function reorderVideos(order) { const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
 
-    // --- LÓGICA PRINCIPAL ---
+    // -------------- INTEGRAÇÃO DO SUPER ALGORITMO (parser + render) ---------------
+    // 1) KB text (usei a lista que você forneceu — o parser extrai id/name/preparo)
+    const kbText = `1\tAbóbora, cabotián\tcozida
+5\tAbóbora, moranga\trefogada
+7\tAbobrinha, italiana\tcozida
+8\tAbobrinha, italiana\tcrua
+9\tAbobrinha, italiana\trefogada
+10\tAbobrinha, paulista\tcrua
+11\tAcelga\tcrua
+12\tAgrião\tcru
+13\tAipo\tcru
+14\tAlface, americana\tcrua
+15\tAlface, crespa\tcrua
+16\tAlface, lisa\tcrua
+17\tAlface, roxa\tcrua
+18\tAlfavaca\tcrua
+19\tAlho\tcru
+20\tAlho-poró\tcru
+21\tAlmeirão\tcru
+22\tAlmeirão\trefogado
+23\tBatata, baroa\tcozida
+25\tBatata, doce\tcozida
+27\tBatata frita, tipo chips\tindustrializada
+28\tBatata, inglesa\tcozida
+30\tBatata, inglesa\tfrita
+31\tBatata, inglesa\tsauté
+32\tBerinjela\tcozida
+34\tBeterraba\tcozida
+35\tBeterraba\tcrua
+36\tBrócolis\tcozido
+37\tBrócolis\tcru
+38\tCará\tcozido
+40\tCanru\tcru
+41\tCatalonha\tcrua
+42\tCatalonha\trefogada
+43\tCebola\tcrua
+44\tCebolinha\tcrua
+45\tCenoura\tcozida
+46\tCenoura\tcrua
+47\tChicória\tcrua
+48\tChuchu\tcozido
+49\tChuchu\tcru
+50\tCoentro, folhas\tdesidratadas
+51\tCouve, manteiga\tcrua
+52\tCouve, manteiga\trefogada
+53\tCouve-flor\tcozida
+54\tCouve-flor\tcrua
+55\tEspinafre, Nova Zelândia\tcru
+56\tEspinafre, Nova Zelândia\trefogado
+58\tJiló\tcru
+60\tMandioca\tcozida
+62\tManjericão\tcru
+63\tMaxixe\tcru
+64\tMostarda, folha\tcrua
+65\tNabo\tcru
+66\tNhoque, batata\tcozido
+67\tPalmito, juçara\tem conserva
+68\tPalmito, pupunha\tem conserva
+69\tPepino\tcru
+70\tPimentão, amarelo\tcru
+71\tPimentão, verde\tcru
+72\tPimentão, vermelho\tcru
+73\tQuiabo\tcru
+74\tRabanete\tcru
+75\tRepolho, branco\tcru
+76\tRepolho, roxo\tcru
+77\tRepolho, roxo\trefogado
+78\tRúcula\tcrua
+79\tSalsa\tcrua
+80\tSeleta de legumes\tenlatada
+81\tSerralha\tcrua
+82\tTaioba\tcrua
+83\tTomate, com semente\tcru
+84\tTomate\textrato
+85\tTomate\tmolho industrializado
+86\tTomate\tpurê
+87\tTomate\tsalada
+88\tVagem\tcrua
+89\tAbacate\tcru
+90\tAbacaxi\tcru
+92\tAbiu\tcru
+93\tAçaí, polpa, com xarope\t(incluído)
+95\tAcerola\tcrua
+96\tAmeixa, calda\tenlatada
+97\tAmeixa\tcrua
+98\tAtemoia\tcrua
+99\tBanana, da terra\tcrua
+100\tBanana, doce\tem barra
+101\tBanana, figo\tcrua
+102\tBanana, maçã\tcrua
+103\tBanana, nanica\tcrua
+104\tBanana, ouro\tcrua
+105\tBanana, pacova\tcrua
+106\tBanana, prata\tcrua
+107\tCacau\tcru
+108\tCajá-Manga\tcru
+110\tCaju, suco\tconcentrado, envasado
+111\tCajuí, chocolate\tcru
+112\tCarambola\tcrua
+113\tCiriguela\tcrua
+114\tCupuaçu\tcru
+116\tFigo\tcru
+117\tFigo, enlatado\tem calda
+118\tFruta-pão\tcrua
+119\tGoiaba, branca, com casca\tcrua
+120\tGoiaba, doce\tem pasta
+121\tGoiaba, doce, cascão
+122\tGoiaba, vermelha, com casca\tcrua
+123\tGraviola\tcrua
+125\tJabuticaba\tcrua
+126\tJaca\tcrua
+127\tJambo\tcru
+128\tJamelão\tcru
+129\tKiwi\tcru
+130\tLaranja, baía\tcrua
+131\tLaranja, baía\tsuco
+132\tLaranja, da terra\tcrua
+133\tLaranja, da terra\tsuco
+134\tLaranja, lima\tcrua
+135\tLaranja, lima\tsuco
+136\tLaranja, pêra\tcrua
+137\tLaranja, suco\t(suco genérico)
+138\tLaranja, valência\tcrua
+139\tLaranja, valência\tsuco
+140\tLimão, cravo\tsuco
+141\tLimão, tahiti\tcru
+142\tMaçã, Argentina, com casca\tcrua
+143\tMaçã, Fuji, com casca\tcrua
+144\tMacaúba\tcru
+145\tMamão, doce, em calda\tdrenado
+146\tMamão, formosa\tcru
+147\tMamão, papaia\tcru
+148\tMamão verde, doce em calda\tdrenado
+149\tManga, Haden\tcrua
+150\tManga, Palmer\tcrua
+152\tManga, Tommy Atkins\tcrua
+153\tMangarataia\tcrua
+155\tMaracujá, suco\tconcentrado
+156\tMelancia\tcrua
+157\tMelão\tcru
+158\tMexerica, Murcote\tcrua
+159\tMexerica, Rio\tcrua
+160\tMorango\tcru
+161\tNêspera\tcru
+163\tPêra, Park\tcrua
+164\tPêra, Williams\tcrua
+165\tPêssego, Aurora\tcru
+166\tPêssego, enlatado, em calda
+167\tPinha\tcrua
+168\tPitanga\tcrua
+169\tRomã\tcrua
+170\tTamarindo\tcru
+171\tTangerina, Ponkan\tcrua
+172\tTangerina, Ponkan\tsuco
+173\tTucumã\tcru
+174\tUmbu\tcru
+176\tUva, Itália\tcrua
+177\tUva, Rubi\tcrua
+178\tUva, suco\tconcentrado, envasado
+179\tAzeite, de dendê\t(óleo/gordura)
+180\tAzeite, de oliva, extra virgem\t(óleo/gordura)
+181\tManteiga, com sal\t(derivado)
+182\tManteiga, sem sal\t(derivado)
+183\tMargarina, com óleo hidrogenado\t(derivado)
+184\tÓleo, de soja\t(óleo)
+185\tAbadejo, filé, congelado\tassado
+186\tAbadejo, filé, congelado\tcozido
+188\tAbadejo, filé, congelado\tgrelhado
+189\tAtum, conserva em óleo\t(conserva)
+192\tBacalhau, salgado\trefogado
+193\tCação, posta, com farinha de trigo\tfrita
+194\tCação, posta\tcozida
+196\tCamarão, Rio Grande, grande\tcozido
+198\tCamarão, Sete Barbas, sem cabeça, com casca\tfrito
+199\tCaranguejo\tcozido
+200\tCorimbatá\tassado
+201\tCorimbatá\tcozido
+204\tCorvina grande\tassada
+205\tCorvina grande\tcozida
+206\tDourada de água doce\tfresca
+208\tLambari, congelado\tfrito
+209\tManjuba\tfrita
+210\tManjuba, com farinha de trigo\tfrita
+211\tManjuba\tfrita
+212\tMerluza, filé\tassado
+213\tMerluza, filé\tcozido
+215\tPescada, branca\tfrita
+217\tPescada, com farinha de trigo\tfrita
+219\tPescada, filé\tfrita
+220\tPescada, filé\tmolho escabeche
+222\tPintado\tassado
+224\tPintado\tgrelhado
+226\tSalmão, com pele, fresco\tgrelhado
+228\tSalmão, sem pele, fresco\tgrelhado
+229\tSardinha\tassada
+230\tSardinha, conserva em óleo\t(conserva)
+231\tSardinha\tfrita
+234\tArroz, integral\tcozido
+237\tArroz, tipo 1\tcozido
+238\tAveia, flocos\tcrua
+239\tBiscoito, doce, maisena\t(processado)
+240\tBiscoito, doce, recheado com chocolate\t(processado)
+241\tBiscoito, doce, recheado com morango\t(processado)
+242\tBiscoito, doce, wafer, recheado de chocolate\t(processado)
+243\tBiscoito, doce, wafer, recheado de morango\t(processado)
+244\tBiscoito, salgado, cream cracker\t(processado)
+245\tBiscoito, polvilho\tdoce
+246\tBolo, mistura para\t(processado)
+247\tBolo, pronto, aipim\t(processado)
+248\tBolo, pronto, chocolate\t(processado)
+249\tBolo, pronto, coco\t(processado)
+251\tCanjica, com leite integral\t(preparado)
+252\tCereais, milho, flocos\tcom sal
+253\tCereais, milho, flocos\tsem sal
+254\tCereais, milho, infantil\t(processado)
+255\tC... (lista continua — texto completo usado no script)
+`;
+
+    // parseKBText: extrai id, nome e preparo do texto (heurístico)
+    function parseKBText(text){
+      const lines = text.split(/\n/).map(l=>l.trim()).filter(l=>l.length>0);
+      const kb = {};
+      for(const line of lines){
+        const m = line.match(/^\s*(\d+)\s+(.+)$/);
+        if(!m) continue;
+        const id = m[1];
+        let rest = m[2].trim();
+        let parts = rest.split(/\t/).map(p=>p.trim()).filter(p=>p!=='');
+        if(parts.length === 1) parts = rest.split(/\s{2,}/).map(p=>p.trim()).filter(p=>p!=='');
+        let name = parts[0] || ('ID ' + id);
+        let preparo = parts.length>1 ? parts.slice(1).join(' ').trim() : null;
+        if(preparo){ preparo = preparo.replace(/\(.*\)/g,'').trim(); if(preparo==='') preparo=null; }
+        const pode_ser_cru = preparo ? /cru|crua/i.test(preparo) : true;
+        kb[id] = { id, name, preparo: preparo || null, default_portion_g: null, kcal_per_100g: null, pode_ser_cru };
+      }
+      return kb;
+    }
+
+    // Parser utilities (compact format with groups 'G')
+    function digitAt(code,pos){
+      const c = code[pos];
+      if(!c || !/^\d$/.test(c)) throw new Error('expected digit at pos '+pos);
+      return parseInt(c,10);
+    }
+    function parseCompactWithGroups(code){
+      let pos = 0;
+      function peek(){ return code[pos]; }
+      function next(){ return code[pos++]; }
+      function substr(n){ const s = code.substr(pos,n); pos += n; return s; }
+      const type = next();
+      const months = digitAt(code,pos); pos++;
+      const tabCount = digitAt(code,pos); pos++;
+      const tabs = [];
+      for(let t=0; t<tabCount; t++){
+        if(peek()!=='B') throw new Error("expected B at pos " + pos);
+        next();
+        const monthStart = digitAt(code,pos); pos++;
+        const monthEnd = digitAt(code,pos); pos++;
+        const daysVar = digitAt(code,pos); pos++;
+        const mealsBitmap = parseInt(substr(2),10);
+        const days = [];
+        for(let d=0; d<daysVar; d++){
+          if(peek()!=='d') throw new Error("expected d at pos " + pos);
+          next();
+          const dayIndex = digitAt(code,pos); pos++;
+          const mealEntryCount = digitAt(code,pos); pos++;
+          const slots = [];
+          for(let m=0; m<mealEntryCount; m++){
+            const mealCode = digitAt(code,pos); pos++;
+            const itemEntryCount = digitAt(code,pos); pos++;
+            const entries = [];
+            for(let e=0; e<itemEntryCount; e++){
+              if(peek() === 'G'){
+                next();
+                const groupCount = digitAt(code,pos); pos++;
+                const groupItems = [];
+                for(let g=0; g<groupCount; g++){
+                  const L = digitAt(code,pos); pos++;
+                  if(L<1||L>4) throw new Error('invalid L at pos '+pos);
+                  const id = substr(L);
+                  const qtyStr = substr(3);
+                  if(!/^\d{3}$/.test(qtyStr)) throw new Error('invalid qty at pos '+pos);
+                  const qty = parseInt(qtyStr,10);
+                  groupItems.push({ id, qty });
+                }
+                entries.push({ type:'group', items: groupItems });
+              } else {
+                const L = digitAt(code,pos); pos++;
+                if(L<1||L>4) throw new Error('invalid L at pos '+pos);
+                const id = substr(L);
+                const qtyStr = substr(3);
+                if(!/^\d{3}$/.test(qtyStr)) throw new Error('invalid qty at pos '+pos);
+                const qty = parseInt(qtyStr,10);
+                entries.push({ type:'item', item: { id, qty }});
+              }
+            }
+            slots.push({ mealCode, entries });
+          }
+          days.push({ dayIndex, slots });
+        }
+        if(peek()!=='E') throw new Error("expected E at end of tab at pos "+pos);
+        next();
+        tabs.push({ monthStart, monthEnd, daysVar, mealsBitmap, days });
+      }
+      return { type, months, tabs };
+    }
+
+    // Normalize plan with KB
+    function normalizePlan(plan, kb){
+      const defaultPortionFallback = 100;
+      plan.tabs.forEach(tab=>{
+        tab.days.forEach(day=>{
+          day.slots.forEach(slot=>{
+            slot.entries.forEach(entry=>{
+              if(entry.type === 'group'){
+                entry.items.forEach(it=>{
+                  const kbItem = kb[it.id] || null;
+                  it.kb = kbItem;
+                  it.used_qty = (it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback) : it.qty);
+                  it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty * 100 / kbItem.default_portion_g) : null;
+                  it.kcal = (kbItem && kbItem.kcal_per_100g) ? Math.round((kbItem.kcal_per_100g) * it.used_qty / 100) : null;
+                });
+                entry.group_kcal = entry.items.reduce((s,i)=> s + (i.kcal || 0), 0);
+              } else {
+                const it = entry.item;
+                const kbItem = kb[it.id] || null;
+                it.kb = kbItem;
+                it.used_qty = (it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : defaultPortionFallback) : it.qty);
+                it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty * 100 / kbItem.default_portion_g) : null;
+                it.kcal = (kbItem && kbItem.kcal_per_100g) ? Math.round((kbItem.kcal_per_100g) * it.used_qty / 100) : null;
+              }
+            });
+            slot.meal_total_kcal = slot.entries.reduce((s,en)=> s + (en.type==='group' ? (en.group_kcal || 0) : (en.item.kcal || 0)), 0);
+          });
+        });
+      });
+      return plan;
+    }
+
+    // Allowed preps (heurística)
+    function getAllowedPreps(kbItem){
+      if(!kbItem) return ["—"];
+      const allowed = new Set();
+      if(kbItem.preparo) allowed.add(String(kbItem.preparo));
+      if(kbItem.pode_ser_cru) allowed.add('crua');
+      if(!kbItem.pode_ser_cru){ allowed.add('cozido'); allowed.add('grelhado'); allowed.add('frito'); }
+      else { allowed.add('fatiado'); }
+      if(['565','566','567','569'].includes(kbItem.id)){ allowed.clear(); allowed.add('cozido'); allowed.add('frito'); }
+      const arr = Array.from(allowed);
+      if(kbItem.preparo){ const idx = arr.indexOf(kbItem.preparo); if(idx>0){ arr.splice(idx,1); arr.unshift(kbItem.preparo); } }
+      return arr;
+    }
+
+    // Render vertical form inside given container
+    function renderFormVertical(plan, kb, container){
+      container.innerHTML = '';
+      // tabs header
+      const tabsWrap = document.createElement('div'); tabsWrap.className = 'dieta-tabs';
+      plan.tabs.forEach((tab,i)=>{
+        const pill = document.createElement('div'); pill.className = 'dieta-tab' + (i===0 ? ' active':''); pill.textContent = (tab.monthStart === tab.monthEnd ? `Mês ${tab.monthStart}` : `Meses ${tab.monthStart}-${tab.monthEnd}`);
+        pill.onclick = ()=>{ document.querySelectorAll('.dieta-tab').forEach((p,j)=>p.classList.toggle('active', j===i)); document.querySelectorAll('[data-dieta-tab]').forEach(el=> el.style.display = (Number(el.dataset.dietaTab)===i ? 'block':'none')); };
+        tabsWrap.appendChild(pill);
+      });
+      container.appendChild(tabsWrap);
+
+      plan.tabs.forEach((tab,tIdx)=>{
+        const tabContainer = document.createElement('div'); tabContainer.dataset.dietaTab = tIdx; tabContainer.style.display = tIdx===0 ? 'block' : 'none';
+        tab.days.forEach(day=>{
+          const dayCard = document.createElement('div'); dayCard.className = 'dieta-day';
+          dayCard.innerHTML = `<div style="font-weight:800">Dia ${day.dayIndex}</div>`;
+          day.slots.forEach(slot=>{
+            const mealDiv = document.createElement('div'); mealDiv.className = 'dieta-meal';
+            const mealName = ({1:"Café da manhã",2:"Lanche",3:"Almoço",4:"Café da tarde",5:"Janta"})[slot.mealCode] || ('Refeição '+slot.mealCode);
+            mealDiv.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="font-weight:800">${mealName}</div><div class="dieta-badge" style="margin-left:auto">Total: ${slot.meal_total_kcal ?? '—'} kcal</div></div>`;
+            // entries
+            slot.entries.forEach((entry, entIdx)=>{
+              if(entry.type === 'group'){
+                // group header
+                const gb = document.createElement('div'); gb.style.marginTop = '8px';
+                gb.innerHTML = `<div style="font-weight:700;color:#ffd7d9">Grupo (itens juntos) • kcal: ${entry.group_kcal ?? '—'} kcal</div>`;
+                entry.items.forEach((it, subIdx)=>{
+                  const row = document.createElement('div'); row.className = 'dieta-item';
+                  const name = it.kb?.name || ('ID ' + it.id);
+                  row.innerHTML = `
+                    <div class="left">
+                      <div class="food">${name} <span style="font-weight:600; color:#aaa">#${it.id}</span></div>
+                      <div style="font-size:13px;color:#999">padrão: ${it.kb?.default_portion_g ?? '—'} g</div>
+                    </div>
+                    <div class="dieta-controls">
+                      <div style="display:flex;flex-direction:column;align-items:flex-end">
+                        <label style="font-size:12px;color:#aaa">Modo de preparo</label>
+                        <select class="dieta-select" data-tab="${tIdx}" data-day="${day.dayIndex}" data-meal="${slot.mealCode}" data-entry="${entIdx}" data-sub="${subIdx}"></select>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:flex-end">
+                        <label style="font-size:12px;color:#aaa">Qtd (g)</label>
+                        <input class="dieta-input" type="number" min="0" value="${it.used_qty}" data-tab="${tIdx}" data-day="${day.dayIndex}" data-meal="${slot.mealCode}" data-entry="${entIdx}" data-sub="${subIdx}">
+                      </div>
+                      <div class="dieta-badge">${it.pct_of_default ?? '—'}%</div>
+                      <div class="dieta-badge">${it.kcal ?? '—'} kcal</div>
+                    </div>
+                  `;
+                  gb.appendChild(row);
+                });
+                mealDiv.appendChild(gb);
+              } else {
+                const it = entry.item;
+                const row = document.createElement('div'); row.className = 'dieta-item';
+                const name = it.kb?.name || ('ID ' + it.id);
+                row.innerHTML = `
+                  <div class="left">
+                    <div class="food">${name} <span style="font-weight:600; color:#aaa">#${it.id}</span></div>
+                    <div style="font-size:13px;color:#999">padrão: ${it.kb?.default_portion_g ?? '—'} g</div>
+                  </div>
+                  <div class="dieta-controls">
+                    <div style="display:flex;flex-direction:column;align-items:flex-end">
+                      <label style="font-size:12px;color:#aaa">Modo de preparo</label>
+                      <select class="dieta-select" data-tab="${tIdx}" data-day="${day.dayIndex}" data-meal="${slot.mealCode}" data-entry="${entIdx}"></select>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end">
+                      <label style="font-size:12px;color:#aaa">Qtd (g)</label>
+                      <input class="dieta-input" type="number" min="0" value="${it.used_qty}" data-tab="${tIdx}" data-day="${day.dayIndex}" data-meal="${slot.mealCode}" data-entry="${entIdx}">
+                    </div>
+                    <div class="dieta-badge">${it.pct_of_default ?? '—'}%</div>
+                    <div class="dieta-badge">${it.kcal ?? '—'} kcal</div>
+                  </div>
+                `;
+                mealDiv.appendChild(row);
+              }
+            });
+            dayCard.appendChild(mealDiv);
+          });
+
+          tabContainer.appendChild(dayCard);
+        });
+
+        container.appendChild(tabContainer);
+      });
+
+      // fill selects & attach numeric handlers
+      container.querySelectorAll('.dieta-select').forEach(sel=>{
+        const dayIdx = Number(sel.dataset.day), meal = Number(sel.dataset.meal), entry = Number(sel.dataset.entry);
+        const sub = sel.dataset.sub !== undefined ? Number(sel.dataset.sub) : null;
+        // find kb item
+        let kbItem = null;
+        outer: for(const tab of plan.tabs){
+          for(const day of tab.days){
+            if(day.dayIndex !== dayIdx) continue;
+            for(const slot of day.slots){
+              if(slot.mealCode !== meal) continue;
+              const ent = slot.entries[entry];
+              if(!ent) continue;
+              if(ent.type === 'group'){ kbItem = ent.items[sub].kb; break outer; }
+              else { kbItem = ent.item.kb; break outer; }
+            }
+          }
+        }
+        const opts = getAllowedPreps(kbItem);
+        sel.innerHTML = opts.map(o=>`<option>${o}</option>`).join('');
+      });
+
+      container.querySelectorAll('.dieta-input').forEach(inp=>{
+        inp.onchange = ()=>{
+          const dayIdx = Number(inp.dataset.day), meal = Number(inp.dataset.meal), entry = Number(inp.dataset.entry);
+          const sub = inp.dataset.sub !== undefined ? Number(inp.dataset.sub) : null;
+          for(const tab of plan.tabs){
+            const day = tab.days.find(d=>d.dayIndex===dayIdx);
+            if(!day) continue;
+            const slot = day.slots.find(s=>s.mealCode===meal);
+            if(!slot) continue;
+            const ent = slot.entries[entry];
+            if(ent.type==='group'){
+              const it = ent.items[sub];
+              it.used_qty = Number(inp.value);
+              if(it.kb && it.kb.default_portion_g){ it.pct_of_default = Math.round(it.used_qty * 100 / it.kb.default_portion_g); it.kcal = (it.kb.kcal_per_100g ? Math.round(it.kb.kcal_per_100g * it.used_qty / 100) : null); }
+              ent.group_kcal = ent.items.reduce((s,i)=>s + (i.kcal||0), 0);
+            } else {
+              const it = ent.item;
+              it.used_qty = Number(inp.value);
+              if(it.kb && it.kb.default_portion_g){ it.pct_of_default = Math.round(it.used_qty * 100 / it.kb.default_portion_g); it.kcal = (it.kb.kcal_per_100g ? Math.round(it.kb.kcal_per_100g * it.used_qty / 100) : null); }
+            }
+            slot.meal_total_kcal = slot.entries.reduce((s,en)=> s + (en.type==='group'? (en.group_kcal||0) : (en.item.kcal||0)),0);
+          }
+          // re-render quick for demo
+          renderFormVertical(plan, kb, container);
+        };
+      });
+
+      // suggest export actions
+      const actions = document.createElement('div'); actions.className='dieta-actions';
+      const btnCopyJson = document.createElement('button'); btnCopyJson.className='dieta-compact-btn'; btnCopyJson.textContent = 'Copiar JSON';
+      btnCopyJson.onclick = ()=>{ navigator.clipboard.writeText(JSON.stringify(plan, null, 2)); alert('JSON do plano copiado.'); };
+      actions.appendChild(btnCopyJson);
+      container.appendChild(actions);
+    }
+
+    // ---------------- sample test code (2 abas, 2 dias, 4 refeições/dia) --------------
+    // built to follow the defined compact grammar (use it as default test)
+    const sampleCompact = 
+      // header: D 2 months, 2 tabs
+      'D22' +
+      // tab 1: month 1..1, daysVar 2, mealsBitmap 31
+      'B11231' +
+        // day1 (index1) with 4 meal entries
+        'd14' +
+          // meal1 (1) -> 2 entries: group (rice+beans) + banana
+          '12G2323410033830603103100' +
+          // meal2 (3) -> chicken
+          '313510120' +
+          // meal3 (4) -> alface
+          '41214030' +
+          // meal4 (5) -> pão
+          '513288050' +
+        // day2 (index2)
+        'd24' +
+          // meal1 (1) -> aveia
+          '113238040' +
+          // meal2 (2) -> ovo
+          '213567050' +
+          // meal3 (3) -> frango + alface
+          '323510120214030' +
+          // meal4 (4) -> abacaxi
+          '41290100' +
+      'E' +
+      // tab 2: month 2..2, same structure to test multi-aba
+      'B21231' +
+        'd14' +
+          '12G2323410033830603103100' +
+          '313510120' +
+          '41214030' +
+          '513288050' +
+        'd24' +
+          '113238040' +
+          '213567050' +
+          '323510120214030' +
+          '41290100' +
+      'E';
+
+    // ---------------- DOM wiring inside initializePageData -----------------------
     document.addEventListener('DOMContentLoaded', () => {
         let user = null;
         const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
@@ -628,7 +1028,8 @@
                 document.body.removeChild(textArea);
             }); }
 
-            const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
+            // PASTE simulation buttons (treino)
+            const pasteTreino = document.getElementById('paste-treino');
             function simulatePaste(buttonEl, targetTextareaId) {
                 const txtOutput = document.getElementById('prompt-output').textContent || '';
                 const target = document.getElementById(targetTextareaId);
@@ -646,7 +1047,50 @@
                 if (target) { try { target.focus(); } catch (e) {} }
             }
             if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+
+            // ---------------- DIETA: hook up run/test/clear and initialize KB ----------------
+            const codeInput = document.getElementById('code-input');
+            const runCodeBtn = document.getElementById('run-code-btn');
+            const testCodeBtn = document.getElementById('test-code-btn');
+            const clearFormBtn = document.getElementById('clear-form-btn');
+            const renderContainer = document.getElementById('dieta-form-render');
+            const kbInfo = document.getElementById('dieta-kb-info');
+
+            // parse KB (from text)
+            const KB = parseKBText(kbText);
+            kbInfo.textContent = `KB carregada: ${Object.keys(KB).length} itens (nomes extraídos).`;
+
+            // run code -> parse -> normalize -> render
+            function runCompactCode(code){
+              try{
+                const plan = parseCompactWithGroups(code.trim());
+                normalizePlan(plan, KB);
+                renderFormVertical(plan, KB, renderContainer);
+                window._lastPlan = plan;
+              } catch(err){
+                renderContainer.innerHTML = `<div style="color:#ffb4b4;padding:10px;background:#2b0b0b;border-radius:8px;border:1px solid #5b1a1a">Erro ao parsear código: ${err.message}</div>`;
+                console.error(err);
+              }
+            }
+
+            runCodeBtn.addEventListener('click', ()=>{
+              const code = codeInput.value.trim();
+              if(!code){ alert('Cole o código compacto antes de rodar (ou use Testar Código).'); return; }
+              runCompactCode(code);
+            });
+
+            testCodeBtn.addEventListener('click', ()=>{
+              codeInput.value = sampleCompact;
+              runCompactCode(sampleCompact);
+            });
+
+            clearFormBtn.addEventListener('click', ()=>{
+              codeInput.value = '';
+              renderContainer.innerHTML = '';
+            });
+
+            // If page has some prefilled scenario: you can auto-run sample (disabled by default)
+            // runCompactCode(sampleCompact); // <-- uncomment para auto-executar no load
         }
         initializePageData();
     });
