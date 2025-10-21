@@ -1,34 +1,20 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="utf-8" />
-  <title>Plataforma de IA — Saúde & Estética (com parser integrado)</title>
+  <title>Plataforma de IA — Saúde & Estética</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --color-ia-specialist: #007BFF;
-      --color-video-lessons: #8A2BE2;
-      --color-journey: #DC143C;
-      --journey-red-1: #ff2646;
-      --journey-red-2: #be123c;
-    }
-    html { scroll-behavior: smooth; }
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #121212;
-        color: #E0E0E0;
-        margin: 0;
-        padding: 40px 20px;
-    }
-    .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-    h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
-
-    /* sidebar/menu (copiado do seu estilo) */
+    :root { --color-ia-specialist:#007BFF; --color-video-lessons:#8A2BE2; --color-journey:#DC143C; --journey-red-1:#ff2646; --journey-red-2:#be123c; }
+    html{scroll-behavior:smooth}
+    body{font-family:'Poppins',sans-serif;background:#121212;color:#E0E0E0;margin:0;padding:40px 20px}
+    .container{max-width:1600px;margin:0 auto;padding:0 20px}
+    h1,h2,h3{color:#f0f0f0;text-align:center;margin-top:30px;margin-bottom:15px}
     .menu-toggle{position:fixed;top:25px;left:25px;z-index:1001;background:#333;border:none;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:0}
-    .menu-toggle .bar{width:24px;height:3px;background:#fff;border-radius:2px;transition:all .3s}
+    .menu-toggle .bar{width:24px;height:3px;background:#fff;border-radius:2px}
     .menu-toggle.open .bar:nth-child(1){transform:translateY(8px) rotate(45deg)}
     .menu-toggle.open .bar:nth-child(2){opacity:0}
     .menu-toggle.open .bar:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
@@ -53,25 +39,19 @@
     .tab-content.active{display:block}
     .form-wrapper,.results-wrapper{width:100%;max-width:800px;margin:0 auto}
     .form-container,.results-container,.percurso-container{background:#1E1E1E;padding:40px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);border:1px solid #333}
-    .form-group{margin-bottom:25px}
     label{display:block;margin-bottom:8px;font-weight:600;color:#BBBBBB}
     input,select,textarea{width:100%;padding:12px;background:#2C2C2C;border:1px solid #444;border-radius:8px;color:#E0E0E0;font-size:16px;box-sizing:border-box}
     textarea{resize:vertical;min-height:100px}
-    .goal-section{background:linear-gradient(145deg,#2a2a2a,#1a1a1a);border:1px solid #444;padding:30px;margin-bottom:40px;border-radius:10px;text-align:center}
-    .goal-title{font-size:28px;font-weight:700;background:linear-gradient(90deg,#007BFF,#00C6FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .percurso-forms{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px}
     .percurso-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.25));border:1px solid rgba(190,18,60,.12);padding:20px;border-radius:12px}
-    .paste-btn{--h:36px;display:inline-flex;align-items:center;justify-content:center;height:var(--h);min-width:160px;padding:8px 24px;border-radius:999px;background:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2));border:none;color:#fff;font-weight:700;cursor:pointer;position:relative}
-    .small-note{font-size:13px;color:#cfc;opacity:.7;margin-top:6px}
-
-    /* compact parser UI */
+    .paste-btn{--h:36px;display:inline-flex;align-items:center;justify-content:center;height:var(--h);min-width:160px;padding:8px 24px;border-radius:999px;background:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2));border:none;color:#fff;font-weight:700;cursor:pointer}
     .compact-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.06));padding:14px;border-radius:10px}
     .compact-input{width:100%;min-height:110px;padding:10px;border-radius:8px;background:#0f0f10;border:1px solid #222;color:#e6eefc}
     .compact-controls{display:flex;gap:10px;margin-top:8px}
     .compact-btn{padding:9px 14px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(90deg,#ff4b6b,#be123c);color:white;font-weight:700}
     .compact-btn.clear{background:#222;border:1px solid #333}
     .compact-btn.copy{background:#0b74ff}
-    .compact-error{margin-top:8px;padding:10px;border-radius:8px;background:#3b0f0f;color:#ffdede;display:none}
+    .compact-error{margin-top:8px;padding:10px;border-radius:8px;background:#3b0f0f;color:#ffdede;display:none;white-space:pre-wrap;font-family:monospace;font-size:13px}
     .kb-preview{margin-top:8px;font-size:13px;color:#bbb}
     .compact-root{margin-top:12px}
     @media(max-width:900px){.percurso-forms{grid-template-columns:1fr}.menu-toggle{top:14px;left:14px;width:44px;height:44px}}
@@ -100,9 +80,9 @@
 <div class="container">
   <div class="header"><p id="welcome-msg">A carregar...</p></div>
 
-  <!-- IA Especialista (mantive o seu formulário original) -->
+  <!-- IA Especialista -->
   <div id="ia-planejamento" class="tab-content active">
-    <div class="form-wrapper" id="form-wrapper" style="display: none;">
+    <div class="form-wrapper" id="form-wrapper" style="display:none">
       <div class="form-container">
         <h1>Crie a sua Meta</h1>
         <form id="ia-fit-form">
@@ -135,7 +115,7 @@
       <div class="results-container">
         <h2>Seu Plano de Ação</h2>
         <pre id="prompt-output"></pre>
-        <button id="copy-btn" class="copy-button">Copiar Pedido</button>
+        <button id="copy-btn-main" class="copy-button">Copiar Pedido</button>
 
         <h3>Comece sua Conversa com a IA</h3>
         <p style="text-align:center;color:#bbb;margin-top:-10px;margin-bottom:20px">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
@@ -158,7 +138,7 @@
     </div>
   </div>
 
-  <!-- Video aulas (mantive seus iframes) -->
+  <!-- Video aulas -->
   <div id="video-aulas" class="tab-content">
     <h2>Nossas Aulas</h2>
     <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
@@ -166,7 +146,7 @@
     <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
   </div>
 
-  <!-- Percurso: incluí o parser aqui -->
+  <!-- Percurso (inclui parser e KB completo) -->
   <div id="percurso" class="tab-content">
     <div class="percurso-container">
       <h2>Meu Percurso</h2>
@@ -185,10 +165,9 @@
         <div class="percurso-card" id="dieta-card">
           <h4>Formulário: Dieta</h4>
 
-          <!-- Parser UI -->
           <div class="compact-card">
             <label for="compactInput">Cole aqui o código compacto (formato compacto → formulário):</label>
-            <textarea id="compactInput" class="compact-input" placeholder="Cole o código compacto aqui...">D12B11131d11111L290100L312150EB21131d11111L237200L309180E</textarea>
+            <textarea id="compactInput" class="compact-input" placeholder="Cole o código compacto aqui..."></textarea>
             <div class="compact-controls">
               <button id="runBtn" class="compact-btn">Rodar Código</button>
               <button id="clearBtn" class="compact-btn clear">Limpar</button>
@@ -198,6 +177,7 @@
             <div id="kbPreview" class="kb-preview"></div>
             <div id="compactRoot" class="compact-root"></div>
           </div>
+
         </div>
       </div>
 
@@ -207,662 +187,644 @@
 
 </div>
 
-<!-- ====== SCRIPTS: supabase (mantive), utilidades e parser corrigido ====== -->
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  // ====== CONFIGURAÇÃO (mantenha as suas chaves) ======
   const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  /* ---------- utility functions (mantidas) ---------- */
-  function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
-  function calculateEndDate(prazoText) { if(!prazoText) return null; const now=new Date(); const year=now.getFullYear(); let prazoLower=prazoText.toLowerCase(); if(prazoLower.includes('final do ano')||prazoLower.includes('fim de ano')) return new Date(year,11,31); let match=prazoLower.match(/(\d+)\s+mes(es)?/); if(match){let d=new Date();d.setMonth(d.getMonth()+parseInt(match[1],10));return d;} match=prazoLower.match(/(\d+)\s+dia(s)?/); if(match){let d=new Date();d.setDate(d.getDate()+parseInt(match[1],10));return d;} if(prazoLower.includes('verao')||prazoLower.includes('verão')){const s=new Date(year,11,21);return now<s?s:new Date(year+1,11,21);} if(prazoLower.includes('natal')){const c=new Date(year,11,25);return now<c?c:new Date(year+1,11,25);} if(prazoLower.includes('ano novo')) return new Date(year+1,0,1); if(prazoLower.includes('pascoa')||prazoLower.includes('páscoa')){const e=getEaster(year);return now<e?e:getEaster(year+1);} return null; }
-  function displayProgress(startDate,endDate){ const now=new Date(); now.setHours(0,0,0,0); const sDate=new Date(startDate); sDate.setHours(0,0,0,0); const eDate=new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate-getTime?sDate.getTime(): (eDate.getTime()-sDate.getTime()); const elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; const pb=document.getElementById('progress-bar'); if(pb) pb.style.width=`${progressPercentage}%`; const sLbl=document.getElementById('start-date-label'); const eLbl=document.getElementById('end-date-label'); if(sLbl) sLbl.textContent=sDate.toLocaleDateString('pt-BR'); if(eLbl) eLbl.textContent=eDate.toLocaleDateString('pt-BR'); const cd=document.getElementById('countdown-days'); if(cd) cd.textContent=daysRemaining>=0?daysRemaining:0; const fw=document.getElementById('form-wrapper'); const rs=document.getElementById('results-wrapper'); if(fw && rs){ fw.style.display='none'; rs.style.display='block'; } }
+  // ---------- KB COMPLETO (somente nome) ----------
+  // IDs conforme lista que você enviou — cada item tem 'name'.
+  const KB = {
+    "1":{"name":"Abóbora, cabotián — cozida"},
+    "5":{"name":"Abóbora, moranga — refogada"},
+    "7":{"name":"Abobrinha, italiana — cozida"},
+    "8":{"name":"Abobrinha, italiana — crua"},
+    "9":{"name":"Abobrinha, italiana — refogada"},
+    "10":{"name":"Abobrinha, paulista — crua"},
+    "11":{"name":"Acelga — crua"},
+    "12":{"name":"Agrião — cru"},
+    "13":{"name":"Aipo — cru"},
+    "14":{"name":"Alface, americana — crua"},
+    "15":{"name":"Alface, crespa — crua"},
+    "16":{"name":"Alface, lisa — crua"},
+    "17":{"name":"Alface, roxa — crua"},
+    "18":{"name":"Alfavaca — crua"},
+    "19":{"name":"Alho — cru (uso culinário)"},
+    "20":{"name":"Alho-poró — cru"},
+    "21":{"name":"Almeirão — cru"},
+    "22":{"name":"Almeirão — refogado"},
+    "23":{"name":"Batata, baroa — cozida"},
+    "25":{"name":"Batata, doce — cozida"},
+    "27":{"name":"Batata frita, tipo chips — industrializada"},
+    "28":{"name":"Batata, inglesa — cozida"},
+    "30":{"name":"Batata, inglesa — frita"},
+    "31":{"name":"Batata, inglesa — sauté"},
+    "32":{"name":"Berinjela — cozida"},
+    "34":{"name":"Beterraba — cozida"},
+    "35":{"name":"Beterraba — crua"},
+    "36":{"name":"Brócolis — cozido"},
+    "37":{"name":"Brócolis — cru"},
+    "38":{"name":"Cará — cozido"},
+    "40":{"name":"Canru — cru"},
+    "41":{"name":"Catalonha — crua"},
+    "42":{"name":"Catalonha — refogada"},
+    "43":{"name":"Cebola — crua"},
+    "44":{"name":"Cebolinha — crua"},
+    "45":{"name":"Cenoura — cozida"},
+    "46":{"name":"Cenoura — crua"},
+    "47":{"name":"Chicória — crua"},
+    "48":{"name":"Chuchu — cozido"},
+    "49":{"name":"Chuchu — cru"},
+    "50":{"name":"Coentro, folhas — desidratadas"},
+    "51":{"name":"Couve, manteiga — crua"},
+    "52":{"name":"Couve, manteiga — refogada"},
+    "53":{"name":"Couve-flor — cozida"},
+    "54":{"name":"Couve-flor — crua"},
+    "55":{"name":"Espinafre, Nova Zelândia — cru"},
+    "56":{"name":"Espinafre, Nova Zelândia — refogado"},
+    "58":{"name":"Jiló — cru"},
+    "60":{"name":"Mandioca — cozida"},
+    "62":{"name":"Manjericão — cru"},
+    "63":{"name":"Maxixe — cru"},
+    "64":{"name":"Mostarda, folha — crua"},
+    "65":{"name":"Nabo — cru"},
+    "66":{"name":"Nhoque, batata — cozido"},
+    "67":{"name":"Palmito, juçara — em conserva"},
+    "68":{"name":"Palmito, pupunha — em conserva"},
+    "69":{"name":"Pepino — cru"},
+    "70":{"name":"Pimentão, amarelo — cru"},
+    "71":{"name":"Pimentão, verde — cru"},
+    "72":{"name":"Pimentão, vermelho — cru"},
+    "73":{"name":"Quiabo — cru"},
+    "74":{"name":"Rabanete — cru"},
+    "75":{"name":"Repolho, branco — cru"},
+    "76":{"name":"Repolho, roxo — cru"},
+    "77":{"name":"Repolho, roxo — refogado"},
+    "78":{"name":"Rúcula — crua"},
+    "79":{"name":"Salsa — crua"},
+    "80":{"name":"Seleta de legumes — enlatada"},
+    "81":{"name":"Serralha — crua"},
+    "82":{"name":"Taioba — crua"},
+    "83":{"name":"Tomate, com semente — cru"},
+    "84":{"name":"Tomate — extrato"},
+    "85":{"name":"Tomate — molho industrializado"},
+    "86":{"name":"Tomate — purê"},
+    "87":{"name":"Tomate — salada"},
+    "88":{"name":"Vagem — crua"},
+    "89":{"name":"Abacate — cru"},
+    "90":{"name":"Abacaxi — cru"},
+    "92":{"name":"Abiu — cru"},
+    "93":{"name":"Açaí, polpa, com xarope"},
+    "95":{"name":"Acerola — crua"},
+    "96":{"name":"Ameixa, calda — enlatada"},
+    "97":{"name":"Ameixa — crua"},
+    "98":{"name":"Atemoia — crua"},
+    "99":{"name":"Banana, da terra — crua"},
+    "100":{"name":"Banana, doce — em barra (processado)"},
+    "101":{"name":"Banana, figo — crua"},
+    "102":{"name":"Banana, maçã — crua"},
+    "103":{"name":"Banana, nanica — crua"},
+    "104":{"name":"Banana, ouro — crua"},
+    "105":{"name":"Banana, pacova — crua"},
+    "106":{"name":"Banana, prata — crua"},
+    "107":{"name":"Cacau — cru"},
+    "108":{"name":"Cajá-Manga — cru"},
+    "110":{"name":"Caju, suco — concentrado, envasado"},
+    "111":{"name":"Cajuí, chocolate — cru"},
+    "112":{"name":"Carambola — crua"},
+    "113":{"name":"Ciriguela — crua"},
+    "114":{"name":"Cupuaçu — cru"},
+    "116":{"name":"Figo — cru"},
+    "117":{"name":"Figo, enlatado — em calda"},
+    "118":{"name":"Fruta-pão — crua"},
+    "119":{"name":"Goiaba, branca, com casca — crua"},
+    "120":{"name":"Goiaba, doce — em pasta"},
+    "121":{"name":"Goiaba, doce, cascão"},
+    "122":{"name":"Goiaba, vermelha, com casca — crua"},
+    "123":{"name":"Graviola — crua"},
+    "125":{"name":"Jabuticaba — crua"},
+    "126":{"name":"Jaca — crua"},
+    "127":{"name":"Jambo — cru"},
+    "128":{"name":"Jamelão — cru"},
+    "129":{"name":"Kiwi — cru"},
+    "130":{"name":"Laranja, baía — crua"},
+    "131":{"name":"Laranja, baía — suco"},
+    "132":{"name":"Laranja, da terra — crua"},
+    "133":{"name":"Laranja, da terra — suco"},
+    "134":{"name":"Laranja, lima — crua"},
+    "135":{"name":"Laranja, lima — suco"},
+    "136":{"name":"Laranja, pêra — crua"},
+    "137":{"name":"Laranja, suco (genérico)"},
+    "138":{"name":"Laranja, valência — crua"},
+    "139":{"name":"Laranja, valência — suco"},
+    "140":{"name":"Limão, cravo — suco"},
+    "141":{"name":"Limão, tahiti — cru"},
+    "142":{"name":"Maçã, Argentina, com casca — crua"},
+    "143":{"name":"Maçã, Fuji, com casca — crua"},
+    "144":{"name":"Macaúba — cru"},
+    "145":{"name":"Mamão, doce, em calda — drenado"},
+    "146":{"name":"Mamão, formosa — cru"},
+    "147":{"name":"Mamão, papaia — cru"},
+    "148":{"name":"Mamão verde, doce em calda — drenado"},
+    "149":{"name":"Manga, Haden — crua"},
+    "150":{"name":"Manga, Palmer — crua"},
+    "152":{"name":"Manga, Tommy Atkins — crua"},
+    "153":{"name":"Mangarataia — crua"},
+    "155":{"name":"Maracujá, suco — concentrado"},
+    "156":{"name":"Melancia — crua"},
+    "157":{"name":"Melão — cru"},
+    "158":{"name":"Mexerica, Murcote — crua"},
+    "159":{"name":"Mexerica, Rio — crua"},
+    "160":{"name":"Morango — cru"},
+    "161":{"name":"Nêspera — cru"},
+    "163":{"name":"Pêra, Park — crua"},
+    "164":{"name":"Pêra, Williams — crua"},
+    "165":{"name":"Pêssego, Aurora — cru"},
+    "166":{"name":"Pêssego, enlatado, em calda"},
+    "167":{"name":"Pinha — cru"},
+    "168":{"name":"Pitanga — cru"},
+    "169":{"name":"Romã — cru"},
+    "170":{"name":"Tamarindo — cru"},
+    "171":{"name":"Tangerina, Ponkan — cru"},
+    "172":{"name":"Tangerina, Ponkan — suco"},
+    "173":{"name":"Tucumã — cru"},
+    "174":{"name":"Umbu — cru"},
+    "176":{"name":"Uva, Itália — crua"},
+    "177":{"name":"Uva, Rubi — crua"},
+    "178":{"name":"Uva, suco — concentrado, envasado"},
+    "179":{"name":"Azeite, de dendê"},
+    "180":{"name":"Azeite, de oliva, extra virgem"},
+    "181":{"name":"Manteiga, com sal"},
+    "182":{"name":"Manteiga, sem sal"},
+    "183":{"name":"Margarina, com óleo hidrogenado"},
+    "184":{"name":"Óleo, de soja"},
+    "185":{"name":"Abadejo, filé, congelado — assado"},
+    "186":{"name":"Abadejo, filé, congelado — cozido"},
+    "188":{"name":"Abadejo, filé, congelado — grelhado"},
+    "189":{"name":"Atum, conserva em óleo"},
+    "192":{"name":"Bacalhau, salgado — refogado"},
+    "193":{"name":"Cação, posta, com farinha de trigo — frita"},
+    "194":{"name":"Cação, posta — cozida"},
+    "196":{"name":"Camarão, Rio Grande, grande — cozido"},
+    "198":{"name":"Camarão, Sete Barbas, sem cabeça, com casca — frito"},
+    "199":{"name":"Caranguejo — cozido"},
+    "200":{"name":"Corimbatá — assado"},
+    "201":{"name":"Corimbatá — cozido"},
+    "204":{"name":"Corvina grande — assada"},
+    "205":{"name":"Corvina grande — cozida"},
+    "206":{"name":"Dourada de água doce — fresca"},
+    "208":{"name":"Lambari, congelado — frito"},
+    "209":{"name":"Manjuba — frita"},
+    "210":{"name":"Manjuba, com farinha de trigo — frita"},
+    "211":{"name":"Manjuba — frita (variante)"},
+    "212":{"name":"Merluza, filé — assado"},
+    "213":{"name":"Merluza, filé — cozido"},
+    "215":{"name":"Pescada, branca — frita"},
+    "217":{"name":"Pescada, com farinha de trigo — frita"},
+    "219":{"name":"Pescada, filé — frita"},
+    "220":{"name":"Pescada, filé — molho escabeche"},
+    "222":{"name":"Pintado — assado"},
+    "224":{"name":"Pintado — grelhado"},
+    "226":{"name":"Salmão, com pele, fresco — grelhado"},
+    "228":{"name":"Salmão, sem pele, fresco — grelhado"},
+    "229":{"name":"Sardinha — assada"},
+    "230":{"name":"Sardinha, conserva em óleo"},
+    "231":{"name":"Sardinha — frita"},
+    "234":{"name":"Arroz, integral — cozido"},
+    "237":{"name":"Arroz, tipo 1 — cozido"},
+    "238":{"name":"Aveia, flocos — crua"},
+    "239":{"name":"Biscoito, doce, maisena"},
+    "240":{"name":"Biscoito, doce, recheado com chocolate"},
+    "241":{"name":"Biscoito, doce, recheado com morango"},
+    "242":{"name":"Biscoito, doce, wafer, recheado de chocolate"},
+    "243":{"name":"Biscoito, doce, wafer, recheado de morango"},
+    "244":{"name":"Biscoito, salgado, cream cracker"},
+    "245":{"name":"Biscoito, polvilho — doce"},
+    "246":{"name":"Bolo, mistura para"},
+    "247":{"name":"Bolo, pronto, aipim"},
+    "248":{"name":"Bolo, pronto, chocolate"},
+    "249":{"name":"Bolo, pronto, coco"},
+    "251":{"name":"Canjica, com leite integral"},
+    "252":{"name":"Cereais, milho, flocos, com sal"},
+    "253":{"name":"Cereais, milho, flocos, sem sal"},
+    "254":{"name":"Cereais, milho, infantil"},
+    "255":{"name":"Cereais, mistura para vitamina"},
+    "256":{"name":"Cereal matinal, milho"},
+    "257":{"name":"Cereal matinal, milho, açúcar"},
+    "258":{"name":"Creme de arroz, pó"},
+    "259":{"name":"Creme de milho, pó"},
+    "260":{"name":"Curau, milho verde"},
+    "261":{"name":"Farinha, de arroz, enriquecida"},
+    "262":{"name":"Farinha, de centeio, integral"},
+    "263":{"name":"Farinha, de milho, amarela"},
+    "264":{"name":"Farinha, de rosca"},
+    "265":{"name":"Farinha, de trigo"},
+    "266":{"name":"Farinha, láctea, de cereais"},
+    "267":{"name":"Farinha, de mandioca, torrada"},
+    "268":{"name":"Farinha, de puba"},
+    "269":{"name":"Feijão, de mandioca — cozido"},
+    "271":{"name":"Lasanha, massa fresca — cozida"},
+    "273":{"name":"Macarrão, instantâneo"},
+    "278":{"name":"Milho, verde — cru"},
+    "279":{"name":"Milho, verde, enlatado — drenado"},
+    "280":{"name":"Mingau tradicional, pó"},
+    "281":{"name":"Pamonha, barra para cozimento"},
+    "282":{"name":"Pão, aveia, forma"},
+    "283":{"name":"Pão, de glúten, forma"},
+    "284":{"name":"Pão, de glúten, forma (variante)"},
+    "285":{"name":"Pão, milho, forma"},
+    "288":{"name":"Pão, trigo, forma, integral"},
+    "289":{"name":"Pão, trigo, francês"},
+    "290":{"name":"Pão, trigo, sovado"},
+    "293":{"name":"Pastel, de queijo — frito"},
+    "294":{"name":"Pastel, de queijo — frito (variante)"},
+    "295":{"name":"Pastel, massa — frita"},
+    "296":{"name":"Pastel, massa — frita (variante)"},
+    "297":{"name":"Pipoca, com óleo de soja — sem sal"},
+    "298":{"name":"Polenta, pré-cozida"},
+    "299":{"name":"Torrada, pão francês"},
+    "300":{"name":"Açúcar, mascavo"},
+    "301":{"name":"Açúcar, refinado"},
+    "302":{"name":"Chocolate, ao leite"},
+    "303":{"name":"Chocolate, ao leite, com castanha do Pará"},
+    "304":{"name":"Chocolate, ao leite, dietético"},
+    "305":{"name":"Chocolate, meio amargo"},
+    "306":{"name":"Cocada branca"},
+    "307":{"name":"Doce, de abóbora, cremoso"},
+    "308":{"name":"Doce, de leite, cremoso"},
+    "309":{"name":"Geleia, mocotó, natural"},
+    "310":{"name":"Glicose de milho"},
+    "311":{"name":"Maria mole"},
+    "312":{"name":"Maria mole, coco queimado"},
+    "313":{"name":"Marmelada"},
+    "314":{"name":"Mel, de abelha"},
+    "315":{"name":"Melado"},
+    "316":{"name":"Quindim"},
+    "317":{"name":"Rapadura"},
+    "318":{"name":"Café, pó, torrado"},
+    "319":{"name":"Capuccino, pó"},
+    "320":{"name":"Fermento em pó, químico"},
+    "321":{"name":"Fermento, biológico, levedura, tablete"},
+    "322":{"name":"Gelatina, sabores variados, pó"},
+    "323":{"name":"Sal, dietético"},
+    "324":{"name":"Sal, grosso"},
+    "325":{"name":"Shoyu"},
+    "326":{"name":"Tempero à base de sal"},
+    "327":{"name":"Azeitona, preta — conserva"},
+    "328":{"name":"Azeitona, verde — conserva"},
+    "329":{"name":"Chantilly, spray, com gordura vegetal"},
+    "330":{"name":"Leite, de coco"},
+    "331":{"name":"Maionese, tradicional com ovos"},
+    "332":{"name":"Bebida isotônica"},
+    "333":{"name":"Café, infusão 10%"},
+    "334":{"name":"Cana, aguardente"},
+    "335":{"name":"Cana, caldo"},
+    "336":{"name":"Cerveja, pilsen"},
+    "337":{"name":"Chá, erva-doce — infusão"},
+    "338":{"name":"Chá, mate — infusão"},
+    "339":{"name":"Chá, preto — infusão"},
+    "340":{"name":"Coco, água de — bebida"},
+    "341":{"name":"Refrigerante, água tônica"},
+    "342":{"name":"Refrigerante, tipo cola"},
+    "343":{"name":"Refrigerante, tipo guaraná"},
+    "344":{"name":"Refrigerante, tipo laranja"},
+    "345":{"name":"Refrigerante, tipo limão"},
+    "346":{"name":"Achocolatado, pó"},
+    "347":{"name":"Tacacá"},
+    "348":{"name":"Tapioca, com manteiga"},
+    "349":{"name":"Tucupi, com pimenta-de-cheiro"},
+    "350":{"name":"Vaca atolada"},
+    "351":{"name":"Vatapá"},
+    "352":{"name":"Virado à paulista"},
+    "353":{"name":"Yakisoba"},
+    "354":{"name":"Acarajé"},
+    "355":{"name":"Arroz carreteiro"},
+    "356":{"name":"Baião de dois, arroz e feijão-de-corda"},
+    "357":{"name":"Barreado"},
+    "358":{"name":"Bife à cavalo, com contra filé"},
+    "359":{"name":"Bolinho de arroz"},
+    "360":{"name":"Camarão à baiana"},
+    "361":{"name":"Charuto, de repolho"},
+    "362":{"name":"Cuscuz, de milho, cozido com sal"},
+    "363":{"name":"Cuscuz, paulista"},
+    "364":{"name":"Cuxá, molho"},
+    "365":{"name":"Dobradinha"},
+    "366":{"name":"Estrogonofe de carne"},
+    "367":{"name":"Estrogonofe de frango"},
+    "368":{"name":"Feijoada tropeiro mineiro"},
+    "369":{"name":"Feijoada"},
+    "370":{"name":"Frango, com açafrão"},
+    "371":{"name":"Macarrão, molho bolonhesa"},
+    "372":{"name":"Maniçoba"},
+    "373":{"name":"Quibebe"},
+    "374":{"name":"Salada, de legumes, com maionese"},
+    "375":{"name":"Salada, de legumes, cozida no vapor"},
+    "376":{"name":"Salpicão, de frango"},
+    "377":{"name":"Sarapatel"},
+    "378":{"name":"Tabule"},
+    "379":{"name":"Amendoim, grão — cru"},
+    "380":{"name":"Amendoim, torrado, salgado"},
+    "381":{"name":"Ervilha, em vagem"},
+    "382":{"name":"Ervilha, enlatada — drenada"},
+    "383":{"name":"Feijão, carioca — cozido"},
+    "385":{"name":"Feijão, fradinho — cozido"},
+    "387":{"name":"Feijão, jalo — cozido"},
+    "389":{"name":"Feijão, preto — cozido"},
+    "391":{"name":"Feijão, rajado — cozido"},
+    "393":{"name":"Feijão, rosinha — cozido"},
+    "395":{"name":"Feijão, roxo — cozido"},
+    "399":{"name":"Lentilha — cozida"},
+    "401":{"name":"Paçoca, amendoim"},
+    "402":{"name":"Pé-de-moleque, amendoim"},
+    "403":{"name":"Soja, farinha"},
+    "404":{"name":"Soja, extrato solúvel, natural, fluido"},
+    "405":{"name":"Soja, extrato solúvel, pó"},
+    "406":{"name":"Soja, queijo (tofu)"},
+    "408":{"name":"Tremoço — em conserva"},
+    "409":{"name":"Amêndoa, torrada, salgada"},
+    "410":{"name":"Castanha-de-caju, torrada, salgada"},
+    "411":{"name":"Castanha-do-Brasil — cru"},
+    "412":{"name":"Coco — cru"},
+    "413":{"name":"Gergelim, semente"},
+    "414":{"name":"Linhaça, semente"},
+    "415":{"name":"Pinhão — cozido"},
+    "416":{"name":"Pupunha — cozida"},
+    "417":{"name":"Noz — cru"},
+    "419":{"name":"Presunto, com capa de gordura"},
+    "420":{"name":"Presunto, sem capa de gordura"},
+    "421":{"name":"Quibe — assado"},
+    "423":{"name":"Quibe — frito"},
+    "424":{"name":"Salame"},
+    "426":{"name":"Toucinho — frito"},
+    "427":{"name":"Apresentado (linha ambígua)"},
+    "428":{"name":"Caldo de carne, tablete"},
+    "429":{"name":"Caldo de galinha, tablete"},
+    "430":{"name":"Carne, bovina, acém, moído, cozido"},
+    "432":{"name":"Carne, bovina, acém, sem gordura, cozido"},
+    "435":{"name":"Carne, bovina, almôndegas, fritas"},
+    "436":{"name":"Carne, bovina, bucho, cozido"},
+    "439":{"name":"Carne, bovina, capa de contra-filé, com gordura — grelhada"},
+    "441":{"name":"Carne, bovina, capa de contra-filé, sem gordura — grelhada"},
+    "442":{"name":"Carne, bovina, charque, cozido"},
+    "444":{"name":"Carne, bovina, filé à milanesa — frita/assada"},
+    "446":{"name":"Carne, bovina, contra-filé de costela — grelhado"},
+    "448":{"name":"Carne, bovina, contra-filé, com gordura — grelhado"},
+    "450":{"name":"Carne, bovina, contra-filé, sem gordura — grelhada"},
+    "451":{"name":"Carne, bovina, costela — assada"},
+    "453":{"name":"Carne, bovina, coxão duro, sem gordura — cozido"},
+    "455":{"name":"Carne, bovina, coxão mole, sem gordura — cozido"},
+    "457":{"name":"Carne, bovina, cupim — assado"},
+    "460":{"name":"Carne, bovina, filé mignon, sem gordura — cozido"},
+    "462":{"name":"Carne, bovina, flanco, sem gordura — cozido"},
+    "464":{"name":"Carne, bovina, fraldinha, com gordura — cozida"},
+    "466":{"name":"Carne, bovina, lagarto — cozido"},
+    "468":{"name":"Carne, bovina, língua — cozida"},
+    "470":{"name":"Carne, bovina, maminha — grelhada"},
+    "473":{"name":"Carne, bovina, miolo de alcatra, sem gordura — grelhado"},
+    "474":{"name":"Carne, bovina, músculo, sem gordura — cozido"},
+    "477":{"name":"Carne, bovina, paleta, sem gordura — cozida"},
+    "479":{"name":"Carne, bovina, patinho, sem gordura — cozido"},
+    "480":{"name":"Carne, bovina, patinho, sem gordura — grelhado"},
+    "481":{"name":"Carne, bovina, peito, sem gordura — cozido"},
+    "484":{"name":"Carne, bovina, picanha, com gordura — grelhada"},
+    "486":{"name":"Carne, bovina, picanha, sem gordura — grelhada"},
+    "487":{"name":"Carne, bovina, seca — cozida"},
+    "489":{"name":"Coxinha de frango — frita"},
+    "491":{"name":"Croquete, de carne — frito"},
+    "492":{"name":"Empada de frango, pré-cozida — assada"},
+    "493":{"name":"Empada de frango, pré-cozida"},
+    "495":{"name":"Frango, caipira, inteiro, com pele — cozido"},
+    "496":{"name":"Frango, caipira, inteiro, sem pele — cozido"},
+    "498":{"name":"Frango, coração — grelhado"},
+    "499":{"name":"Frango, coxa, com pele — assada"},
+    "500":{"name":"Frango, coxa, com pele — cozida"},
+    "501":{"name":"Frango, coxa, sem pele — cozida"},
+    "503":{"name":"Frango, filé, à milanesa"},
+    "505":{"name":"Frango, inteiro, sem pele — assado"},
+    "506":{"name":"Frango, inteiro, sem pele — cozido"},
+    "508":{"name":"Frango, peito, com pele — assado"},
+    "510":{"name":"Frango, peito, sem pele — cozido"},
+    "512":{"name":"Frango, peito, sem pele — grelhado"},
+    "513":{"name":"Frango, sobrecoxa, com pele — assada"},
+    "515":{"name":"Frango, sobrecoxa, sem pele — assada"},
+    "518":{"name":"Hambúrguer, bovino — frito"},
+    "519":{"name":"Hambúrguer, bovino — grelhado"},
+    "520":{"name":"Linguiça, frango — frita"},
+    "521":{"name":"Linguiça, frango — grelhada"},
+    "523":{"name":"Linguiça, porco — frita"},
+    "524":{"name":"Linguiça, porco — frita (variante)"},
+    "525":{"name":"Linguiça, porco — grelhada"},
+    "526":{"name":"Mortadela"},
+    "527":{"name":"Peru, congelado — assado"},
+    "530":{"name":"Porco, bisteca — frita"},
+    "531":{"name":"Porco, bisteca — grelhada"},
+    "532":{"name":"Porco, costela — assada"},
+    "534":{"name":"Porco, lombo — assado"},
+    "537":{"name":"Porco, pernil — assado"},
+    "539":{"name":"Bebida láctea, pêssego"},
+    "540":{"name":"Creme de Leite"},
+    "541":{"name":"Iogurte, natural"},
+    "542":{"name":"Iogurte, natural, desnatado"},
+    "543":{"name":"Iogurte, sabor abacaxi"},
+    "544":{"name":"Iogurte, sabor morango"},
+    "545":{"name":"Iogurte, sabor pêssego"},
+    "546":{"name":"Leite, condensado"},
+    "547":{"name":"Leite, de cabra"},
+    "548":{"name":"Leite, de vaca, achocolatado"},
+    "549":{"name":"Leite, de vaca, desnatado, pó"},
+    "550":{"name":"Leite, de vaca, desnatado, UHT"},
+    "551":{"name":"Leite, de vaca, integral"},
+    "552":{"name":"Leite, de vaca, integral, pó"},
+    "553":{"name":"Leite, fermentado"},
+    "554":{"name":"Queijo, minas, frescal"},
+    "555":{"name":"Queijo, minas, meia cura"},
+    "556":{"name":"Queijo, mozarela"},
+    "557":{"name":"Queijo, parmesão"},
+    "558":{"name":"Queijo, pasteurizado"},
+    "559":{"name":"Queijo, petit suisse, morango"},
+    "560":{"name":"Queijo, prato"},
+    "561":{"name":"Queijo, requeijão, cremoso"},
+    "562":{"name":"Queijo, ricota"},
+    "563":{"name":"Omelete, de queijo"},
+    "565":{"name":"Ovo, de galinha, clara — cozida/10minutos"},
+    "566":{"name":"Ovo, de galinha, gema — cozida/10minutos"},
+    "567":{"name":"Ovo, de galinha, inteiro — cozido/10minutos"},
+    "569":{"name":"Ovo, de galinha, inteiro — frito"}
+  };
 
+  // ---------- Utilitários de data/plan (mantidos) ----------
+  function getEaster(year){ const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month-1, day); }
+  function calculateEndDate(prazoText){ if(!prazoText) return null; const now=new Date(); const year=now.getFullYear(); let prazoLower=(prazoText||'').toLowerCase(); if(prazoLower.includes('final do ano')||prazoLower.includes('fim de ano')) return new Date(year,11,31); let match=prazoLower.match(/(\d+)\s+mes(es)?/); if(match){let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d;} match=prazoLower.match(/(\d+)\s+dia(s)?/); if(match){let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d;} if(prazoLower.includes('verao')||prazoLower.includes('verão')){ const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21);} if(prazoLower.includes('natal')){ const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25);} if(prazoLower.includes('ano novo')) return new Date(year+1,0,1); if(prazoLower.includes('pascoa')||prazoLower.includes('páscoa')){ const e=getEaster(year); return now<e?e:getEaster(year+1);} return null; }
+  function displayProgress(startDate,endDate){ const now=new Date(); now.setHours(0,0,0,0); const sDate=new Date(startDate); sDate.setHours(0,0,0,0); const eDate=new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; const pb=document.getElementById('progress-bar'); if(pb) pb.style.width=`${progressPercentage}%`; const sLbl=document.getElementById('start-date-label'); const eLbl=document.getElementById('end-date-label'); if(sLbl) sLbl.textContent=sDate.toLocaleDateString('pt-BR'); if(eLbl) eLbl.textContent=eDate.toLocaleDateString('pt-BR'); const cd=document.getElementById('countdown-days'); if(cd) cd.textContent=daysRemaining>=0?daysRemaining:0; const fw=document.getElementById('form-wrapper'); const rs=document.getElementById('results-wrapper'); if(fw && rs){ fw.style.display='none'; rs.style.display='block'; } }
   function analyzeGoal(text){ const lowerText=(text||'').toLowerCase(); const emagrecerKeywords=['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; const musculoKeywords=['ganhar musculo','hipertrofia','sheipado','crescer','massa muscular','ficar forte','músculo']; const hasEmagrecer=emagrecerKeywords.some(k=>lowerText.includes(k)); const hasMusculo=musculoKeywords.some(k=>lowerText.includes(k)); if(hasEmagrecer && !hasMusculo) return 'emagrecer'; if(hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; }
-  function reorderVideos(order){ const c=document.getElementById('video-aulas'); const v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
+  function reorderVideos(order){ const c=document.getElementById('video-aulas'), v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
 
-  /* ---------- KB parser (cobre o texto enviado por você) ---------- */
-  const kbText = `
-1\tAbóbora, cabotián\tcozida
-5\tAbóbora, moranga\trefogada
-7\tAbobrinha, italiana\tcozida
-8\tAbobrinha, italiana\tcrua
-9\tAbobrinha, italiana\trefogada
-10\tAbobrinha, paulista\tcrua
-11\tAcelga\tcrua
-12\tAgrião\tcru
-13\tAipo\tcru
-14\tAlface, americana\tcrua
-15\tAlface, crespa\tcrua
-16\tAlface, lisa\tcrua
-17\tAlface, roxa\tcrua
-18\tAlfavaca\tcrua
-19\tAlho\tcru
-20\tAlho-poró\tcru
-21\tAlmeirão\tcru
-22\tAlmeirão\trefogado
-23\tBatata, baroa\tcozida
-25\tBatata, doce\tcozida
-27\tBatata frita, tipo chips\tindustrializada
-28\tBatata, inglesa\tcozida
-30\tBatata, inglesa\tfrita
-31\tBatata, inglesa\tsauté
-32\tBerinjela\tcozida
-34\tBeterraba\tcozida
-35\tBeterraba\tcrua
-36\tBrócolis\tcozido
-37\tBrócolis\tcru
-38\tCará\tcozido
-40\tCanru\tcru
-41\tCatalonha\tcrua
-42\tCatalonha\trefogada
-43\tCebola\tcrua
-44\tCebolinha\tcrua
-45\tCenoura\tcozida
-46\tCenoura\tcrua
-47\tChicória\tcrua
-48\tChuchu\tcozido
-49\tChuchu\tcru
-50\tCoentro, folhas\tdesidratadas
-51\tCouve, manteiga\tcrua
-52\tCouve, manteiga\trefogada
-53\tCouve-flor\tcozida
-54\tCouve-flor\tcrua
-55\tEspinafre, Nova Zelândia\tcru
-56\tEspinafre, Nova Zelândia\trefogado
-58\tJiló\tcru
-60\tMandioca\tcozida
-62\tManjericão\tcru
-63\tMaxixe\tcru
-64\tMostarda, folha\tcrua
-65\tNabo\tcru
-66\tNhoque, batata\tcozido
-67\tPalmito, juçara\tem conserva
-68\tPalmito, pupunha\tem conserva
-69\tPepino\tcru
-70\tPimentão, amarelo\tcru
-71\tPimentão, verde\tcru
-72\tPimentão, vermelho\tcru
-73\tQuiabo\tcru
-74\tRabanete\tcru
-75\tRepolho, branco\tcru
-76\tRepolho, roxo\tcru
-77\tRepolho, roxo\trefogado
-78\tRúcula\tcrua
-79\tSalsa\tcrua
-80\tSeleta de legumes\tenlatada
-81\tSerralha\tcrua
-82\tTaioba\tcrua
-83\tTomate, com semente\tcru
-84\tTomate\textrato
-85\tTomate\tmolho industrializado
-86\tTomate\tpurê
-87\tTomate\tsalada
-88\tVagem\tcrua
-89\tAbacate\tcru
-90\tAbacaxi\tcru
-92\tAbiu\tcru
-93\tAçaí, polpa, com xarope\t(incluído)
-95\tAcerola\tcrua
-96\tAmeixa, calda\tenlatada
-97\tAmeixa\tcrua
-98\tAtemoia\tcrua
-99\tBanana, da terra\tcrua
-100\tBanana, doce\tem barra
-101\tBanana, figo\tcrua
-102\tBanana, maçã\tcrua
-103\tBanana, nanica\tcrua
-104\tBanana, ouro\tcrua
-105\tBanana, pacova\tcrua
-106\tBanana, prata\tcrua
-107\tCacau\tcru
-108\tCajá-Manga\tcru
-110\tCaju, suco\tconcentrado, envasado
-111\tCajuí, chocolate\tcru
-112\tCarambola\tcrua
-113\tCiriguela\tcrua
-114\tCupuaçu\tcru
-116\tFigo\tcru
-117\tFigo, enlatado\tem calda
-118\tFruta-pão\tcrua
-119\tGoiaba, branca, com casca\tcrua
-120\tGoiaba, doce\tem pasta
-121\tGoiaba, doce, cascão
-122\tGoiaba, vermelha, com casca\tcrua
-123\tGraviola\tcrua
-125\tJabuticaba\tcrua
-126\tJaca\tcrua
-127\tJambo\tcru
-128\tJamelão\tcru
-129\tKiwi\tcru
-130\tLaranja, baía\tcrua
-131\tLaranja, baía\tsuco
-132\tLaranja, da terra\tcrua
-133\tLaranja, da terra\tsuco
-134\tLaranja, lima\tcrua
-135\tLaranja, lima\tsuco
-136\tLaranja, pêra\tcrua
-137\tLaranja, suco\t(suco genérico)
-138\tLaranja, valência\tcrua
-139\tLaranja, valência\tsuco
-140\tLimão, cravo\tsuco
-141\tLimão, tahiti\tcru
-142\tMaçã, Argentina, com casca\tcrua
-143\tMaçã, Fuji, com casca\tcrua
-144\tMacaúba\tcru
-145\tMamão, doce, em calda\tdrenado
-146\tMamão, formosa\tcru
-147\tMamão, papaia\tcru
-148\tMamão verde, doce em calda\tdrenado
-149\tManga, Haden\tcrua
-150\tManga, Palmer\tcrua
-152\tManga, Tommy Atkins\tcrua
-153\tMangarataia\tcrua
-155\tMaracujá, suco\tconcentrado
-156\tMelancia\tcrua
-157\tMelão\tcru
-158\tMexerica, Murcote\tcrua
-159\tMexerica, Rio\tcrua
-160\tMorango\tcru
-161\tNêspera\tcru
-163\tPêra, Park\tcrua
-164\tPêra, Williams\tcrua
-165\tPêssego, Aurora\tcru
-166\tPêssego, enlatado, em calda
-167\tPinha\tcrua
-168\tPitanga\tcrua
-169\tRomã\tcrua
-170\tTamarindo\tcru
-171\tTangerina, Ponkan\tcrua
-172\tTangerina, Ponkan\tsuco
-173\tTucumã\tcru
-174\tUmbu\tcru
-176\tUva, Itália\tcrua
-177\tUva, Rubi\tcrua
-178\tUva, suco\tconcentrado, envasado
-179\tAzeite, de dendê\t(óleo/gordura)
-180\tAzeite, de oliva, extra virgem\t(óleo/gordura)
-181\tManteiga, com sal\t(derivado)
-182\tManteiga, sem sal\t(derivado)
-183\tMargarina, com óleo hidrogenado\t(derivado)
-184\tÓleo, de soja\t(óleo)
-185\tAbadejo, filé, congelado\tassado
-186\tAbadejo, filé, congelado\tcozido
-188\tAbadejo, filé, congelado\tgrelhado
-189\tAtum, conserva em óleo\t(conserva)
-192\tBacalhau, salgado\trefogado
-193\tCação, posta, com farinha de trigo\tfrita
-194\tCação, posta\tcozida
-196\tCamarão, Rio Grande, grande\tcozido
-198\tCamarão, Sete Barbas, sem cabeça, com casca\tfrito
-199\tCaranguejo\tcozido
-200\tCorimbatá\tassado
-201\tCorimbatá\tcozido
-204\tCorvina grande\tassada
-205\tCorvina grande\tcozida
-206\tDourada de água doce\tfresca
-208\tLambari, congelado\tfrito
-209\tManjuba\tfrita
-210\tManjuba, com farinha de trigo\tfrita
-211\tManjuba\tfrita
-212\tMerluza, filé\tassado
-213\tMerluza, filé\tcozido
-215\tPescada, branca\tfrita
-217\tPescada, com farinha de trigo\tfrita
-219\tPescada, filé\tfrita
-220\tPescada, filé\tmolho escabeche
-222\tPintado\tassado
-224\tPintado\tgrelhado
-226\tSalmão, com pele, fresco\tgrelhado
-228\tSalmão, sem pele, fresco\tgrelhado
-229\tSardinha\tassada
-230\tSardinha, conserva em óleo\t(conserva)
-231\tSardinha\tfrita
-234\tArroz, integral\tcozido
-237\tArroz, tipo 1\tcozido
-238\tAveia, flocos\tcrua
-239\tBiscoito, doce, maisena\t(processado)
-240\tBiscoito, doce, recheado com chocolate\t(processado)
-241\tBiscoito, doce, recheado com morango\t(processado)
-242\tBiscoito, doce, wafer, recheado de chocolate\t(processado)
-243\tBiscoito, doce, wafer, recheado de morango\t(processado)
-244\tBiscoito, salgado, cream cracker\t(processado)
-245\tBiscoito, polvilho\tdoce
-246\tBolo, mistura para\t(processado)
-247\tBolo, pronto, aipim\t(processado)
-248\tBolo, pronto, chocolate\t(processado)
-249\tBolo, pronto, coco\t(processado)
-251\tCanjica, com leite integral\t(preparado)
-252\tCereais, milho, flocos\tcom sal
-253\tCereais, milho, flocos\tsem sal
-254\tCereais, milho, infantil\t(processado)
-255\tCereais, mistura para vitamina\t(processado)
-256\tCereal matinal, milho\t(processado)
-257\tCereal matinal, milho, açúcar\t(processado)
-258\tCreme de arroz, pó\t(processado)
-259\tCreme de milho, pó\t(processado)
-260\tCurau, milho verde\t(preparado)
-261\tFarinha, de arroz, enriquecida\t(derivado)
-262\tFarinha, de centeio, integral\t(derivado)
-263\tFarinha, de milho, amarela\t(derivado)
-264\tFarinha, de rosca\t(derivado)
-265\tFarinha, de trigo\t(derivado)
-266\tFarinha, láctea, de cereais\t(derivado)
-267\tFarinha, de mandioca, torrada\t(derivado)
-268\tFarinha, de puba\t(derivado)
-269\tFeijão, de mandioca\tcozido
-271\tLasanha, massa fresca\tcozida
-273\tMacarrão, instantâneo\t(processado)
-278\tMilho, verde\tcru
-279\tMilho, verde, enlatado\tdrenado
-280\tMingau tradicional, pó\t(processado)
-281\tPamonha, barra para cozimento\t(preparado)
-282\tPão, aveia, forma\t(processado)
-283\tPão, de glúten, forma\t(processado)
-284\tPão, de glúten, forma\t(variante)
-285\tPão, milho, forma\t(processado)
-288\tPão, trigo, forma, integral\t(processado)
-289\tPão, trigo, francês\t(processado)
-290\tPão, trigo, sovado\t(processado)
-293\tPastel, de queijo\tfrito
-294\tPastel, de queijo\tfrito
-295\tPastel, massa\tfrita
-296\tPastel, massa\tfrita
-297\tPipoca, com óleo de soja\tsem sal
-298\tPolenta, pré-cozida\t(processado)
-299\tTorrada, pão francês\t(processado)
-300\tAçúcar, mascavo\t(ingrediente)
-301\tAçúcar, refinado\t(ingrediente)
-302\tChocolate, ao leite\t(processado)
-303\tChocolate, ao leite, com castanha do Pará\t(processado)
-304\tChocolate, ao leite, dietético\t(processado)
-305\tChocolate, meio amargo\t(processado)
-306\tCocada branca\t(doces)
-307\tDoce, de abóbora, cremoso\t(doces)
-308\tDoce, de leite, cremoso\t(doces)
-309\tGeleia, mocotó, natural\t(doces)
-310\tGlicose de milho\t(ingrediente)
-311\tMaria mole\t(doces)
-312\tMaria mole, coco queimado\t(doces)
-313\tMarmelada\t(doces)
-314\tMel, de abelha\t(doces)
-315\tMelado\t(doces)
-316\tQuindim\t(doces)
-317\tRapadura\t(doces)
-318\tCafé, pó, torrado\t(bebida/ingrediente)
-319\tCapuccino, pó\t(bebida/ingrediente)
-320\tFermento em pó, químico\t(ingrediente)
-321\tFermento, biológico, levedura, tablete\t(ingrediente)
-322\tGelatina, sabores variados, pó\t(ingrediente)
-323\tSal, dietético\t(ingrediente)
-324\tSal, grosso\t(ingrediente)
-325\tShoyu\t(ingrediente/tempero)
-326\tTempero à base de sal\t(tempero)
-327\tAzeitona, preta\tconserva
-328\tAzeitona, verde\tconserva
-329\tChantilly, spray, com gordura vegetal\t(processado)
-330\tLeite, de coco\t(derivado)
-331\tMaionese, tradicional com ovos\t(condimento)
-332\tBebida isotônica\t(processado)
-333\tCafé, infusão\t10%
-334\tCana, aguardente\t(álcool)
-335\tCana, caldo\t(bebida)
-336\tCerveja, pilsen\t(bebida)
-337\tChá, erva-doce\tinfusão
-338\tChá, mate\tinfusão
-339\tChá, preto\tinfusão
-340\tCoco, água de\t(bebida)
-341\tRefrigerante, água tônica\t(bebida)
-342\tRefrigerante, tipo cola\t(bebida)
-343\tRefrigerante, tipo guaraná\t(bebida)
-344\tRefrigerante, tipo laranja\t(bebida)
-345\tRefrigerante, tipo limão\t(bebida)
-346\tAchocolatado, pó\t(bebida)
-347\tTacacá\t(prato)
-348\tTapioca, com manteiga\t(prato)
-349\tTucupi, com pimenta-de-cheiro\t(prato/molho)
-350\tVaca atolada\t(prato)
-351\tVatapá\t(prato)
-352\tVirado à paulista\t(prato)
-353\tYakisoba\t(prato)
-354\tAcarajé\t(prato)
-355\tArroz carreteiro\t(prato)
-356\tBaião de dois, arroz e feijão-de-corda\t(prato)
-357\tBarreado\t(prato)
-358\tBife à cavalo, com contra filé\t(prato)
-359\tBolinho de arroz\t(prato)
-360\tCamarão à baiana\t(prato)
-361\tCharuto, de repolho\t(prato)
-362\tCuscuz, de milho, cozido com sal\t(prato)
-363\tCuscuz, paulista\t(prato)
-364\tCuxá, molho\t(prato/molho)
-365\tDobradinha\t(prato)
-366\tEstrogonofe de carne\t(prato)
-367\tEstrogonofe de frango\t(prato)
-368\tFeijoada tropeiro mineiro\t(prato)
-369\tFeijoada\t(prato)
-370\tFrango, com açafrão\t(prato)
-371\tMacarrão, molho bolonhesa\t(prato)
-372\tManiçoba\t(prato)
-373\tQuibebe\t(prato)
-374\tSalada, de legumes, com maionese\t(prato)
-375\tSalada, de legumes, cozida no vapor\t(prato)
-376\tSalpicão, de frango\t(prato)
-377\tSarapatel\t(prato)
-378\tTabule\t(prato)
-379\tAmendoim, grão\tcru
-380\tAmendoim, torrado, salgado\t(torrado/salgado)
-381\tErvilha, em vagem\t(crua/cozida)
-382\tErvilha, enlatada\tdrenada
-383\tFeijão, carioca\tcozido
-385\tFeijão, fradinho\tcozido
-387\tFeijão, jalo\tcozido
-389\tFeijão, preto\tcozido
-391\tFeijão, rajado\tcozido
-393\tFeijão, rosinha\tcozido
-395\tFeijão, roxo\tcozido
-399\tLentilha\tcozida
-401\tPaçoca, amendoim\t(processado)
-402\tPé-de-moleque, amendoim\t(doces)
-403\tSoja, farinha\t(derivado)
-404\tSoja, extrato solúvel, natural, fluido\t(produto)
-405\tSoja, extrato solúvel, pó\t(produto)
-406\tSoja, queijo (tofu)\t(produto)
-408\tTremoço\tem conserva
-409\tAmêndoa, torrada, salgada\t(oleaginosa)
-410\tCastanha-de-caju, torrada, salgada\t(oleaginosa)
-411\tCastanha-do-Brasil\tcrua
-412\tCoco\tcru
-413\tGergelim, semente\t(semente)
-414\tLinhaça, semente\t(semente)
-415\tPinhão\tcozido
-416\tPupunha\tcozida
-417\tNoz\tcrua
-419\tPresunto, com capa de gordura\t(processado)
-420\tPresunto, sem capa de gordura\t(processado)
-421\tQuibe\tassado
-423\tQuibe\tfrito
-424\tSalame\t(processado)
-426\tToucinho\tfrito
-427\tApresentado\t(linha ambígua)
-428\tCaldo de carne, tablete\t(ingrediente)
-429\tCaldo de galinha, tablete\t(ingrediente)
-430\tCarne, bovina, acém, moído, cozido
-432\tCarne, bovina, acém, sem gordura, cozido
-435\tCarne, bovina, almôndegas, fritas
-436\tCarne, bovina, bucho, cozido
-439\tCarne, bovina, capa de contra-filé, com gordura\tgrelhada
-441\tCarne, bovina, capa de contra-filé, sem gordura\tgrelhada
-442\tCarne, bovina, charque, cozido
-444\tCarne, bovina, filé à milanesa\tfrita/assada
-446\tCarne, bovina, contra-filé de costela\tgrelhado
-448\tCarne, bovina, contra-filé, com gordura\tgrelhado
-450\tCarne, bovina, contra-filé, sem gordura\tgrelhada
-451\tCarne, bovina, costela\tassada
-453\tCarne, bovina, coxão duro, sem gordura\tcozido
-455\tCarne, bovina, coxão mole, sem gordura\tcozido
-457\tCarne, bovina, cupim\tassado
-460\tCarne, bovina, filé mignon, sem gordura\tcozido
-462\tCarne, bovina, flanco, sem gordura\tcozido
-464\tCarne, bovina, fraldinha, com gordura\tcozida
-466\tCarne, bovina, lagarto\tcozido
-468\tCarne, bovina, língua\tcozida
-470\tCarne, bovina, maminha\tgrelhada
-473\tCarne, bovina, miolo de alcatra, sem gordura\tgrelado
-474\tCarne, bovina, músculo, sem gordura\tcozido
-477\tCarne, bovina, paleta, sem gordura\tcozida
-479\tCarne, bovina, patinho, sem gordura\tcozido
-480\tCarne, bovina, patinho, sem gordura\tgrelhado
-481\tCarne, bovina, peito, sem gordura\tcozido
-484\tCarne, bovina, picanha, com gordura\tgrelhada
-486\tCarne, bovina, picanha, sem gordura\tgrelada
-487\tCarne, bovina, seca\tcozida
-489\tCoxinha de frango\tfrita
-491\tCroquete, de carne\tfrito
-492\tEmpada de frango, pré-cozida\tassada
-493\tEmpada de frango, pré-cozida\t(preparado)
-495\tFrango, caipira, inteiro, com pele\tcozido
-496\tFrango, caipira, inteiro, sem pele\tcozido
-498\tFrango, coração\tgrelhado
-499\tFrango, coxa, com pele\tassada
-500\tFrango, coxa, com pele\tcozida
-501\tFrango, coxa, sem pele\tcozida
-503\tFrango, filé, à milanesa\t(preparado)
-505\tFrango, inteiro, sem pele\tassado
-506\tFrango, inteiro, sem pele\tcozido
-508\tFrango, peito, com pele\tassado
-510\tFrango, peito, sem pele\tcozido
-512\tFrango, peito, sem pele\tgrelhado
-513\tFrango, sobrecoxa, com pele\tassada
-515\tFrango, sobrecoxa, sem pele\tassada
-518\tHambúrguer, bovino\tfrito
-519\tHambúrguer, bovino\tgrelhado
-520\tLinguiça, frango\tfrita
-521\tLinguiça, frango\tgrelhada
-523\tLinguiça, porco\tfrita
-524\tLinguiça, porco\tfrita
-525\tLinguiça, porco\tgrelhada
-526\tMortadela\t(processado)
-527\tPeru, congelado\tassado
-530\tPorco, bisteca\tfrita
-531\tPorco, bisteca\tgrelhada
-532\tPorco, costela\tassada
-534\tPorco, lombo\tassado
-537\tPorco, pernil\tassado
-539\tBebida láctea, pêssego\t(produto)
-540\tCreme de Leite\t(derivado)
-541\tIogurte, natural\t(derivado)
-542\tIogurte, natural, desnatado\t(derivado)
-543\tIogurte, sabor abacaxi\t(derivado)
-544\tIogurte, sabor morango\t(derivado)
-545\tIogurte, sabor pêssego\t(derivado)
-546\tLeite, condensado\t(derivado)
-547\tLeite, de cabra\t(derivado)
-548\tLeite, de vaca, achocolatado\t(derivado)
-549\tLeite, de vaca, desnatado, pó\t(derivado)
-550\tLeite, de vaca, desnatado, UHT\t(derivado)
-551\tLeite, de vaca, integral\t(derivado)
-552\tLeite, de vaca, integral, pó\t(derivado)
-553\tLeite, fermentado\t(derivado)
-554\tQueijo, minas, frescal\t(derivado)
-555\tQueijo, minas, meia cura\t(derivado)
-556\tQueijo, mozarela\t(derivado)
-557\tQueijo, parmesão\t(derivado)
-558\tQueijo, pasteurizado\t(derivado)
-559\tQueijo, petit suisse, morango\t(derivado)
-560\tQueijo, prato\t(derivado)
-561\tQueijo, requeijão, cremoso\t(derivado)
-562\tQueijo, ricota\t(derivado)
-563\tOmelete, de queijo\t(preparado)
-565\tOvo, de galinha, clara\tcozida/10minutos
-566\tOvo, de galinha, gema\tcozida/10minutos
-567\tOvo, de galinha, inteiro\tcozido/10minutos
-569\tOvo, de galinha, inteiro\tfrito
-  `.trim();
-
-  function parseKBText(text){
-    const lines = text.split(/\n/).map(l=>l.trim()).filter(l=>l.length>0);
-    const kb = {};
-    for(const line of lines){
-      const m = line.match(/^\s*(\d+)\s+(.+)$/);
-      if(!m) continue;
-      const id = m[1];
-      let rest = m[2].trim();
-      let parts = rest.split(/\t/).map(p=>p.trim()).filter(p=>p!=='');
-      if(parts.length===1) parts = rest.split(/\s{2,}/).map(p=>p.trim()).filter(p=>p!=='');
-      let name = parts[0];
-      let preparo = parts.length>1 ? parts.slice(1).join(' ').trim() : null;
-      if(preparo){ preparo = preparo.replace(/\(.*\)/g,'').trim(); if(preparo==='') preparo=null; }
-      kb[id] = { id, name: name||('ID '+id), preparo: preparo||null, default_portion_g: null, kcal_per_100g: null, pode_ser_cru: (preparo ? /cru|crua/i.test(preparo) : true) };
-    }
-    return kb;
-  }
-
-  /* ---------- Parser compacto (corrigido para aceitar L<id><qty> e L<len><id><qty>) ---------- */
-  function parseCompactWithGroups(raw){
-    if(!raw || typeof raw !== 'string') throw new Error('Código inválido');
+  // ---------- PARSER CORRIGIDO E LOG DE ERROS DETALHADO ----------
+  function parseCompactWithGroups(raw) {
+    if(!raw || typeof raw !== 'string') throwDetailed('Código inválido (vazio ou tipo incorreto)', raw, 0);
     const code = raw.trim();
-    let i=0;
+    let i = 0;
     function peek(){ return code[i]; }
     function next(){ return code[i++]; }
     function eof(){ return i >= code.length; }
     function readDigits(){ let s=''; while(!eof() && /\d/.test(peek())) s += next(); return s; }
-    function expect(ch,msg){ if(peek() !== ch) throw new Error(msg + ' (pos ' + i + '). Encontrado: "' + (peek()||'EOF') + '"'); }
 
-    // helpers to read L... id+qty. Accept two variants:
-    // 1) L <lenDigit 1-4> <id len> <qty 3>   (legacy)
-    // 2) L <digits...>  where last 3 digits are qty and the rest is id (most common)
-    function read_L_id_qty(){
-      // we are at position where peek() === 'L'
-      next(); // consume 'L'
-      if(eof()) throw new Error('Conteúdo inesperado após "L" (pos ' + i + ')');
-      // lookahead digits
+    function throwDetailed(msg, ctxRaw, pos){
+      const contextRadius = 20;
+      const start = Math.max(0, pos - contextRadius);
+      const end = Math.min(ctxRaw.length, pos + contextRadius);
+      const contextSnippet = ctxRaw.slice(start, end);
+      const pointerIndex = pos - start;
+      const pointerLine = ' '.repeat(pointerIndex) + '^';
+      const error = new Error(msg + '\nPosition: ' + pos + '\nContext: "' + contextSnippet + '"\n' + pointerLine);
+      error.position = pos;
+      error.context = contextSnippet;
+      throw error;
+    }
+
+    function read_L_id_qty() {
+      const ch = peek();
+      if(!ch) throwDetailed('Fim inesperado ao esperar "L"', code, i);
+      if(ch.toUpperCase() !== 'L') throwDetailed(`Esperado 'L' antes do item`, code, i);
+      next(); // consome L
+      if(eof()) throwDetailed('Fim inesperado após "L"', code, i);
+      // lookahead: legacy (L<len><id><qty3>) vs modern (L<id><qty3>)
       const remaining = code.slice(i);
-      // If next char is a single digit between 1 and 4 and followed by at least len+3 digits, interpret as length prefix
       const nextChar = remaining[0];
-      if(/^[1-4]$/.test(nextChar)){
-        // try legacy format
+      // legacy if nextChar in [1-4] and sufficient length
+      if(/^[1-4]$/.test(nextChar)) {
         const len = parseInt(nextChar,10);
-        // check we have enough digits for id + qty
-        const after = code.slice(i+1); // after length-digit
-        const m = after.match(/^(\d{` + len + `})(\d{3})/); // this inline won't work; do manual
-        // implement manual:
-        i++; // consume length-digit
+        if(remaining.length < 1 + len + 3) {
+          throwDetailed('Formato legacy L<len><id><qty> incompleto (faltando dígitos)', code, i);
+        }
+        // consume len-digit
+        i++;
         const idPart = code.substr(i, len);
-        if(idPart.length < len || !/^\d+$/.test(idPart)) throw new Error('ID inválido no formato L<len><id><qty> (pos ' + i + ')');
+        if(idPart.length < len || !/^\d+$/.test(idPart)) throwDetailed('ID inválido no formato legacy', code, i);
         i += len;
         const qtyPart = code.substr(i, 3);
-        if(qtyPart.length < 3 || !/^\d{3}$/.test(qtyPart)) throw new Error('Quantidade inválida (esperado 3 dígitos) na pos ' + i);
+        if(qtyPart.length < 3 || !/^\d{3}$/.test(qtyPart)) throwDetailed('Quantidade inválida (esperado 3 dígitos) no formato legacy', code, i);
         i += 3;
         return { id: idPart.replace(/^0+/, '') || '0', qty: parseInt(qtyPart,10) };
       } else {
-        // variant 2: read consecutive digits; must be at least 4 digits (1+3)
+        // modern: read continuous digits, last 3 = qty
         const digits = readDigits();
-        if(digits.length < 4) throw new Error('Esperado L<id><qty(3)> com pelo menos 4 dígitos após L (pos ' + (i - digits.length) + ')');
+        if(digits.length < 4) throwDetailed('Esperado L<id><qty(3)> (pelo menos 4 dígitos) após L', code, i - digits.length);
         const qtyStr = digits.slice(-3);
         const idStr = digits.slice(0, -3).replace(/^0+/, '') || '0';
         return { id: idStr, qty: parseInt(qtyStr,10) };
       }
     }
 
-    // Start parse
-    // Header: <type><months><tabCount>
-    if(eof()) throw new Error('Código vazio');
-    const type = next(); // 1 char
-    if(eof()) throw new Error('Código incompleto: meses ausentes');
-    const monthsChar = next();
-    if(!/^\d$/.test(monthsChar)) throw new Error('Número de meses inválido na posição 2');
+    if(eof()) throwDetailed('Código vazio', code, 0);
+    const type = next(); if(eof()) throwDetailed('Código incompleto: meses ausentes', code, i);
+    const monthsChar = next(); if(!/^\d$/.test(monthsChar)) throwDetailed('Número de meses inválido (posição 2)', code, i-1);
     const months = parseInt(monthsChar,10);
-    if(eof()) throw new Error('Código incompleto: tabCount ausente');
-    const tabCountChar = next();
-    if(!/^\d$/.test(tabCountChar)) throw new Error('Número de abas inválido na posição 3');
+    if(eof()) throwDetailed('Código incompleto: tabCount ausente', code, i);
+    const tabCountChar = next(); if(!/^\d$/.test(tabCountChar)) throwDetailed('Número de abas inválido (posição 3)', code, i-1);
     const tabCount = parseInt(tabCountChar,10);
 
     const tabs = [];
     for(let t=0; t<tabCount; t++){
-      // expect 'B'
-      if(eof()) throw new Error("Esperado 'B' (início de aba) mas fim do código");
-      const bChar = next().toUpperCase();
-      if(bChar !== 'B') throw new Error("Esperado 'B' no início da aba na posição " + (i-1));
-      // months start/end/daysVar/mealsBitmap(2)
-      if(eof()) throw new Error('Código incompleto na aba: faltam dados de mês');
-      const ms = next(); if(!/^\d$/.test(ms)) throw new Error('Mês inicial inválido em pos ' + (i-1));
-      const me = next(); if(!/^\d$/.test(me)) throw new Error('Mês final inválido em pos ' + (i-1));
-      const daysVarChar = next(); if(!/^\d$/.test(daysVarChar)) throw new Error('Número de dias inválido em pos ' + (i-1));
+      if(eof()) throwDetailed("Esperado 'B' (início de aba) mas fim do código", code, i);
+      const bChar = next();
+      if(bChar.toUpperCase() !== 'B') throwDetailed("Esperado 'B' no início da aba", code, i-1);
+      // meses start/end/daysVar/mealsBitmap(2)
+      if(eof()) throwDetailed('Código incompleto na aba: faltam dados de mês', code, i);
+      const ms = next(); if(!/^\d$/.test(ms)) throwDetailed('Mês inicial inválido', code, i-1);
+      const me = next(); if(!/^\d$/.test(me)) throwDetailed('Mês final inválido', code, i-1);
+      const daysVarChar = next(); if(!/^\d$/.test(daysVarChar)) throwDetailed('Número de dias inválido', code, i-1);
       const monthsStart = parseInt(ms,10), monthsEnd = parseInt(me,10), daysVar = parseInt(daysVarChar,10);
       // meals bitmap: two digits
       const mb1 = next(); const mb2 = next();
-      if(!/^\d$/.test(mb1) || !/^\d$/.test(mb2)) throw new Error('Bitmap de refeições inválido (são 2 dígitos) em pos ' + (i-2));
+      if(!/^\d$/.test(mb1) || !/^\d$/.test(mb2)) throwDetailed('Bitmap de refeições inválido (2 dígitos)', code, i-2);
       const mealsBitmap = parseInt(mb1+mb2,10);
 
       const days = [];
       for(let d=0; d<daysVar; d++){
-        // expect 'd' or 'D'
-        if(eof()) throw new Error("Esperado 'd' (início de dia) mas fim do código");
-        const dayChar = next().toUpperCase();
-        if(dayChar !== 'D') throw new Error("Esperado 'd' no início do dia na posição " + (i-1));
-        // dayIndex (1 digit) and mealEntryCount (1 digit)
-        const dayIdxChar = next(); if(!/^\d$/.test(dayIdxChar)) throw new Error('Índice do dia inválido em pos ' + (i-1));
-        const mealEntryCountChar = next(); if(!/^\d$/.test(mealEntryCountChar)) throw new Error('Contagem de refeições inválida em pos ' + (i-1));
+        if(eof()) throwDetailed("Esperado 'd' (início de dia) mas fim do código", code, i);
+        const dayChar = next();
+        if(dayChar.toUpperCase() !== 'D') throwDetailed("Esperado 'd' no início do dia", code, i-1);
+        const dayIdxChar = next(); if(!/^\d$/.test(dayIdxChar)) throwDetailed('Índice do dia inválido', code, i-1);
+        const mealEntryCountChar = next(); if(!/^\d$/.test(mealEntryCountChar)) throwDetailed('Contagem de refeições inválida', code, i-1);
         const dayIndex = parseInt(dayIdxChar,10), mealEntryCount = parseInt(mealEntryCountChar,10);
         const slots = [];
         for(let m=0; m<mealEntryCount; m++){
-          // mealCode (1 digit), itemEntryCount(1 digit)
-          const mealCodeChar = next(); if(!/^\d$/.test(mealCodeChar)) throw new Error('Código da refeição inválido em pos ' + (i-1));
+          if(eof()) throwDetailed('Fim inesperado antes de ler slot da refeição', code, i);
+          const mealCodeChar = next(); if(!/^\d$/.test(mealCodeChar)) throwDetailed('Código da refeição inválido', code, i-1);
           const mealCode = parseInt(mealCodeChar,10);
-          const itemEntryCountChar = next(); if(!/^\d$/.test(itemEntryCountChar)) throw new Error('Contagem de itens inválida em pos ' + (i-1));
+          const itemEntryCountChar = next(); if(!/^\d$/.test(itemEntryCountChar)) throwDetailed('Contagem de itens inválida', code, i-1);
           const itemEntryCount = parseInt(itemEntryCountChar,10);
           const entries = [];
           for(let e=0; e<itemEntryCount; e++){
-            if(eof()) throw new Error('Fim inesperado dentro de entries');
+            if(eof()) throwDetailed('Fim inesperado dentro de entries', code, i);
             const p = peek();
-            if(p.toUpperCase() === 'G'){
-              next(); // consume G
-              if(eof()) throw new Error('Fim inesperado após G');
-              const groupCountChar = next(); if(!/^\d$/.test(groupCountChar)) throw new Error('Contagem de grupos inválida após G em pos ' + (i-1));
+            if(!p) throwDetailed('Fim inesperado ao ler entry', code, i);
+            if(p.toUpperCase() === 'G'){ // grupo
+              next(); // consome 'G'
+              if(eof()) throwDetailed('Fim inesperado após G', code, i);
+              const groupCountChar = next(); if(!/^\d$/.test(groupCountChar)) throwDetailed('Contagem de grupos inválida após G', code, i-1);
               const groupCount = parseInt(groupCountChar,10);
               const groupItems = [];
               for(let g=0; g<groupCount; g++){
-                // read L... pattern
-                if(eof()) throw new Error('Fim inesperado dentro de grupo');
-                if(peek().toUpperCase() !== 'L') throw new Error("Esperado 'L' antes do item do grupo em pos " + i);
+                if(eof()) throwDetailed('Fim inesperado dentro de grupo', code, i);
+                const nextCh = peek();
+                if(!nextCh || nextCh.toUpperCase() !== 'L') throwDetailed("Esperado 'L' antes do item do grupo", code, i);
                 const it = read_L_id_qty();
                 groupItems.push({ id: it.id, qty: it.qty });
               }
               entries.push({ type:'group', items: groupItems });
             } else {
-              // single item: expect 'L'
-              if(peek().toUpperCase() !== 'L') throw new Error("Esperado 'L' antes do item em pos " + i);
+              // item único - espera 'L'
+              if(p.toUpperCase() !== 'L') throwDetailed("Esperado 'L' antes do item", code, i);
               const it = read_L_id_qty();
               entries.push({ type:'item', item: { id: it.id, qty: it.qty } });
             }
-          } // end entries loop
+          }
           slots.push({ mealCode, entries });
-        } // end mealEntryCount loop
+        }
         days.push({ dayIndex, slots });
-      } // end days loop
+      }
 
-      // expect 'E' end of tab
-      if(eof()) throw new Error("Esperado 'E' (fim de aba) mas fim do código");
-      const endChar = next().toUpperCase();
-      if(endChar !== 'E') throw new Error("Esperado 'E' no fim da aba na posição " + (i-1));
+      if(eof()) throwDetailed("Esperado 'E' (fim de aba) mas fim do código", code, i);
+      const endChar = next();
+      if(endChar.toUpperCase() !== 'E') throwDetailed("Esperado 'E' no fim da aba", code, i-1);
       tabs.push({ monthStart: monthsStart, monthEnd: monthsEnd, daysVar, mealsBitmap, days });
-    } // end tabs
+    }
 
-    // if extra content left, error
     if(!eof()){
       const rest = code.slice(i);
-      throw new Error('Conteúdo extra após parse na pos ' + i + ': "' + rest.slice(0,40) + '"');
+      throwDetailed('Conteúdo extra após parse', code, i);
     }
 
     return { type, months, tabs };
   }
 
-  /* ---------- normalize & render (simplificado) ---------- */
+  // ---------- normalização & render ----------
   function normalizePlan(plan, kb){
-    const fallback = 100;
+    const fallbackPortion = 100;
     plan.tabs.forEach(tab=>{
       tab.days.forEach(day=>{
         day.slots.forEach(slot=>{
           slot.entries.forEach(entry=>{
-            if(entry.type==='group'){
+            if(entry.type === 'group'){
               entry.items.forEach(it=>{
                 const kbItem = kb[it.id] || null;
                 it.kb = kbItem;
-                it.used_qty = it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : fallback) : it.qty;
-                it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty*100/kbItem.default_portion_g) : null;
-                it.kcal = kbItem && kbItem.kcal_per_100g ? Math.round(kbItem.kcal_per_100g * it.used_qty/100) : null;
+                it.used_qty = it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : fallbackPortion) : it.qty;
+                it.kcal = kbItem && kbItem.kcal_per_100g ? Math.round(kbItem.kcal_per_100g * it.used_qty / 100) : null;
               });
               entry.group_kcal = entry.items.reduce((s,i)=> s + (i.kcal || 0), 0);
             } else {
               const it = entry.item;
               const kbItem = kb[it.id] || null;
               it.kb = kbItem;
-              it.used_qty = it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : fallback) : it.qty;
-              it.pct_of_default = kbItem && kbItem.default_portion_g ? Math.round(it.used_qty*100/kbItem.default_portion_g) : null;
-              it.kcal = kbItem && kbItem.kcal_per_100g ? Math.round(kbItem.kcal_per_100g * it.used_qty/100) : null;
+              it.used_qty = it.qty === 0 ? (kbItem && kbItem.default_portion_g ? kbItem.default_portion_g : fallbackPortion) : it.qty;
+              it.kcal = kbItem && kbItem.kcal_per_100g ? Math.round(kbItem.kcal_per_100g * it.used_qty / 100) : null;
             }
           });
           slot.meal_total_kcal = slot.entries.reduce((s,en)=> s + (en.type==='group' ? (en.group_kcal || 0) : (en.item.kcal || 0)), 0);
@@ -872,13 +834,12 @@
     return plan;
   }
 
-  const MEAL_NAMES = { 1:"Refeição 1 (Café da manhã)", 2:"Refeição 2 (Lanche)", 3:"Refeição 3 (Almoço)", 4:"Refeição 4 (Café da tarde)", 5:"Refeição 5 (Janta)" };
-
   function renderForm(plan, kb, container){
     container.innerHTML = '';
     const summary = document.createElement('div'); summary.style.marginBottom='10px';
     summary.innerHTML = `<strong>Plano: type=${plan.type}, months=${plan.months}, abas=${plan.tabs.length}</strong>`;
     container.appendChild(summary);
+    const MEAL_NAMES = { 1:"Refeição 1 (Café da manhã)", 2:"Refeição 2 (Lanche)", 3:"Refeição 3 (Almoço)", 4:"Refeição 4 (Café da tarde)", 5:"Refeição 5 (Janta)" };
     plan.tabs.forEach((tab,tabIdx)=>{
       const tabEl = document.createElement('div'); tabEl.style.marginTop='12px';
       tabEl.innerHTML = `<div style="font-weight:700;margin-bottom:8px">Mês ${tab.monthStart}${tab.monthStart!==tab.monthEnd?(' - '+tab.monthEnd):''} • dias: ${tab.days.length}</div>`;
@@ -895,7 +856,7 @@
               entry.items.forEach(it=>{
                 const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.marginTop='6px';
                 const name = it.kb?.name || ('ID '+it.id);
-                row.innerHTML = `<div><strong>${name}</strong><div style="font-size:12px;color:#bbb">(#${it.id}) porção padrão: ${it.kb?.default_portion_g ?? '—'} g</div></div><div style="text-align:right"><div style="font-weight:700">${it.used_qty} g</div><div style="font-size:12px;color:#bbb">${it.kcal ?? '—'} kcal</div></div>`;
+                row.innerHTML = `<div><strong>${name}</strong><div style="font-size:12px;color:#bbb">(#${it.id})</div></div><div style="text-align:right"><div style="font-weight:700">${it.used_qty} g</div><div style="font-size:12px;color:#bbb">${it.kcal ?? '—'} kcal</div></div>`;
                 g.appendChild(row);
               });
               mealDiv.appendChild(g);
@@ -903,7 +864,7 @@
               const it = entry.item;
               const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.marginTop='6px'; row.style.padding='6px'; row.style.border='1px solid rgba(255,255,255,0.02)'; row.style.borderRadius='8px';
               const name = it.kb?.name || ('ID '+it.id);
-              row.innerHTML = `<div><strong>${name}</strong><div style="font-size:12px;color:#bbb">(#${it.id}) porção padrão: ${it.kb?.default_portion_g ?? '—'} g</div></div><div style="text-align:right"><div style="font-weight:700">${it.used_qty} g</div><div style="font-size:12px;color:#bbb">${it.kcal ?? '—'} kcal</div></div>`;
+              row.innerHTML = `<div><strong>${name}</strong><div style="font-size:12px;color:#bbb">(#${it.id})</div></div><div style="text-align:right"><div style="font-weight:700">${it.used_qty} g</div><div style="font-size:12px;color:#bbb">${it.kcal ?? '—'} kcal</div></div>`;
               mealDiv.appendChild(row);
             }
           });
@@ -915,38 +876,39 @@
     });
   }
 
-  /* ---------- Wiring UI ---------- */
-  const KB = parseKBText(kbText);
-  document.getElementById('kbPreview').innerText = 'KB entries: ' + Object.keys(KB).length + ' (loaded).';
-
+  // ---------- UI wiring do parser ----------
   const compactInput = document.getElementById('compactInput');
   const runBtn = document.getElementById('runBtn');
   const clearBtn = document.getElementById('clearBtn');
   const copyBtn = document.getElementById('copyBtn');
   const compactRoot = document.getElementById('compactRoot');
   const compactError = document.getElementById('compactError');
+  const kbPreview = document.getElementById('kbPreview');
+  kbPreview.innerText = 'KB entries: ' + Object.keys(KB).length + ' (loaded).';
 
-  function showError(msg){
-    compactError.style.display = 'block';
-    compactError.innerText = msg;
+  function showErrorDetailed(err){
+    compactError.style.display='block';
+    if(err && err.context && err.position !== undefined){
+      compactError.innerText = 'Erro ao parsear: ' + (err.message || String(err)) + '\n\nPosição: ' + err.position + '\nContexto próximo: "' + (err.context || '') + '"\n\nStack:\n' + (err.stack || '');
+    } else {
+      compactError.innerText = 'Erro ao parsear: ' + (err && err.message ? err.message : String(err)) + '\n\nStack:\n' + (err && err.stack ? err.stack : '—');
+    }
   }
-  function hideError(){
-    compactError.style.display = 'none';
-    compactError.innerText = '';
-  }
+  function hideError(){ compactError.style.display='none'; compactError.innerText=''; }
 
+  window.currentCompactPlan = null;
   runBtn.addEventListener('click', ()=>{
     hideError();
     compactRoot.innerHTML = '';
     const code = (compactInput.value||'').trim();
-    if(!code){ showError('Cole um código compacto antes de rodar.'); return; }
+    if(!code){ showErrorDetailed(new Error('Cole um código compacto antes de rodar.')); return; }
     try {
       const plan = parseCompactWithGroups(code);
       normalizePlan(plan, KB);
       renderForm(plan, KB, compactRoot);
       window.currentCompactPlan = plan;
     } catch(err){
-      showError('Erro ao parsear: ' + (err && err.message ? err.message : String(err)));
+      showErrorDetailed(err);
     }
   });
 
@@ -965,41 +927,95 @@
     }
   });
 
-  /* ---------- menu & tab wiring & remaining original logic ---------- */
-  document.getElementById('menu-toggle').addEventListener('click', function(){ this.classList.toggle('open'); document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); });
-  document.getElementById('overlay').addEventListener('click', function(){ document.getElementById('menu-toggle').classList.remove('open'); document.getElementById('sidebar').classList.remove('open'); this.classList.remove('show'); });
-  document.querySelectorAll('.nav-link').forEach(link=>{
-    link.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const tabId = link.dataset.tab;
-      document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
-      link.classList.add('active');
-      document.getElementById('menu-toggle').classList.remove('open');
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('overlay').classList.remove('show');
-    });
-  });
-
-  /* mantém sua lógica de inicialização e formulários originais (simplificado aqui para demo) */
+  // ---------- Resto da sua lógica com Supabase & UI ----------
   document.addEventListener('DOMContentLoaded', () => {
-    // mostra formulário principal (sem supabase login real aqui na demo)
-    const fw = document.getElementById('form-wrapper'); if(fw) fw.style.display='block';
-    // ligações UX (suplementos, paste simulation)
-    const objetivoInput = document.getElementById('objetivo'); if(objetivoInput){ objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display = this.value.trim() !== '' ? 'block' : 'none'; }); }
-    const usoSup = document.getElementById('uso_suplemento'); if(usoSup){ usoSup.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display = this.value==='Sim' ? 'block' : 'none'; if(this.value !== 'Sim') document.getElementById('quais_suplementos').value = ''; }); }
-    const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
-    function simulatePaste(btn, targetId){
-      const txt = document.getElementById('prompt-output').textContent || '';
-      const target = document.getElementById(targetId);
-      if(btn.disabled) return;
-      btn.classList.add('pasted','done');
-      btn.disabled = true;
-      if(target) target.value = txt.trim() || '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]';
+    let user = null;
+    const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
+    const switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active'); };
+    const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+    menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', closeMenu);
+    navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const tabId = link.dataset.tab; switchTab(tabId); closeMenu(); }); });
+    configBtn.addEventListener('click', (e) => { e.preventDefault(); logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
+    logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
+    resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null, }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
+
+    async function initializePageData(){
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) { window.location.replace('/login.html'); return; }
+      user = data.user;
+      document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
+      const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
+      if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
+
+      // injeta chat Dify
+      function loadFreshDifyChat(){
+        const difyContainer = document.getElementById('dify-container');
+        if(!difyContainer) return;
+        difyContainer.innerHTML = '';
+        const frameWrap = document.createElement('div'); frameWrap.className = 'dify-frame';
+        const iframe = document.createElement('iframe');
+        const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+        const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
+        iframe.src = difyUrl; iframe.allow='microphone'; frameWrap.appendChild(iframe);
+        const strip = document.createElement('div'); strip.className='dify-top-strip'; strip.setAttribute('aria-hidden','true');
+        const badge = document.createElement('div'); badge.className='dify-top-badge'; badge.textContent='Fale com a IA';
+        const label = document.createElement('span'); label.className='mvp-label'; label.textContent='MVPia';
+        strip.appendChild(badge); strip.appendChild(label);
+        const bottomMask = document.createElement('div'); bottomMask.className='dify-bottom-mask'; bottomMask.setAttribute('aria-hidden','true');
+        frameWrap.appendChild(strip); frameWrap.appendChild(bottomMask); difyContainer.appendChild(frameWrap);
+      }
+      loadFreshDifyChat();
+
+      // restante da lógica do formulário IA
+      const objetivoInput = document.getElementById('objetivo'); if(objetivoInput) objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()? 'block':'none'; });
+      const usoSuplementoSelect = document.getElementById('uso_suplemento'); if(usoSuplementoSelect) usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim') document.getElementById('quais_suplementos').value=''; });
+
+      const iaFitForm = document.getElementById('ia-fit-form'); if(iaFitForm) iaFitForm.addEventListener('submit', async function(event){
+        event.preventDefault();
+        const formElements = event.target.elements;
+        const prazoText = formElements.prazo.value;
+        const endDate = calculateEndDate(prazoText);
+        if(!endDate){ console.error("Prazo da meta inválido."); return; }
+        const startDate = new Date(); startDate.setHours(0,0,0,0);
+        const objetivoText = formElements.objetivo.value;
+        const goalType = analyzeGoal(objetivoText);
+        const daysRemaining = Math.ceil((endDate - startDate)/(1000*60*60*24));
+        const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
+        const orcamentoValue = formElements.orcamento.value.replace(',', '.');
+        const formData = { objetivo:objetivoText, prazo:prazoOtimizado, sexo:formElements.sexo.value, altura:formElements.altura.value, peso:formElements.peso.value, idade:formElements.idade.value, disponibilidade:formElements.disponibilidade.value, local_treino:formElements.local_treino.value, orcamento:orcamentoValue, uso_suplemento:formElements.uso_suplemento.value, quais_suplementos:formElements.quais_suplementos.value, nivel:formElements.nivel.value };
+        let suplementoInfo = `Pretende usar suplementos: ${formData.uso_suplemento}.`;
+        if(formData.uso_suplemento==='Sim' && formData.quais_suplementos){ suplementoInfo += ` Os suplementos são: ${formData.quais_suplementos}.` } else if(formData.uso_suplemento==='Sim'){ suplementoInfo += ` Ainda não decidi quais.`; }
+        const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
+
+        const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
+        if(updateError){ console.error("Erro ao salvar a meta: " + updateError.message); } else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display='block'; displayProgress(startDate, endDate); }
+      });
+
+      const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) playlistBtn.addEventListener('click', function(){ if(!profile) return; let videoOrder; if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];} else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];} else { videoOrder=[1,2,3]; } reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior:'smooth' }); });
+
+      const copyBtnMain = document.getElementById('copy-btn-main'); if(copyBtnMain) copyBtnMain.addEventListener('click', function(){ const textToCopy=document.getElementById('prompt-output').textContent; const textArea=document.createElement('textarea'); textArea.value=textToCopy; textArea.style.position='fixed'; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try{ document.execCommand('copy'); const btn=document.getElementById('copy-btn-main'); btn.textContent='Copiado!'; setTimeout(()=>{btn.textContent='Copiar Pedido';},2000);}catch(err){console.error('Erro ao copiar',err);} document.body.removeChild(textArea); });
+
+      // paste simulation buttons
+      const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
+      function simulatePaste(buttonEl, targetTextareaId){
+        const txtOutput = document.getElementById('prompt-output').textContent || '';
+        const target = document.getElementById(targetTextareaId);
+        const label = buttonEl.querySelector('.label');
+        if(buttonEl.disabled) return;
+        buttonEl.classList.remove('appearing'); void buttonEl.offsetWidth; buttonEl.classList.add('appearing');
+        if(txtOutput.trim() && target) { target.value = txtOutput; } else if(target) { target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]'; }
+        if(label) label.textContent = 'Formulário pronto ✓';
+        buttonEl.classList.add('pasted','done');
+        buttonEl.setAttribute('aria-pressed','true'); buttonEl.disabled = true; buttonEl.setAttribute('aria-disabled','true');
+        if(target){ try{ target.focus(); } catch(e){} }
+      }
+      if(pasteTreino) pasteTreino.addEventListener('click', ()=> simulatePaste(pasteTreino,'objetivo_treino'));
+      if(pasteDieta) pasteDieta.addEventListener('click', ()=> simulatePaste(pasteDieta,'objetivo_dieta'));
     }
-    if(pasteTreino) pasteTreino.addEventListener('click', ()=> simulatePaste(pasteTreino,'objetivo_treino'));
-    if(pasteDieta) pasteDieta.addEventListener('click', ()=> simulatePaste(pasteDieta,'objetivo_dieta'));
+
+    initializePageData();
   });
 </script>
 </body>
