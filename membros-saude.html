@@ -8,14 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* === (mantive todo o teu CSS original, para não alterar o design) === */
+    /* --- CSS (mantive a maior parte do estilo original) --- */
     :root {
       --color-ia-specialist: #007BFF;
       --color-video-lessons: #8A2BE2;
       --color-journey: #DC143C;
       --journey-red-1: #ff2646;
       --journey-red-2: #be123c;
-      --journey-dark: #2a0a12;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -25,1568 +24,679 @@
         margin: 0;
         padding: 40px 20px;
     }
-    .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-    h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
-    /* --- MENU E SIDEBAR --- (mantido) */
-    .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width:50px; height:50px; border-radius:50%; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; padding:0;}
-    .menu-toggle .bar{ width:24px; height:3px; background:#fff; border-radius:2px; transition:all .3s;}
-    .menu-toggle.open .bar:nth-child(1){ transform: translateY(8px) rotate(45deg); }
-    .menu-toggle.open .bar:nth-child(2){ opacity:0; }
-    .menu-toggle.open .bar:nth-child(3){ transform: translateY(-8px) rotate(-45deg); }
-    .sidebar{ position: fixed; top:0; left:-300px; width:280px; height:100%; background:#1E1E1E; transition:left .3s; z-index:1000; border-right:1px solid #333; display:flex; flex-direction:column; justify-content:space-between;}
-    .sidebar.open{ left:0; }
-    .sidebar nav{ padding-top:100px; }
-    .sidebar nav ul{ list-style:none; margin:0; padding:0; }
-    .sidebar nav a{ display:block; padding:15px 30px; text-decoration:none; font-size:1.1em; font-weight:700; border-left:5px solid transparent; transition: background-color .2s, border-left .2s;}
-    .sidebar nav a:hover{ background:#2c2c2c; }
-    .link-ia,.link-aulas,.link-percurso{ background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .link-ia{ background-image:linear-gradient(90deg,#38b6ff,#0056b3); }
-    .link-aulas{ background-image:linear-gradient(90deg,#c048f2,#6b21a8); }
-    .link-percurso{ background-image:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); }
-    .sidebar-footer{ padding:20px 30px; text-align:center; }
-    .sidebar-config-btn{ width:100%; background:transparent; border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; gap:8px; align-items:center; justify-content:center; }
-    .sidebar-action-btn{ width:100%; padding:10px; border-radius:8px; cursor:pointer; font-weight:600; margin-top:10px; }
-    .sidebar-reset-btn{ background-color:transparent; border:1px solid var(--color-ia-specialist); color:var(--color-ia-specialist); }
-    .sidebar-logout-btn{ background-color:#be123c; border:1px solid #be123c; color:#fff; }
-    .hidden{ display:none; }
-    .overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.6); z-index:999; opacity:0; visibility:hidden; transition:opacity .3s, visibility .3s;}
-    .overlay.show{ opacity:1; visibility:visible; }
-    .header{ display:flex; justify-content:flex-end; align-items:center; margin-bottom:20px;}
-    #welcome-msg{ color:#bbb; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    h1,h2,h3 { color: #f0f0f0; text-align: center; margin-top: 20px; margin-bottom: 12px; }
 
-    /* conteúdo principal */
-    .tab-content{ display:none; }
-    .tab-content.active{ display:block; }
-    .form-wrapper,.results-wrapper{ width:100%; max-width:800px; margin:0 auto; }
-    .form-container,.results-container,.percurso-container{ background:#1E1E1E; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.5); border:1px solid #333; }
-    .form-group{ margin-bottom:25px; }
-    label{ display:block; margin-bottom:8px; font-weight:600; color:#BBBBBB; }
-    input,select,textarea{ width:100%; padding:12px; background:#2C2C2C; border:1px solid #444; border-radius:8px; color:#E0E0E0; font-size:16px; box-sizing:border-box; }
-    textarea{ min-height:100px; resize:vertical; }
-    .goal-section{ background:linear-gradient(145deg,#2a2a2a,#1a1a1a); border:1px solid #444; padding:30px; margin-bottom:40px; border-radius:10px; text-align:center; }
-    .goal-title{ font-size:28px; font-weight:700; background:linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90deg,#007BFF,#0056b3); border:none; border-radius:8px; color:#fff; font-size:18px; font-weight:600; cursor:pointer; }
+    /* menu & sidebar */
+    .menu-toggle{position:fixed;top:25px;left:25px;z-index:1001;background:#333;border:none;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:0}
+    .menu-toggle .bar{width:24px;height:3px;background:#fff;border-radius:2px;transition:all .3s}
+    .sidebar{position:fixed;top:0;left:-300px;width:280px;height:100%;background:#1E1E1E;transition:left .3s;z-index:1000;border-right:1px solid #333;display:flex;flex-direction:column;justify-content:space-between}
+    .sidebar.open{left:0}
+    .sidebar nav{padding-top:100px}
+    .sidebar nav a{display:block;padding:15px 30px;text-decoration:none;font-size:1.1em;font-weight:700;border-left:5px solid transparent}
+    .link-ia{background-image:linear-gradient(90deg,#38b6ff,#0056b3);-webkit-background-clip:text;color:transparent}
+    .link-aulas{background-image:linear-gradient(90deg,#c048f2,#6b21a8);-webkit-background-clip:text;color:transparent}
+    .link-percurso{background-image:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2));-webkit-background-clip:text;color:transparent}
+    .sidebar-footer{padding:20px 30px;text-align:center}
+    .sidebar-config-btn{width:100%;background:transparent;border:1px solid #444;color:#aaa;padding:10px;border-radius:8px;cursor:pointer;font-weight:600}
 
-    /* percurso / dieta UI additions */
-    .compact-area { background: #111; border:1px solid #333; padding:12px; border-radius:8px; min-height:100px; color:#cfc; font-family:monospace; white-space:pre-wrap; }
-    .btn-row { display:flex; gap:12px; margin-top:12px; align-items:center; }
-    .btn { padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-    .btn.primary { background: #ff2d63; color:#fff; }
-    .btn.secondary { background:#333; color:#fff; border:1px solid #444; }
-    .btn.info { background:#0b84ff; color:#fff; }
-    .error-box { background:#4b0b0b; color:#ffdede; padding:12px; border-radius:8px; margin-top:12px; font-family:monospace; white-space:pre-wrap; }
-    .form-result { margin-top:16px; background:#161616; border:1px solid #282828; padding:12px; border-radius:8px; color:#ddd; }
-    .kb-name { font-weight:700; color:#fff; }
-    .entry-row { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
-    .entry-row .pill { background:#222; padding:8px 12px; border-radius:999px; border:1px solid #333; font-family:monospace; }
-    .small-note { font-size:13px; color:#cfc; opacity:.7; margin-top:6px; }
-
-    /* iframe dify */
-    .iframe-container { border-radius:12px; overflow:hidden; height:auto; position:relative; }
-    #dify-container { width:100%; margin:18px auto 0 auto; padding:0; }
-    .dify-frame { position:relative; border-radius:16px; overflow:hidden; background:linear-gradient(180deg,#0b0b0b,#121212); border:3px solid rgba(0,0,0,0.9); box-shadow:0 30px 60px rgba(0,0,0,.7); min-height:420px; }
-    .dify-top-strip{ position:absolute; top:14px; left:14px; right:14px; height:64px; background:linear-gradient(180deg, rgba(0,0,0,.995), rgba(18,18,18,.98)); z-index:200; display:flex; align-items:center; justify-content:space-between; padding:0 18px; border-radius:12px; box-shadow:0 18px 36px rgba(0,0,0,.55); pointer-events:none; }
-
-    @media (max-width:900px){ body{ padding:20px 12px; } .percurso-forms{ grid-template-columns:1fr; } }
+    /* content */
+    .form-container, .results-container, .percurso-container { background-color: #1E1E1E; padding: 28px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+    label{display:block;margin-bottom:8px;font-weight:600;color:#BBBBBB}
+    input, select, textarea { width:100%; padding:10px; background:#2C2C2C; border:1px solid #444; border-radius:8px; color:#E0E0E0; box-sizing:border-box; }
+    textarea{min-height:100px; resize:vertical;}
+    button{cursor:pointer}
+    .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:none;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,#007BFF,#0056b3);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid #444;color:#ddd}
+    .small-note{font-size:13px;color:#cfc;opacity:0.8;margin-top:6px}
+    .log-area{background:#3b0b0d;color:#ffdede;padding:14px;border-radius:8px;margin-top:12px;font-family:monospace;white-space:pre-wrap}
+    .percurso-forms{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+    .percurso-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.25));border:1px solid rgba(190,18,60,0.12);padding:16px;border-radius:12px}
+    .food-line{display:flex;align-items:center;gap:10px;padding:6px 0}
+    .food-id{background:#0d0d0d;border:1px solid #222;padding:6px 8px;border-radius:8px;font-weight:700;color:#ddd}
+    .meal-title{font-weight:700;margin-bottom:6px}
+    .day-card{background:#111;padding:10px;border-radius:10px;margin-bottom:10px}
+    .copy-button{display:block;width:200px;margin:16px auto 0 auto;padding:10px 15px;background:#007BFF;color:white;border:none;border-radius:8px;cursor:pointer}
+    @media(max-width:900px){ .percurso-forms{grid-template-columns:1fr} body{padding:20px} }
   </style>
 </head>
 <body>
-
-<button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-<div class="sidebar" id="sidebar">
-  <nav>
-    <ul>
-      <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
-      <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
-      <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
-    </ul>
-  </nav>
-  <div class="sidebar-footer">
-    <button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button>
-    <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
-    <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
+  <button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+  <div class="sidebar" id="sidebar">
+    <nav>
+      <ul style="list-style:none;padding-left:0;margin:0">
+        <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
+        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
+        <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="config-btn" class="sidebar-config-btn">⚙️ Configurações</button>
+    </div>
   </div>
-</div>
-<div class="overlay" id="overlay"></div>
 
-<div class="container">
-  <div class="header"><p id="welcome-msg">A carregar...</p></div>
+  <div class="container">
+    <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:18px"><p id="welcome-msg" style="color:#bbb">A carregar...</p></div>
 
-  <!-- IA Especialista -->
-  <div id="ia-planejamento" class="tab-content active">
-    <div class="form-wrapper" id="form-wrapper" style="display:none;">
+    <!-- IA Especialista (formulário principal) -->
+    <div id="ia-planejamento" class="tab-content active">
       <div class="form-container">
         <h1>Crie a sua Meta</h1>
         <form id="ia-fit-form">
-          <div class="goal-section">
-            <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
-            <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea>
-            <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
-              <label for="prazo">Qual o prazo para esta meta?</label>
-              <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required />
+          <div style="margin-bottom:12px">
+            <label for="objetivo">Qual é a sua Grande Meta?</label>
+            <textarea id="objetivo" name="objetivo" placeholder="Ex: perder 6kg, ganhar massa..." required></textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label for="sexo">Sexo</label>
+              <select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
+            </div>
+            <div>
+              <label for="idade">Idade</label>
+              <input id="idade" name="idade" type="number" min="10" max="120" placeholder="Ex: 28" required>
             </div>
           </div>
 
-          <h3>Informações Básicas e Realidade Atual</h3>
-          <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
-          <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
-          <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
-          <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
-          <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
-          <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
-          <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
-          <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
-          <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
-          <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
-          <button type="submit">Crie seu próprio caminho</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+            <div>
+              <label for="altura">Altura (m)</label>
+              <input id="altura" name="altura" type="text" inputmode="decimal" placeholder="Ex: 1.75" required>
+            </div>
+            <div>
+              <label for="peso">Peso (kg)</label>
+              <input id="peso" name="peso" type="number" placeholder="Ex: 75" required>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+            <div>
+              <label for="disponibilidade">Dias por semana para treinar</label>
+              <input id="disponibilidade" name="disponibilidade" type="number" min="0" max="7" placeholder="Ex: 4" required>
+            </div>
+            <div>
+              <label for="local_treino">Onde vai treinar?</label>
+              <select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+            <div>
+              <label for="nivel">Seu nível em atividades físicas</label>
+              <select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select>
+            </div>
+            <div>
+              <label for="uso_suplemento">Pretende usar suplementos?</label>
+              <select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <label for="prazo">Prazo (ex: 3 meses / até o verão / final do ano)</label>
+            <input id="prazo" name="prazo" placeholder="Ex: 3 meses" required>
+          </div>
+
+          <div style="margin-top:16px">
+            <button id="submit-goal" class="btn btn-primary" type="submit">Gerar Planos (Formato B)</button>
+          </div>
         </form>
+
+        <div id="generated-summary" style="margin-top:18px;display:none" class="results-container">
+          <h3>Resumo gerado</h3>
+          <div id="summary-content" style="white-space:pre-wrap;color:#ddd;padding:8px"></div>
+        </div>
+
       </div>
     </div>
 
-    <div class="results-wrapper" id="results-wrapper" style="display:none;">
-      <div class="results-container">
-        <h2>Seu Plano de Ação</h2>
-        <pre id="prompt-output"></pre>
-        <button id="copy-btn" class="copy-button">Copiar Pedido</button>
-
-        <h3>Comece sua Conversa com a IA</h3>
-        <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
-
-        <div id="dify-container" class="iframe-container"></div>
-
-        <div class="playlist-section" id="playlist-section" style="display:none;">
-          <h4>Roteiro de Aulas Sugerido</h4>
-          <p style="color:#bbb; margin-top:-10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
-          <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
-        </div>
-
-        <div class="progress-section">
-          <h3>Sua Jornada</h3>
-          <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
-          <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
-          <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-        </div>
+    <!-- Video aulas (mantive como antes) -->
+    <div id="video-aulas" class="tab-content" style="display:none">
+      <h2>Nossas Aulas</h2>
+      <div style="margin-bottom:16px"><h3>Aula 1: Introdução ao Treino Estético</h3>
+        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
+      </div>
+      <div style="margin-bottom:16px"><h3>Aula 2: Fundamentos da Nutrição</h3>
+        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
+      </div>
+      <div><h3>Aula 3: Desvendando a Hipertrofia</h3>
+        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
       </div>
     </div>
-  </div>
 
-  <!-- Video Aulas -->
-  <div id="video-aulas" class="tab-content">
-    <h2>Nossas Aulas</h2>
-    <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
-    <div id="video-block-2"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen></iframe></div></div>
-    <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
-  </div>
+    <!-- Percurso: aqui aparecerão os formulários gerados automaticamente -->
+    <div id="percurso" class="tab-content" style="display:none">
+      <div class="percurso-container">
+        <h2>Meu Percurso</h2>
+        <p style="text-align:center;color:#bbb">Aqui estão os formulários (Dieta e Treino) gerados automaticamente pelo sistema (Formato B).</p>
 
-  <!-- Percurso (com formulário Dieta integrado) -->
-  <div id="percurso" class="tab-content">
-    <div class="percurso-container">
-      <h2>Meu Percurso</h2>
-      <p style="text-align:center; color:#bbb;">Cole o código compacto (formato compacto → formulário: dieta) abaixo e clique "Rodar Código".</p>
-
-      <div style="margin-top:18px;">
-        <div style="display:grid;grid-template-columns:1fr;gap:12px;">
-          <div>
-            <label style="font-weight:700; color:#ddd;">Cole aqui o código compacto (formato compacto → formulário):</label>
-            <textarea id="compact-input" class="compact-area" placeholder="Ex: D12B11131d11111L290100L312150EB21131d11111L237200L309180E" ></textarea>
-          </div>
-
-          <div class="btn-row">
-            <button id="run-compact" class="btn primary">Rodar Código</button>
-            <button id="clear-compact" class="btn secondary">Limpar</button>
-            <button id="copy-json" class="btn info">Copiar JSON</button>
-          </div>
-
-          <div id="parse-error" class="error-box" style="display:none;"></div>
-
-          <div id="generated-form" class="form-result" style="display:none;">
-            <h4 style="margin-top:0;">Formulário Dieta gerado</h4>
-            <div id="form-entries"></div>
-            <div style="margin-top:10px;"><strong>JSON gerado:</strong><pre id="json-output" style="white-space:pre-wrap;background:#0b0b0b;padding:8px;border-radius:8px;"></pre></div>
-          </div>
-          <div class="small-note">O botão "Colar plano" nos cards do percurso continuará a simular colar o texto gerado (mantido).</div>
+        <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <label style="margin:0;font-weight:700">Cole seu KB (opcional) — linhas: <code>id[TAB]descrição</code></label>
         </div>
-      </div>
+        <textarea id="kb-input" placeholder="Opcional: cole KB completo (id[tab]descrição). Ex: 290	Pão, trigo, sovado — (processado)" style="margin-top:8px"></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="load-kb" class="btn btn-ghost">Carregar KB</button>
+          <div class="small-note">Se carregar o KB, a interface irá tentar mostrar nomes reais para os IDs usados nas refeições.</div>
+        </div>
 
-      <div style="margin-top:22px;">
-        <div class="percurso-forms">
-          <div class="percurso-card" id="treino-card">
-            <h4>Formulário: Treino</h4>
-            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
-            <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
-            <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-              <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
-              <div class="small-note">Clique para colar (simulação)</div>
-            </div>
-          </div>
-
+        <div class="percurso-forms" style="margin-top:20px">
+          <!-- Card Dieta -->
           <div class="percurso-card" id="dieta-card">
             <h4>Formulário: Dieta</h4>
-            <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta</label><textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea></div>
+            <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta (gerado)</label><textarea id="objetivo_dieta" placeholder="Será preenchido automaticamente"></textarea></div>
             <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
-            <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-              <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
-              <div class="small-note">Clique para colar (simulação)</div>
+            <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+              <button id="copy-dieta-json" class="btn btn-primary">Copiar Dieta (JSON)</button>
+              <button id="download-dieta" class="btn btn-ghost">Baixar Dieta (JSON)</button>
             </div>
+            <div id="dieta-render" style="margin-top:12px"></div>
+          </div>
+
+          <!-- Card Treino -->
+          <div class="percurso-card" id="treino-card">
+            <h4>Formulário: Treino</h4>
+            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino (gerado)</label><textarea id="objetivo_treino" placeholder="Será preenchido automaticamente"></textarea></div>
+            <div class="form-group"><label for="frequencia_treino">Frequência semanal (gerado)</label><input id="frequencia_treino" type="number" min="0" max="7" placeholder="Ex: 4"></div>
+            <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+              <button id="copy-treino-json" class="btn btn-primary">Copiar Treino (JSON)</button>
+              <button id="download-treino" class="btn btn-ghost">Baixar Treino (JSON)</button>
+            </div>
+            <div id="treino-render" style="margin-top:12px"></div>
           </div>
         </div>
+
+        <div id="percurso-log" class="log-area" style="display:none"></div>
+
       </div>
-
-      <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo).</p>
     </div>
-  </div>
 
-</div>
+  </div> <!-- container -->
+
+  <!-- Dify container (chat advisor) -->
+  <div id="dify-container" style="max-width:1200px;margin:18px auto 80px;"></div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  // ====== CONFIGURAÇÃO (mantida) ======
+  // ================== CONFIGURAÇÃO ==================
   const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  // ============================
-  // KB: bloco textual que tu forneceste (usei exactamente o teu KB)
-  // ============================
-  // Obs: mantive o bloco que nos enviaste (muitas linhas).
-  // O script converte automaticamente para um mapa id->descricao.
-  const KB_TEXT = `
-1	Abóbora, cabotián	cozida
-
-5	Abóbora, moranga	refogada
-
-7	Abobrinha, italiana	cozida
-
-8	Abobrinha, italiana	crua
-
-9	Abobrinha, italiana	refogada
-
-10	Abobrinha, paulista	crua
-
-11	Acelga	crua
-
-12	Agrião	cru
-
-13	Aipo	cru
-
-14	Alface, americana	crua
-
-15	Alface, crespa	crua
-
-16	Alface, lisa	crua
-
-17	Alface, roxa	crua
-
-18	Alfavaca	crua
-
-19	Alho	cru (uso culinário cru possível — incluí)
-
-20	Alho-poró	cru
-
-21	Almeirão	cru
-
-22	Almeirão	refogado
-
-23	Batata, baroa	cozida
-
-25	Batata, doce	cozida
-
-27	Batata frita, tipo chips	industrializada
-
-28	Batata, inglesa	cozida
-
-30	Batata, inglesa	frita
-
-31	Batata, inglesa	sauté
-
-32	Berinjela	cozida
-
-34	Beterraba	cozida
-
-35	Beterraba	crua
-
-36	Brócolis	cozido
-
-37	Brócolis	cru
-
-38	Cará	cozido
-
-40	Canru	cru (entrada ambígua — mantive como "cru" mas revisar se for outro nome)
-
-41	Catalonha	crua
-
-42	Catalonha	refogada
-
-43	Cebola	crua
-
-44	Cebolinha	crua
-
-45	Cenoura	cozida
-
-46	Cenoura	crua
-
-47	Chicória	crua
-
-48	Chuchu	cozido
-
-49	Chuchu	cru
-
-50	Coentro, folhas	desidratadas
-
-51	Couve, manteiga	crua
-
-52	Couve, manteiga	refogada
-
-53	Couve-flor	cozida
-
-54	Couve-flor	crua
-
-55	Espinafre, Nova Zelândia	cru
-
-56	Espinafre, Nova Zelândia	refogado
-
-58	Jiló	cru (marcado cru na tabela — mantive, embora raro cru)
-
-60	Mandioca	cozida
-
-62	Manjericão	cru
-
-63	Maxixe	cru
-
-64	Mostarda, folha	crua
-
-65	Nabo	cru
-
-66	Nhoque, batata	cozido
-
-67	Palmito, juçara	em conserva
-
-68	Palmito, pupunha	em conserva
-
-69	Pepino	cru
-
-70	Pimentão, amarelo	cru
-
-71	Pimentão, verde	cru
-
-72	Pimentão, vermelho	cru
-
-73	Quiabo	cru (mantive cru; geralmente cozido, mas cru é consumido em algumas preparações)
-
-74	Rabanete	cru
-
-75	Repolho, branco	cru
-
-76	Repolho, roxo	cru
-
-77	Repolho, roxo	refogado
-
-78	Rúcula	crua
-
-79	Salsa	crua
-
-80	Seleta de legumes	enlatada
-
-81	Serralha	crua
-
-82	Taioba	crua
-
-83	Tomate, com semente	cru
-
-84	Tomate	extrato
-
-85	Tomate	molho industrializado
-
-86	Tomate	purê
-
-87	Tomate	salada
-
-88	Vagem	crua
-
-89	Abacate	cru
-
-90	Abacaxi	cru
-
-92	Abiu	cru
-
-93	Açaí, polpa, com xarope	(incluído; polpa com xarope)
-
-95	Acerola	crua
-
-96	Ameixa, calda	enlatada
-
-97	Ameixa	crua
-
-98	Atemoia	crua
-
-99	Banana, da terra	crua
-
-100	Banana, doce	em barra (processado)
-
-101	Banana, figo	crua
-
-102	Banana, maçã	crua
-
-103	Banana, nanica	crua
-
-104	Banana, ouro	crua
-
-105	Banana, pacova	crua
-
-106	Banana, prata	crua
-
-107	Cacau	cru
-
-108	Cajá-Manga	cru
-
-110	Caju, suco	concentrado, envasado
-
-111	Cajuí, chocolate	cru
-
-112	Carambola	crua
-
-113	Ciriguela	crua
-
-114	Cupuaçu	cru
-
-116	Figo	cru
-
-117	Figo, enlatado	em calda
-
-118	Fruta-pão	crua
-
-119	Goiaba, branca, com casca	crua
-
-120	Goiaba, doce	em pasta
-
-121	Goiaba, doce, cascão
-
-122	Goiaba, vermelha, com casca	crua
-
-123	Graviola	crua
-
-125	Jabuticaba	crua
-
-126	Jaca	crua
-
-127	Jambo	cru
-
-128	Jamelão	cru
-
-129	Kiwi	cru
-
-130	Laranja, baía	crua
-
-131	Laranja, baía	suco
-
-132	Laranja, da terra	crua
-
-133	Laranja, da terra	suco
-
-134	Laranja, lima	crua
-
-135	Laranja, lima	suco
-
-136	Laranja, pêra	crua
-
-137	Laranja, suco	(suco genérico)
-
-138	Laranja, valência	crua
-
-139	Laranja, valência	suco
-
-140	Limão, cravo	suco
-
-141	Limão, tahiti	cru
-
-142	Maçã, Argentina, com casca	crua
-
-143	Maçã, Fuji, com casca	crua
-
-144	Macaúba	cru
-
-145	Mamão, doce, em calda	drenado (processado)
-
-146	Mamão, formosa	cru
-
-147	Mamão, papaia	cru
-
-148	Mamão verde, doce em calda	drenado (processado)
-
-149	Manga, Haden	crua
-
-150	Manga, Palmer	crua
-
-152	Manga, Tommy Atkins	crua
-
-153	Mangarataia	crua
-
-155	Maracujá, suco	concentrado
-
-156	Melancia	crua
-
-157	Melão	cru
-
-158	Mexerica, Murcote	crua
-
-159	Mexerica, Rio	crua
-
-160	Morango	cru
-
-161	Nêspera	cru
-
-163	Pêra, Park	crua
-
-164	Pêra, Williams	crua
-
-165	Pêssego, Aurora	cru
-
-166	Pêssego, enlatado, em calda
-
-167	Pinha	crua
-
-168	Pitanga	crua
-
-169	Romã	crua
-
-170	Tamarindo	cru
-
-171	Tangerina, Ponkan	crua
-
-172	Tangerina, Ponkan	suco
-
-173	Tucumã	cru
-
-174	Umbu	cru
-
-176	Uva, Itália	crua
-
-177	Uva, Rubi	crua
-
-178	Uva, suco	concentrado, envasado
-
-179	Azeite, de dendê	(óleo/gordura)
-
-180	Azeite, de oliva, extra virgem	(óleo/gordura)
-
-181	Manteiga, com sal	(derivado)
-
-182	Manteiga, sem sal	(derivado)
-
-183	Margarina, com óleo hidrogenado	(derivado)
-
-184	Óleo, de soja	(óleo)
-
-185	Abadejo, filé, congelado	assado
-
-186	Abadejo, filé, congelado	cozido
-
-188	Abadejo, filé, congelado	grelhado
-
-189	Atum, conserva em óleo	(conserva)
-
-192	Bacalhau, salgado	refogado
-
-193	Cação, posta, com farinha de trigo	frita
-
-194	Cação, posta	cozida
-
-196	Camarão, Rio Grande, grande	cozido
-
-198	Camarão, Sete Barbas, sem cabeça, com casca	frito
-
-199	Caranguejo	cozido
-
-200	Corimbatá	assado
-
-201	Corimbatá	cozido
-
-204	Corvina grande	assada
-
-205	Corvina grande	cozida
-
-206	Dourada de água doce	fresca (incluí como fresco)
-
-208	Lambari, congelado	frito
-
-209	Manjuba	frita
-
-210	Manjuba, com farinha de trigo	frita
-
-211	Manjuba	frita (variante)
-
-212	Merluza, filé	assado
-
-213	Merluza, filé	cozido
-
-215	Pescada, branca	frita
-
-217	Pescada, com farinha de trigo	frita
-
-219	Pescada, filé	frita
-
-220	Pescada, filé	molho escabeche
-
-222	Pintado	assado
-
-224	Pintado	grelhado
-
-226	Salmão, com pele, fresco	grelhado
-
-228	Salmão, sem pele, fresco	grelhado
-
-229	Sardinha	assada
-
-230	Sardinha, conserva em óleo	(conserva)
-
-231	Sardinha	frita
-
-234	Arroz, integral	cozido
-
-237	Arroz, tipo 1	cozido
-
-238	Aveia, flocos	crua (uso cru em mingaus / vitaminas — incluí)
-
-239	Biscoito, doce, maisena	(processado)
-
-240	Biscoito, doce, recheado com chocolate	(processado)
-
-241	Biscoito, doce, recheado com morango	(processado)
-
-242	Biscoito, doce, wafer, recheado de chocolate	(processado)
-
-243	Biscoito, doce, wafer, recheado de morango	(processado)
-
-244	Biscoito, salgado, cream cracker	(processado)
-
-245	Biscoito, polvilho	doce (processado)
-
-246	Bolo, mistura para	(processado)
-
-247	Bolo, pronto, aipim	(processado)
-
-248	Bolo, pronto, chocolate	(processado)
-
-249	Bolo, pronto, coco	(processado)
-
-251	Canjica, com leite integral	(preparado)
-
-252	Cereais, milho, flocos, com sal	(processado)
-
-253	Cereais, milho, flocos, sem sal	(processado)
-
-254	Cereais, milho, infantil	(processado)
-
-255	Cereais, mistura para vitamina	(processado)
-
-256	Cereal matinal, milho	(processado)
-
-257	Cereal matinal, milho, açúcar	(processado)
-
-258	Creme de arroz, pó	(processado)
-
-259	Creme de milho, pó	(processado)
-
-260	Curau, milho verde	(preparado)
-
-261	Farinha, de arroz, enriquecida	(derivado)
-
-262	Farinha, de centeio, integral	(derivado)
-
-263	Farinha, de milho, amarela	(derivado)
-
-264	Farinha, de rosca	(derivado)
-
-265	Farinha, de trigo	(derivado)
-
-266	Farinha, láctea, de cereais	(derivado)
-
-267	Farinha, de mandioca, torrada	(derivado)
-
-268	Farinha, de puba	(derivado)
-
-269	Feijão, de mandioca	(cozido)
-
-271	Lasanha, massa fresca	cozida
-
-273	Macarrão, instantâneo	(processado)
-
-278	Milho, verde	cru (incluí — milho verde é consumido cru/cozido)
-
-279	Milho, verde, enlatado	drenado
-
-280	Mingau tradicional, pó	(processado)
-
-281	Pamonha, barra para cozimento	(preparado)
-
-282	Pão, aveia, forma	(processado)
-
-283	Pão, de glúten, forma	(processado)
-
-284	Pão, de glúten, forma	(variante processado)
-
-285	Pão, milho, forma	(processado)
-
-288	Pão, trigo, forma, integral	(processado)
-
-289	Pão, trigo, francês	(processado)
-
-290	Pão, trigo, sovado	(processado)
-
-293	Pastel, de queijo	frito
-
-294	Pastel, de queijo	frito (variante)
-
-295	Pastel, massa	frita
-
-296	Pastel, massa	frita (variante com outro valor)
-
-297	Pipoca, com óleo de soja	sem sal (preparado)
-
-298	Polenta, pré-cozida	(processado)
-
-299	Torrada, pão francês	(processado)
-
-300	Açúcar, mascavo	(ingrediente)
-
-301	Açúcar, refinado	(ingrediente)
-
-302	Chocolate, ao leite	(processado)
-
-303	Chocolate, ao leite, com castanha do Pará	(processado)
-
-304	Chocolate, ao leite, dietético	(processado)
-
-305	Chocolate, meio amargo	(processado)
-
-306	Cocada branca	(doces)
-
-307	Doce, de abóbora, cremoso	(doces)
-
-308	Doce, de leite, cremoso	(doces)
-
-309	Geleia, mocotó, natural	(doces)
-
-310	Glicose de milho	(ingrediente)
-
-311	Maria mole	(doces)
-
-312	Maria mole, coco queimado	(doces)
-
-313	Marmelada	(doces)
-
-314	Mel, de abelha	(doces)
-
-315	Melado	(doces)
-
-316	Quindim	(doces)
-
-317	Rapadura	(doces)
-
-318	Café, pó, torrado	(bebida/ingrediente)
-
-319	Capuccino, pó	(bebida/ingrediente)
-
-320	Fermento em pó, químico	(ingrediente)
-
-321	Fermento, biológico, levedura, tablete	(ingrediente)
-
-322	Gelatina, sabores variados, pó	(ingrediente)
-
-323	Sal, dietético	(ingrediente)
-
-324	Sal, grosso	(ingrediente)
-
-325	Shoyu	(ingrediente/tempero)
-
-326	Tempero à base de sal	(tempero)
-
-327	Azeitona, preta	conserva
-
-328	Azeitona, verde	conserva
-
-329	Chantilly, spray, com gordura vegetal	(processado)
-
-330	Leite, de coco	(derivado)
-
-331	Maionese, tradicional com ovos	(condimento)
-
-332	Bebida isotônica	(processado)
-
-333	Café, infusão	10% (bebida)
-
-334	Cana, aguardente	(álcool)
-
-335	Cana, caldo	de (bebida)
-
-336	Cerveja, pilsen	(bebida)
-
-337	Chá, erva-doce	infusão
-
-338	Chá, mate	infusão
-
-339	Chá, preto	infusão
-
-340	Coco, água de	(bebida)
-
-341	Refrigerante, água tônica	(bebida)
-
-342	Refrigerante, tipo cola	(bebida)
-
-343	Refrigerante, tipo guaraná	(bebida)
-
-344	Refrigerante, tipo laranja	(bebida)
-
-345	Refrigerante, tipo limão	(bebida)
-
-346	Achocolatado, pó	(bebida)
-
-347	Tacacá	(prato)
-
-348	Tapioca, com manteiga	(prato)
-
-349	Tucupi, com pimenta-de-cheiro	(prato/molho)
-
-350	Vaca atolada	(prato)
-
-351	Vatapá	(prato)
-
-352	Virado à paulista	(prato)
-
-353	Yakisoba	(prato)
-
-354	Acarajé	(prato)
-
-355	Arroz carreteiro	(prato)
-
-356	Baião de dois, arroz e feijão-de-corda	(prato)
-
-357	Barreado	(prato)
-
-358	Bife à cavalo, com contra filé	(prato)
-
-359	Bolinho de arroz	(prato)
-
-360	Camarão à baiana	(prato)
-
-361	Charuto, de repolho	(prato)
-
-362	Cuscuz, de milho, cozido com sal	(prato)
-
-363	Cuscuz, paulista	(prato)
-
-364	Cuxá, molho	(prato/molho)
-
-365	Dobradinha	(prato)
-
-366	Estrogonofe de carne	(prato)
-
-367	Estrogonofe de frango	(prato)
-
-368	Feijoada tropeiro mineiro	(prato)
-
-369	Feijoada	(prato)
-
-370	Frango, com açafrão	(prato)
-
-371	Macarrão, molho bolonhesa	(prato)
-
-372	Maniçoba	(prato)
-
-373	Quibebe	(prato)
-
-374	Salada, de legumes, com maionese	(prato)
-
-375	Salada, de legumes, cozida no vapor	(prato)
-
-376	Salpicão, de frango	(prato)
-
-377	Sarapatel	(prato)
-
-378	Tabule	(prato)
-
-379	Amendoim, grão	cru (incluí)
-
-380	Amendoim, torrado, salgado	(torrado/salgado)
-
-381	Ervilha, em vagem	(crua/cozida — mantive)
-
-382	Ervilha, enlatada	drenada
-
-383	Feijão, carioca	cozido
-
-385	Feijão, fradinho	cozido
-
-387	Feijão, jalo	cozido
-
-389	Feijão, preto	cozido
-
-391	Feijão, rajado	cozido
-
-393	Feijão, rosinha	cozido
-
-395	Feijão, roxo	cozido
-
-399	Lentilha	cozida
-
-401	Paçoca, amendoim	(processado)
-
-402	Pé-de-moleque, amendoim	(doces)
-
-403	Soja, farinha	(derivado)
-
-404	Soja, extrato solúvel, natural, fluido	(produto)
-
-405	Soja, extrato solúvel, pó	(produto)
-
-406	Soja, queijo (tofu)	(produto)
-
-408	Tremoço	em conserva	(conserva)
-
-409	Amêndoa, torrada, salgada	(oleaginosa)
-
-410	Castanha-de-caju, torrada, salgada	(oleaginosa)
-
-411	Castanha-do-Brasil	crua (incluí)
-
-412	Coco	cru (incluí)
-
-413	Gergelim, semente	(semente)
-
-414	Linhaça, semente	(semente)
-
-415	Pinhão	cozido
-
-416	Pupunha	cozida
-
-417	Noz	crua (incluí)
-
-419	Presunto, com capa de gordura	(processado)
-
-420	Presunto, sem capa de gordura	(processado)
-
-421	Quibe	assado
-
-423	Quibe	frito
-
-424	Salame	(processado)
-
-426	Toucinho	frito
-
-427	Apresentado (linha ambígua — mantive nome)
-
-428	Caldo de carne, tablete	(ingrediente)
-
-429	Caldo de galinha, tablete	(ingrediente)
-
-430	Carne, bovina, acém, moído, cozido
-
-432	Carne, bovina, acém, sem gordura, cozido
-
-435	Carne, bovina, almôndegas, fritas
-
-436	Carne, bovina, bucho, cozido
-
-439	Carne, bovina, capa de contra-filé, com gordura	grelhada
-
-441	Carne, bovina, capa de contra-filé, sem gordura	grelhada
-
-442	Carne, bovina, charque, cozido
-
-444	Carne, bovina, filé à milanesa	frita/assada (preparado)
-
-446	Carne, bovina, contra-filé de costela, grelhado
-
-448	Carne, bovina, contra-filé, com gordura, grelhado
-
-450	Carne, bovina, contra-filé, sem gordura, grelhada
-
-451	Carne, bovina, costela	assada
-
-453	Carne, bovina, coxão duro, sem gordura, cozido
-
-455	Carne, bovina, coxão mole, sem gordura, cozido
-
-457	Carne, bovina, cupim	assado
-
-460	Carne, bovina, filé mignon, sem gordura, cozido
-
-462	Carne, bovina, flanco, sem gordura, cozido
-
-464	Carne, bovina, fraldinha, com gordura, cozida
-
-466	Carne, bovina, lagarto, cozido
-
-468	Carne, bovina, língua	cozida
-
-470	Carne, bovina, maminha	grelhada
-
-473	Carne, bovina, miolo de alcatra, sem gordura, grelhado
-
-474	Carne, bovina, músculo, sem gordura, cozido
-
-477	Carne, bovina, paleta, sem gordura, cozida
-
-479	Carne, bovina, patinho, sem gordura, cozido
-
-480	Carne, bovina, patinho, sem gordura, grelhado
-
-481	Carne, bovina, peito, sem gordura, cozido
-
-484	Carne, bovina, picanha, com gordura, grelhada
-
-486	Carne, bovina, picanha, sem gordura, grelhada
-
-487	Carne, bovina, seca	cozida
-
-489	Coxinha de frango	frita
-
-491	Croquete, de carne	frito
-
-492	Empada de frango, pré-cozida	assada
-
-493	Empada de frango, pré-cozida	(preparado)
-
-495	Frango, caipira, inteiro, com pele	cozido
-
-496	Frango, caipira, inteiro, sem pele	cozido
-
-498	Frango, coração	grelhado
-
-499	Frango, coxa, com pele, assada
-
-500	Frango, coxa, com pele, cozida
-
-501	Frango, coxa, sem pele, cozida
-
-503	Frango, filé, à milanesa	(preparado)
-
-505	Frango, inteiro, sem pele, assado
-
-506	Frango, inteiro, sem pele, cozido
-
-508	Frango, peito, com pele, assado
-
-510	Frango, peito, sem pele, cozido
-
-512	Frango, peito, sem pele, grelhado
-
-513	Frango, sobrecoxa, com pele, assada
-
-515	Frango, sobrecoxa, sem pele, assada
-
-518	Hambúrguer, bovino	frito
-
-519	Hambúrguer, bovino	grelhado
-
-520	Linguiça, frango	frita
-
-521	Linguiça, frango	grelhada
-
-523	Linguiça, porco	frita
-
-524	Linguiça, porco	frita (variante)
-
-525	Linguiça, porco	grelhada
-
-526	Mortadela	(processado)
-
-527	Peru, congelado	assado
-
-530	Porco, bisteca	frita
-
-531	Porco, bisteca	grelhada
-
-532	Porco, costela	assada
-
-534	Porco, lombo	assado
-
-537	Porco, pernil	assado
-
-539	Bebida láctea, pêssego	(produto)
-
-540	Creme de Leite	(derivado)
-
-541	Iogurte, natural	(derivado)
-
-542	Iogurte, natural, desnatado	(derivado)
-
-543	Iogurte, sabor abacaxi	(derivado)
-
-544	Iogurte, sabor morango	(derivado)
-
-545	Iogurte, sabor pêssego	(derivado)
-
-546	Leite, condensado	(derivado)
-
-547	Leite, de cabra	(derivado)
-
-548	Leite, de vaca, achocolatado	(derivado)
-
-549	Leite, de vaca, desnatado, pó	(derivado)
-
-550	Leite, de vaca, desnatado, UHT	(derivado)
-
-551	Leite, de vaca, integral	(derivado)
-
-552	Leite, de vaca, integral, pó	(derivado)
-
-553	Leite, fermentado	(derivado)
-
-554	Queijo, minas, frescal	(derivado)
-
-555	Queijo, minas, meia cura	(derivado)
-
-556	Queijo, mozarela	(derivado)
-
-557	Queijo, parmesão	(derivado)
-
-558	Queijo, pasteurizado	(derivado)
-
-559	Queijo, petit suisse, morango	(derivado)
-
-560	Queijo, prato	(derivado)
-
-561	Queijo, requeijão, cremoso	(derivado)
-
-562	Queijo, ricota	(derivado)
-
-563	Omelete, de queijo	(preparado)
-
-565	Ovo, de galinha, clara	cozida/10minutos
-
-566	Ovo, de galinha, gema	cozida/10minutos
-
-567	Ovo, de galinha, inteiro	cozido/10minutos
-
-569	Ovo, de galinha, inteiro	frito
-  `;
-
-  // Converte o KB_TEXT em um mapa id -> descrição limpa
-  const kbMap = (() => {
-    const lines = KB_TEXT.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  // ================== UTILITÁRIOS NUTRI/CALORIAS (simples) ==================
+  // Pequena base interna de alimentos com estimativa kcal/100g e nomes (usada para gerar a dieta).
+  // Se você tiver KB com ids reais e calorias, podemos substituir.
+  const INTERNAL_FOOD_DB = {
+    "290": { name: "Pão, trigo, sovado", kcal_per_100g: 265 },
+    "237": { name: "Arroz, tipo 1 - cozido", kcal_per_100g: 130 },
+    "512": { name: "Frango, peito, sem pele - grelhado", kcal_per_100g: 165 },
+    "229": { name: "Sardinha - assada", kcal_per_100g: 208 },
+    "238": { name: "Aveia, flocos", kcal_per_100g: 389 },
+    "541": { name: "Iogurte, natural", kcal_per_100g: 60 },
+    "551": { name: "Leite, integral", kcal_per_100g: 60 },
+    "309": { name: "Geleia, mocotó - natural", kcal_per_100g: 250 },
+    "312": { name: "Maria mole, coco queimado", kcal_per_100g: 350 },
+    "160": { name: "Morango", kcal_per_100g: 32 },
+    // adicione mais conforme necessidade...
+  };
+
+  // Parser KB simples: transforma linhas "id[TAB]descrição" em mapa
+  function parseKB(text) {
+    const lines = (text || "").split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
     const map = {};
-    for (const ln of lines) {
-      // Split por tab ou múltiplos espaços
-      const parts = ln.split(/\t+/).map(p => p.trim()).filter(Boolean);
-      if (parts.length >= 2) {
-        const id = parseInt(parts[0], 10);
-        if (!Number.isNaN(id)) {
-          map[id] = parts.slice(1).join(' — ');
-        }
+    for (const line of lines) {
+      const m = line.match(/^\s*(\d{1,4})\s+[\t\- ]\s*(.+)$/) || line.match(/^\s*(\d{1,4})\t(.+)$/) || line.match(/^\s*(\d{1,4})\s+(.+)$/);
+      if (m) {
+        map[String(parseInt(m[1],10))] = m[2].trim();
       } else {
-        // fallback: tentar separar por espaços (quando não houver tab)
-        const m = ln.match(/^(\d+)\s+(.*)$/);
-        if (m) {
-          map[parseInt(m[1],10)] = m[2].trim();
-        }
+        const mm = line.match(/^\s*(\d{1,4})\s*(.*)$/);
+        if (mm) map[String(parseInt(mm[1],10))] = (mm[2]||"").trim();
       }
     }
     return map;
-  })();
+  }
 
-  // ============================
-  // Parser robusto do formato compacto
-  // ============================
-  function tokenizeCompactString(s) {
-    // produz tokens na ordem. Letras individuais e sequências de dígitos.
-    // Ex: "L290100" => ["L","290100"]
-    // Ex: "d11111" => ["d","11111"]
-    const tokens = [];
-    let i = 0;
-    while (i < s.length) {
-      const ch = s[i];
-      if (/[A-Za-z]/.test(ch)) {
-        tokens.push(ch);
-        i++;
-      } else if (/\d/.test(ch)) {
-        let j = i;
-        while (j < s.length && /\d/.test(s[j])) j++;
-        tokens.push(s.slice(i, j));
-        i = j;
-      } else {
-        // ignora espaços e outros (mantém permissividade)
-        i++;
-      }
+  // ================== CALCULOS (BMR/TDEE) ==================
+  function parseNumberSafe(v) {
+    if (v===undefined || v===null) return NaN;
+    const s = String(v).replace(',', '.').trim();
+    return parseFloat(s);
+  }
+
+  function calculateBMR(sex, weightKg, heightM, age) {
+    // Mifflin-St Jeor
+    const heightCm = heightM * 100;
+    const w = weightKg;
+    const h = heightCm;
+    const a = age;
+    if (sex === 'masculino') {
+      return 10*w + 6.25*h - 5*a + 5;
+    } else {
+      return 10*w + 6.25*h - 5*a - 161;
     }
-    return tokens;
+  }
+  function activityFactorFromDisponibilidade(daysPerWeek) {
+    const d = Number(daysPerWeek);
+    if (d <= 0) return 1.2;
+    if (d <= 2) return 1.35;
+    if (d <= 4) return 1.5;
+    if (d <= 5) return 1.65;
+    return 1.8;
+  }
+  function calculateTDEE(bmr, factor) {
+    return bmr * factor;
   }
 
-  function findCharPosOfToken(original, token, startIndex=0) {
-    // encontra a posição do token na string original começando por startIndex
-    const idx = original.indexOf(token, startIndex);
-    return idx >= 0 ? idx : -1;
-  }
-
-  function parseCompactToJSON(compactStr) {
-    const s = compactStr || '';
-    const tokens = tokenizeCompactString(s);
-    let posPointer = 0; // para mapear token -> posição, usamos indexOf progressivo
-    const ctx = { original: s, tokens };
-
-    try {
-      // resultado: estrutura por dias -> array de itens
-      const result = { days: [] };
-
-      let i = 0;
-      let lastSearchIndex = 0;
-      while (i < tokens.length) {
-        const t = tokens[i];
-        // suportamos diferentes tipos; o que realmente interessa para o formulário de dieta são os tokens 'L' com id+qty
-        if (t.toUpperCase() === 'L') {
-          // deve haver um número a seguir
-          if (i + 1 >= tokens.length) {
-            const pos = findCharPosOfToken(s, t, lastSearchIndex);
-            throwDetailed('Esperado número após L', pos, s);
-          }
-          const numToken = tokens[i+1];
-          if (!/^\d+$/.test(numToken)) {
-            const pos = findCharPosOfToken(s, numToken, lastSearchIndex);
-            throwDetailed('Esperado número (id+qty) após L', pos, s);
-          }
-          // interpretação robusta:
-          // - se numToken tiver >3 dígitos: últimos 3 = qty, resto = id
-          // - se tiver <=3 dígitos: assume id pequeno e qty = número
-          let idStr, qtyStr;
-          if (numToken.length > 3) {
-            qtyStr = numToken.slice(-3);
-            idStr = numToken.slice(0, -3);
-          } else {
-            // se só 1-3 dígitos, assumimos id = número, qty = null (ou número)
-            // para compatibilidade, usamos qty = number, id = null se queremos apenas quantidade
-            // porém para o teu KB, a convenção parece ser id + qty -> então aqui assumiremos id = numToken (qty desconhecida)
-            idStr = numToken;
-            qtyStr = null;
-          }
-
-          const id = idStr ? parseInt(idStr, 10) : null;
-          const qty = qtyStr ? parseInt(qtyStr, 10) : (qtyStr===null ? null : parseInt(qtyStr,10));
-
-          result.days.push({ type: 'item', raw: `L${numToken}`, id, qty, kbName: id ? (kbMap[id] || null) : null });
-
-          // atualizar ponteiros
-          lastSearchIndex = findCharPosOfToken(s, numToken, lastSearchIndex);
-          i += 2;
-          continue;
-        } else if (t.toUpperCase() === 'G') {
-          // Grupo: formato G<num> -> apenas registra
-          if (i + 1 >= tokens.length) {
-            const pos = findCharPosOfToken(s, t, lastSearchIndex);
-            throwDetailed('Esperado número após G', pos, s);
-          }
-          const numToken = tokens[i+1];
-          if (!/^\d+$/.test(numToken)) {
-            const pos = findCharPosOfToken(s, numToken, lastSearchIndex);
-            throwDetailed('Esperado número (grupo) após G', pos, s);
-          }
-          result.days.push({ type:'group', raw: `G${numToken}`, groupId: parseInt(numToken,10) });
-          lastSearchIndex = findCharPosOfToken(s, numToken, lastSearchIndex);
-          i += 2;
-          continue;
-        } else {
-          // Outros tokens (D, d, B, E, etc.) — não usados para montar o formulário, mas mantemos no JSON como 'meta' para debug
-          if (/^[A-Za-z]$/.test(t)) {
-            // verifica se há um número a seguir (muitos desses com números)
-            let meta = { token: t };
-            if (i + 1 < tokens.length && /^\d+$/.test(tokens[i+1])) {
-              meta.value = tokens[i+1];
-              lastSearchIndex = findCharPosOfToken(s, tokens[i+1], lastSearchIndex);
-              i += 2;
-            } else {
-              // apenas token solto
-              lastSearchIndex = findCharPosOfToken(s, t, lastSearchIndex);
-              i += 1;
-            }
-            // adiciona como meta para debug
-            if (!result.meta) result.meta = [];
-            result.meta.push(meta);
-            continue;
-          } else {
-            // token numérico solto (sem letra antes) — tentamos interpretar
-            // se for um número longo e parece id+qty, podemos tentar adivinhar: últimos 3 dígitos = qty
-            const numToken = t;
-            if (numToken.length > 3) {
-              const qtyStr = numToken.slice(-3);
-              const idStr = numToken.slice(0, -3);
-              const id = parseInt(idStr, 10);
-              const qty = parseInt(qtyStr, 10);
-              if (!Number.isNaN(id)) {
-                result.days.push({ type: 'item', raw: numToken, id, qty, kbName: kbMap[id] || null, inferred: true });
-                lastSearchIndex = findCharPosOfToken(s, numToken, lastSearchIndex);
-                i += 1;
-                continue;
-              }
-            }
-            // se chegamos aqui, armazenamos como 'unknown'
-            if (!result.unknown) result.unknown = [];
-            result.unknown.push({ raw: numToken });
-            lastSearchIndex = findCharPosOfToken(s, numToken, lastSearchIndex);
-            i += 1;
-            continue;
-          }
-        }
+  // ================== GERAR DIETA (2 dias × 3 refeições) ==================
+  function generateDietPlan(profile, kcalTargetPerDay) {
+    // Estrutura: 2 dias, cada dia com 3 refeições
+    // Repartimos calorias: 30% café, 40% almoço, 30% jantar
+    const dayCount = 2;
+    const mealDistribution = [0.30, 0.40, 0.30];
+    // alimentos a usar (preferir KB carregado, se existir)
+    // choose recommended items sequence (we'll try to use internal db)
+    const foodPool = Object.keys(INTERNAL_FOOD_DB);
+    function pickFoodsForMeal(mealCal) {
+      // strategy: choose 2 items: um fonte de carbo (rice/bread/oats), uma fonte de proteína (chicken/sardinha) / ou fruta
+      // keep simple: rotate pool
+      const choices = [];
+      // select first two different items (cyclic)
+      for (let i=0;i<2;i++) {
+        const idx = Math.floor(Math.random() * foodPool.length);
+        choices.push(foodPool[idx]);
       }
+      // compute grams such that sum(kcal) ~ mealCal
+      // distribute calories evenly between the 2 choices
+      const half = mealCal / choices.length;
+      const items = choices.map(id => {
+        const info = INTERNAL_FOOD_DB[id] || { kcal_per_100g: 120 };
+        const grams = Math.max(10, Math.round((half / info.kcal_per_100g) * 100));
+        return { id: String(id), qty_g: grams, name: info.name, kcal_per_100g: info.kcal_per_100g, kcal: Math.round(info.kcal_per_100g * grams / 100) };
+      });
+      // adjust rounding difference
+      const totalKcal = items.reduce((s,i)=>s+i.kcal,0);
+      const diff = Math.round(mealCal - totalKcal);
+      if (Math.abs(diff) > 0) {
+        // adjust first item grams a bit
+        const first = items[0];
+        const deltaGrams = Math.round((diff / first.kcal_per_100g) * 100);
+        first.qty_g = Math.max(5, first.qty_g + deltaGrams);
+        first.kcal = Math.round(first.kcal_per_100g * first.qty_g / 100);
+      }
+      return items;
+    }
 
-      return result;
+    const days = [];
+    for (let d=1; d<=dayCount; d++) {
+      const meals = [];
+      for (let m=0;m<3;m++) {
+        const mealCal = Math.round(kcalTargetPerDay * mealDistribution[m]);
+        const mealItems = pickFoodsForMeal(mealCal);
+        meals.push({ mealIndex: m+1, target_kcal: mealCal, items: mealItems });
+      }
+      days.push({ dayIndex: d, meals });
+    }
+    return { days, kcalTargetPerDay };
+  }
 
-    } catch (err) {
-      // se ocorrer erro, lançamos para o chamador com informação detalhada
-      throw err;
+  // ================== GERAR PLANO DE TREINO (2 dias exemplo) ==================
+  function generateTrainingPlan(profile) {
+    // Simples: cria 2 dias com exercícios baseados em nível e disponibilidade
+    const nivel = profile.nivel || 'iniciante';
+    const freq = Math.max(1, Math.min(7, Number(profile.disponibilidade || 3)));
+    const days = [];
+    const baseExercises = {
+      iniciante: [
+        { name: "Agachamento (peso corporal)", sets: 3, reps: "10-12" },
+        { name: "Flexão de braço (joelhos se necessário)", sets: 3, reps: "8-12" },
+        { name: "Remada austral (ou remada com halteres)", sets: 3, reps: "10-12" }
+      ],
+      intermediario: [
+        { name: "Agachamento com barra", sets: 4, reps: "8-10" },
+        { name: "Supino reto", sets: 4, reps: "8-10" },
+        { name: "Remada curvada", sets: 4, reps: "8-10" }
+      ],
+      avancado: [
+        { name: "Agachamento pesado", sets: 5, reps: "5-6" },
+        { name: "Supino pesado", sets: 5, reps: "5-6" },
+        { name: "Levantamento terra", sets: 4, reps: "4-6" }
+      ]
+    };
+    // day A: superior/empurrar / day B: inferior/puxar (simplificado)
+    const day1 = { dayIndex: 1, focus: "Parte superior (empurrar +/core)", exercises: baseExercises[nivel].slice(0,3) };
+    const day2 = { dayIndex: 2, focus: "Parte inferior + posterior", exercises: baseExercises[nivel].slice(0,3).map(e => ({ ...e, name: e.name + (nivel==='iniciante' ? " (variante leve)" : "") })) };
+    days.push(day1); days.push(day2);
+    return { frequencyPerWeek: freq, days };
+  }
+
+  // ================== FUNÇÕES DE RENDER / UI ==================
+  function showLog(msg, show=true) {
+    const el = document.getElementById('percurso-log');
+    el.style.display = show ? 'block' : 'none';
+    el.textContent = msg;
+  }
+
+  function renderDietIntoUI(dietPlan, kbMap) {
+    // fill objetivo_dieta textarea with summary and render detailed cards below
+    const target = document.getElementById('objetivo_dieta');
+    const summaryLines = [`Calorias alvo por dia: ${dietPlan.kcalTargetPerDay} kcal`, `Dias gerados: ${dietPlan.days.length}`];
+    target.value = summaryLines.join("\n");
+    const render = document.getElementById('dieta-render'); render.innerHTML = '';
+    for (const day of dietPlan.days) {
+      const dayCard = document.createElement('div');
+      dayCard.className = 'day-card';
+      dayCard.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:700">Dia ${day.dayIndex}</div><div style="color:#aaa">kcal/dia ~ ${day.meals.reduce((s,m)=>s+m.items.reduce((ss,it)=>ss+it.kcal,0),0)}</div></div>`;
+      day.meals.forEach(m=>{
+        const mealWrap = document.createElement('div'); mealWrap.style.marginTop='8px';
+        mealWrap.innerHTML = `<div class="meal-title">Refeição ${m.mealIndex} — alvo ${m.target_kcal} kcal</div>`;
+        m.items.forEach(it=>{
+          const line = document.createElement('div'); line.className='food-line';
+          const idp = document.createElement('div'); idp.className='food-id'; idp.textContent = `ID:${it.id}`;
+          const namep = document.createElement('div'); namep.style.flex='1';
+          namep.textContent = (kbMap && kbMap[it.id]) ? kbMap[it.id] : (INTERNAL_FOOD_DB[it.id] ? INTERNAL_FOOD_DB[it.id].name : `ID:${it.id} (nome não encontrado)`);
+          const qtyp = document.createElement('div'); qtyp.style.minWidth='70px'; qtyp.style.textAlign='right'; qtyp.textContent = `${it.qty_g} g`;
+          line.appendChild(idp); line.appendChild(namep); line.appendChild(qtyp);
+          mealWrap.appendChild(line);
+        });
+        dayCard.appendChild(mealWrap);
+      });
+      render.appendChild(dayCard);
     }
   }
 
-  // erro detalhado com dump de contexto
-  function throwDetailed(message, position, original) {
-    const pos = (typeof position === 'number') ? position : -1;
-    const left = pos >= 0 ? Math.max(0, pos - 40) : 0;
-    const right = pos >= 0 ? Math.min(original.length, pos + 40) : Math.min(80, original.length);
-    const context = original.slice(left, right);
-    const pointer = (pos >= 0) ? ('\nPosition: ' + pos + '\nContext: "' + context + '"\n' + ' '.repeat(Math.max(0, pos - left)) + '^\n') : '';
-    const e = new Error(`${message}\n${pointer}`);
-    throw e;
-  }
-
-  // função que desenha o formulário de dieta com base no JSON resultante
-  function renderDietForm(parsed) {
-    const container = document.getElementById('form-entries');
-    container.innerHTML = '';
-    const entries = parsed.days || [];
-    if (entries.length === 0) {
-      container.innerHTML = '<div style="color:#aaa;">Nenhum item L/ G encontrado no código compacto.</div>';
-      return;
-    }
-    entries.forEach((entry, idx) => {
-      const row = document.createElement('div');
-      row.className = 'entry-row';
-      if (entry.type === 'item') {
-        const idLabel = document.createElement('div');
-        idLabel.className = 'pill';
-        idLabel.textContent = `ID:${entry.id ?? '-'} ${entry.kbName ? '' : '(ID não encontrado no KB)'}`;
-        const name = document.createElement('div');
-        name.innerHTML = `<div class="kb-name">${entry.kbName || ('ID #' + (entry.id ?? '—'))}</div>`;
-        const qty = document.createElement('div');
-        qty.className = 'pill';
-        qty.textContent = `Qtd: ${entry.qty ?? '—'}`;
-        row.appendChild(idLabel);
-        row.appendChild(name);
-        row.appendChild(qty);
-      } else if (entry.type === 'group') {
-        const g = document.createElement('div');
-        g.className = 'pill';
-        g.textContent = `GRUPO:${entry.groupId}`;
-        row.appendChild(g);
-      } else {
-        const u = document.createElement('div');
-        u.textContent = JSON.stringify(entry);
-        row.appendChild(u);
-      }
-      container.appendChild(row);
+  function renderTrainingIntoUI(trainingPlan) {
+    const target = document.getElementById('objetivo_treino');
+    target.value = `Plano de treino — frequência: ${trainingPlan.frequencyPerWeek}x/sem\nDias: ${trainingPlan.days.length}`;
+    const render = document.getElementById('treino-render'); render.innerHTML = '';
+    trainingPlan.days.forEach(d=>{
+      const dayCard = document.createElement('div'); dayCard.className='day-card';
+      dayCard.innerHTML = `<div style="font-weight:700">Dia ${d.dayIndex} — ${d.focus}</div>`;
+      d.exercises.forEach(ex=>{
+        const exEl = document.createElement('div'); exEl.style.marginTop='8px';
+        exEl.innerHTML = `<div style="font-weight:600">${ex.name}</div><div style="color:#aaa">S: ${ex.sets} • R: ${ex.reps}</div>`;
+        dayCard.appendChild(exEl);
+      });
+      render.appendChild(dayCard);
     });
   }
 
-  // botão "Rodar Código" -> parse -> renderizar -> mostrar JSON
-  document.getElementById('run-compact').addEventListener('click', () => {
-    const input = document.getElementById('compact-input').value.trim();
-    const errBox = document.getElementById('parse-error');
-    const genBox = document.getElementById('generated-form');
-    const jsonOut = document.getElementById('json-output');
-    errBox.style.display = 'none'; errBox.textContent = '';
-    genBox.style.display = 'none';
-    jsonOut.textContent = '';
-    if (!input) {
-      errBox.style.display = 'block';
-      errBox.textContent = 'Nenhum código compacto fornecido.';
-      return;
-    }
-
-    try {
-      const parsed = parseCompactToJSON(input);
-      // sucesso: renderiza o formulário dietético (lista simples)
-      renderDietForm(parsed);
-      document.getElementById('json-output').textContent = JSON.stringify(parsed, null, 2);
-      genBox.style.display = 'block';
-    } catch (e) {
-      // apresentar erro detalhado com contexto
-      errBox.style.display = 'block';
-      let msg = `Erro ao parsear: ${e.message || String(e)}\n\nStack: ${e.stack || 'sem stack'}\n`;
-      errBox.textContent = msg;
-      console.error('Parse error detail:', e);
-    }
-  });
-
-  // Limpar
-  document.getElementById('clear-compact').addEventListener('click', () => {
-    document.getElementById('compact-input').value = '';
-    document.getElementById('parse-error').style.display = 'none';
-    document.getElementById('generated-form').style.display = 'none';
-    document.getElementById('form-entries').innerHTML = '';
-    document.getElementById('json-output').textContent = '';
-  });
-
-  // Copiar JSON
-  document.getElementById('copy-json').addEventListener('click', () => {
-    const json = document.getElementById('json-output').textContent || '';
-    if (!json) return;
-    const ta = document.createElement('textarea');
-    ta.value = json;
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-      alert('JSON copiado para a área de transferência.');
-    } catch (err) {
-      console.error('Erro ao copiar JSON', err);
-    }
-    document.body.removeChild(ta);
-  });
-
-  // Simulação dos botões "Colar" existentes (mantive)
-  const pasteTreino = document.getElementById('paste-treino');
-  const pasteDieta = document.getElementById('paste-dieta');
-  function simulatePaste(buttonEl, targetTextareaId) {
-    const txtOutput = document.getElementById('json-output').textContent || document.getElementById('prompt-output').textContent || '';
-    const target = document.getElementById(targetTextareaId);
-    const label = buttonEl.querySelector('.label');
-    if (buttonEl.disabled) return;
-    buttonEl.classList.remove('appearing');
-    void buttonEl.offsetWidth;
-    buttonEl.classList.add('appearing');
-    if (txtOutput.trim() && target) { target.value = txtOutput; } else if (target) { target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]'; }
-    if (label) label.textContent = 'Formulário pronto ✓';
-    buttonEl.classList.add('pasted', 'done');
-    buttonEl.setAttribute('aria-pressed', 'true');
-    buttonEl.disabled = true;
-    buttonEl.setAttribute('aria-disabled', 'true');
-    if (target) { try { target.focus(); } catch (e) {} }
+  // ================== DIFY CHAT (conselheiro 24/7) ==================
+  function loadFreshDifyChat() {
+    const difyContainer = document.getElementById('dify-container');
+    if(!difyContainer) return;
+    difyContainer.innerHTML = '';
+    const frameWrap = document.createElement('div'); frameWrap.className='dify-frame';
+    const iframe = document.createElement('iframe');
+    const randomSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&_=${Date.now()}`;
+    iframe.src = difyUrl; iframe.allow='microphone';
+    frameWrap.appendChild(iframe);
+    // top strip
+    const strip = document.createElement('div'); strip.className='dify-top-strip';
+    strip.setAttribute('aria-hidden','true');
+    const badge = document.createElement('div'); badge.className='dify-top-badge'; badge.textContent='Fale com a IA';
+    const label = document.createElement('span'); label.className='mvp-label'; label.textContent='MVPia';
+    strip.appendChild(badge); strip.appendChild(label);
+    const bottomMask = document.createElement('div'); bottomMask.className='dify-bottom-mask';
+    frameWrap.appendChild(strip); frameWrap.appendChild(bottomMask);
+    difyContainer.appendChild(frameWrap);
   }
-  if (pasteTreino) pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino'));
-  if (pasteDieta) pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta'));
 
-  // ======================================================================
-  // Resto do teu script original (supabase auth, carregamento de perfil, dify iframe, formulários da IA)
-  // Mantive as funções principais e apenas reagrupuei para compatibilidade.
-  // ======================================================================
-
-  function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
-  function calculateEndDate(prazoText) { if(!prazoText) return null; const now = new Date(); const year = now.getFullYear(); let prazoLower = prazoText.toLowerCase(); if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) { return new Date(year, 11, 31); } let match = prazoLower.match(/(\d+)\s+mes(es)?/); if (match) { let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d; } match = prazoLower.match(/(\d+)\s+dia(s)?/); if (match) { let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d; } if (prazoLower.includes('verao')||prazoLower.includes('verão')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); } if (prazoLower.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); } if (prazoLower.includes('ano novo')) { return new Date(year+1,0,1); } if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); } return null; }
-  function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
-  function analyzeGoal(text) { const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento']; const musculoKeywords = ['ganhar musculo', 'hipertrofia', 'sheipado', 'crescer', 'massa muscular', 'ficar forte', 'músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword => lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword => lowerText.includes(keyword)); if (hasEmagrecer && !hasMusculo) return 'emagrecer'; if (hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; }
-  function reorderVideos(order) { const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
-
+  // ================== LÓGICA PRINCIPAL (inicialização + submit handler) ==================
   document.addEventListener('DOMContentLoaded', () => {
-    let user = null;
-    const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
-    const switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active'); };
-    const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
-    menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
-    overlay.addEventListener('click', closeMenu);
-    navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const tabId = link.dataset.tab; switchTab(tabId); closeMenu(); }); });
-    configBtn.addEventListener('click', (e) => { e.preventDefault(); logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
-    logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
-    resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null, }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
+    // toggle sidebar
+    const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', ()=> { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); });
 
-    async function initializePageData() {
-        const { data } = await supabase.auth.getUser();
-        if (!data.user) { window.location.replace('/login.html'); return; }
-        user = data.user;
-        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
-        if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
+    // navigation tabs
+    document.querySelectorAll('.nav-link').forEach(link=>{
+      link.addEventListener('click', (e)=>{
+        e.preventDefault();
+        document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+        document.getElementById(link.dataset.tab).style.display='block';
+        document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+        link.classList.add('active');
+        // close sidebar on mobile
+        sidebar.classList.remove('open');
+        menuToggle.classList.remove('open');
+      });
+    });
 
-        // =========================================================================
-        // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e máscara inferior
-        // =========================================================================
-        function loadFreshDifyChat() {
-            const difyContainer = document.getElementById('dify-container');
-            if (!difyContainer) return;
+    // Load Dify advisor chat
+    loadFreshDifyChat();
 
-            difyContainer.innerHTML = '';
+    // KB loader
+    let KB_MAP = {};
+    document.getElementById('load-kb').addEventListener('click', (e)=>{
+      e.preventDefault();
+      const raw = document.getElementById('kb-input').value || '';
+      KB_MAP = parseKB(raw);
+      showLog(`KB carregado: ${Object.keys(KB_MAP).length} entradas.`, true);
+    });
 
-            const frameWrap = document.createElement('div');
-            frameWrap.className = 'dify-frame';
+    // INITIAL: try to autoload a small KB so UI names are friendly (optional)
+    const sampleKB = `290\tPão, trigo, sovado — (processado)
+237\tArroz, tipo 1 — cozido
+512\tFrango, peito, sem pele — grelhado
+229\tSardinha — assada
+238\tAveia, flocos
+541\tIogurte, natural
+551\tLeite, integral
+309\tGeleia, mocotó, natural
+312\tMaria mole, coco queimado
+160\tMorango`;
+    document.getElementById('kb-input').value = sampleKB;
+    KB_MAP = parseKB(sampleKB);
 
-            const iframe = document.createElement('iframe');
-            const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-            const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
+    // Submit handler: Formulário principal -> GERA DIETA E TREINO AUTOMATICAMENTE (Formato B)
+    const iaForm = document.getElementById('ia-fit-form');
+    iaForm.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      try {
+        // read form data
+        const form = ev.target;
+        const objetivo = form.objetivo.value.trim();
+        const sexo = form.sexo.value;
+        const idade = parseInt(form.idade.value,10);
+        const altura = parseNumberSafe(form.altura.value); // metros
+        const peso = parseNumberSafe(form.peso.value);
+        const disponibilidade = parseInt(form.disponibilidade.value,10);
+        const local_treino = form.local_treino.value;
+        const nivel = form.nivel.value;
+        const uso_suplemento = form.uso_suplemento.value;
+        const prazoText = form.prazo.value;
 
-            iframe.src = difyUrl;
-            iframe.allow = 'microphone';
-            frameWrap.appendChild(iframe);
-
-            // faixa superior
-            const strip = document.createElement('div');
-            strip.className = 'dify-top-strip';
-            strip.setAttribute('aria-hidden', 'true');
-            const badge = document.createElement('div');
-            badge.className = 'dify-top-badge';
-            badge.textContent = 'Fale com a IA';
-            const label = document.createElement('span');
-            label.className = 'mvp-label';
-            label.textContent = 'MVPia';
-            strip.appendChild(badge);
-            strip.appendChild(label);
-
-            // máscara inferior (cobre o credit dentro da moldura)
-            const bottomMask = document.createElement('div');
-            bottomMask.className = 'dify-bottom-mask';
-            bottomMask.setAttribute('aria-hidden', 'true');
-
-            frameWrap.appendChild(strip);
-            frameWrap.appendChild(bottomMask);
-            difyContainer.appendChild(frameWrap);
+        // validate
+        if (!objetivo || !sexo || !idade || !altura || !peso) {
+          showLog('Por favor preencha os campos obrigatórios.', true);
+          return;
         }
 
-        loadFreshDifyChat();
-        // =========================================================================
+        // Calcula BMR e TDEE
+        const bmr = Math.round(calculateBMR(sexo, peso, altura, idade));
+        const factor = activityFactorFromDisponibilidade(disponibilidade);
+        const tdee = Math.round(calculateTDEE(bmr, factor));
 
-        // restante da lógica (sem alterações)
-        const objetivoInput = document.getElementById('objetivo'); if (objetivoInput) { objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; }); }
-        const usoSuplementoSelect = document.getElementById('uso_suplemento'); if (usoSuplementoSelect) { usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; }); }
-        const iaFitForm = document.getElementById('ia-fit-form'); if(iaFitForm) { iaFitForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const formElements = event.target.elements;
-            const prazoText = formElements.prazo.value;
-            const endDate = calculateEndDate(prazoText);
-            if (!endDate) { console.error("Prazo da meta inválido."); return; }
-            const startDate = new Date(); startDate.setHours(0,0,0,0);
-            const objetivoText = formElements.objetivo.value;
-            const goalType = analyzeGoal(objetivoText);
-            const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-            const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
-            const orcamentoValue = formElements.orcamento.value.replace(',', '.');
-            const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
-            let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
-            if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
-            const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
-            const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
-            if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); } else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display = 'block'; displayProgress(startDate, endDate); }
-        }); }
+        // Determina tipo de meta
+        const lowerObj = objetivo.toLowerCase();
+        let goalType = 'ambos';
+        const emagrecerKeywords = ['emagrecer','perder peso','secar','definir'];
+        const musculoKeywords = ['ganhar musculo','hipertrofia','massa muscular','ganhar massa','músculo','ficar forte'];
+        const hasE = emagrecerKeywords.some(k=>lowerObj.includes(k));
+        const hasM = musculoKeywords.some(k=>lowerObj.includes(k));
+        if (hasE && !hasM) goalType='emagrecer';
+        else if (hasM && !hasE) goalType='musculo';
+        else goalType='ambos';
 
-        const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) { playlistBtn.addEventListener('click', function() { if (!profile) return; let videoOrder; if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];} reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' }); }); }
+        // Aplica ajuste de calorias:
+        let kcalTarget = tdee;
+        if (goalType === 'emagrecer') kcalTarget = Math.round(tdee * 0.80); // -20%
+        else if (goalType === 'musculo') kcalTarget = Math.round(tdee * 1.10); // +10%
+        else kcalTarget = Math.round(tdee * 1.00); // manutenção
 
-        const copyBtn = document.getElementById('copy-btn'); if(copyBtn) { copyBtn.addEventListener('click', function() {
-            const textToCopy=document.getElementById('prompt-output').textContent;
-            const textArea=document.createElement("textarea");
-            textArea.value=textToCopy;
-            textArea.style.position="fixed";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
-            document.body.removeChild(textArea);
-        }); }
+        // Gera planos (dieta + treino)
+        const profile = { objetivo, sexo, idade, altura, peso, disponibilidade, local_treino, nivel, uso_suplemento };
+        const dietPlan = generateDietPlan(profile, kcalTarget);
+        const trainingPlan = generateTrainingPlan(profile);
 
-        const pasteTreinoBtn = document.getElementById('paste-treino'); const pasteDietaBtn = document.getElementById('paste-dieta');
-        if (pasteTreinoBtn) { pasteTreinoBtn.addEventListener('click', () => simulatePaste(pasteTreinoBtn, 'objetivo_treino')); }
-        if (pasteDietaBtn) { pasteDietaBtn.addEventListener('click', () => simulatePaste(pasteDietaBtn, 'objetivo_dieta')); }
+        // Renderiza na UI (percurso)
+        renderDietIntoUI(dietPlan, KB_MAP);
+        renderTrainingIntoUI(trainingPlan);
 
+        // Preenche inputs do percurso (para formatação/salvamento manual)
+        const orcamentoInput = document.getElementById('orcamento_dieta');
+        if (orcamentoInput && form.orcamento) orcamentoInput.value = form.orcamento ? form.orcamento.value : '';
+
+        // Preenche frequencia treino
+        const freqInput = document.getElementById('frequencia_treino');
+        if (freqInput) freqInput.value = trainingPlan.frequencyPerWeek || disponibilidade || 3;
+
+        // Guarda texto resumido nos textareas (objetivo)
+        document.getElementById('objetivo_dieta').value = `Plano gerado automaticamente — ${goalType.toUpperCase()} • Calorias alvo/dia: ${kcalTarget} kcal\nObjetivo: ${objetivo}`;
+        document.getElementById('objetivo_treino').value = `Plano de treino gerado automaticamente — ${goalType.toUpperCase()} • Frequência sugerida: ${trainingPlan.frequencyPerWeek}x/sem\nObjetivo: ${objetivo}`;
+
+        // Exibe resumo ao usuário
+        const summary = [
+          `BMR estimado: ${bmr} kcal/dia`,
+          `TDEE estimado: ${tdee} kcal/dia (fator atividade: ${factor.toFixed(2)})`,
+          `Meta detectada: ${goalType}`,
+          `Calorias alvo por dia: ${kcalTarget} kcal`,
+          `Dieta gerada: ${dietPlan.days.length} dias x 3 refeições`,
+          `Treino gerado: ${trainingPlan.days.length} dias`
+        ].join("\n");
+        document.getElementById('summary-content').textContent = summary;
+        document.getElementById('generated-summary').style.display = 'block';
+
+        // Gera estrutura JSON para salvar no Supabase (ajuste conforme seu schema)
+        const now = new Date();
+        const endDate = (function() {
+          // tenta interpretar prazo: se "3 meses" -> adiciona 3 meses; se "verão"/"final do ano" mantém heurística simples
+          const pt = (prazoText || '').toLowerCase();
+          if (!pt) return null;
+          const m = pt.match(/(\d+)\s+mes/);
+          if (m) { const d = new Date(); d.setMonth(d.getMonth() + parseInt(m[1],10)); return d; }
+          if (pt.includes('final') || pt.includes('fim')) { const d=new Date(); d.setMonth(11); d.setDate(31); return d; }
+          return null;
+        })();
+        const saveObj = {
+          goal_start_date: now.toISOString(),
+          goal_end_date: endDate ? endDate.toISOString() : null,
+          goal_type: goalType,
+          goal_calories: kcalTarget,
+          goal_prompt: null, // Formato B não usa prompt para gerar planos
+          diet_plan: dietPlan,
+          training_plan: trainingPlan
+        };
+
+        // Salva no Supabase (se o usuário estiver logado)
+        try {
+          const { data: authData } = await supabase.auth.getUser();
+          if (authData && authData.user) {
+            const user = authData.user;
+            const { error: upError } = await supabase.from('profiles').update(saveObj).eq('id', user.id);
+            if (upError) {
+              showLog(`Aviso: não foi possível salvar a meta no Supabase: ${upError.message}`, true);
+            } else {
+              showLog('Planos gerados e salvos no seu perfil.', true);
+            }
+          } else {
+            showLog('Planos gerados (usuário não autenticado — não foi salvo).', true);
+          }
+        } catch (e) {
+          showLog('Erro ao tentar salvar no Supabase: ' + (e.message || e), true);
+        }
+
+      } catch (err) {
+        // Log robusto: inclui dump de contexto e stack
+        console.error(err);
+        const msg = typeof err === 'object' && err !== null ? (err.message || JSON.stringify(err)) : String(err);
+        const stack = err && err.stack ? err.stack : '(sem stack)';
+        showLog(`Erro interno ao gerar planos:\n${msg}\n\nStack:\n${stack}`, true);
+      }
+    });
+
+    // copiar/baixar JSON diet & treino
+    document.getElementById('copy-dieta-json').addEventListener('click', (e)=>{
+      e.preventDefault();
+      // pega dados do render (reconstrói JSON simples)
+      const dietJson = collectCurrentDietJSON();
+      if (!dietJson) { showLog('Nenhuma dieta disponível para copiar.', true); return; }
+      navigator.clipboard.writeText(JSON.stringify(dietJson, null, 2)).then(()=>showLog('Dieta copiada para a área de transferência.', true)).catch(err=>showLog('Erro ao copiar dieta: '+err, true));
+    });
+    document.getElementById('copy-treino-json').addEventListener('click', (e)=>{
+      e.preventDefault();
+      const trJson = collectCurrentTrainingJSON();
+      if (!trJson) { showLog('Nenhum treino disponível para copiar.', true); return; }
+      navigator.clipboard.writeText(JSON.stringify(trJson, null, 2)).then(()=>showLog('Treino copiado para a área de transferência.', true)).catch(err=>showLog('Erro ao copiar treino: '+err, true));
+    });
+    document.getElementById('download-dieta').addEventListener('click', (e)=>{ e.preventDefault(); const j = collectCurrentDietJSON(); if(!j) return showLog('Nada para baixar.', true); downloadJSON(j, 'dieta.json'); });
+    document.getElementById('download-treino').addEventListener('click', (e)=>{ e.preventDefault(); const j = collectCurrentTrainingJSON(); if(!j) return showLog('Nada para baixar.', true); downloadJSON(j, 'treino.json'); });
+
+    function collectCurrentDietJSON() {
+      try {
+        // coletar a partir do DOM (dieta-render)
+        const container = document.getElementById('dieta-render');
+        if (!container || !container.children.length) return null;
+        // Mais simples: pegamos texto objetivo_dieta + detalhes estruturais (se quiser salvar a estrutura real, podemos criar estado global)
+        const summary = document.getElementById('objetivo_dieta').value || '';
+        // Para simplicidade retornamos summary + markup interno (para export)
+        const details = container.innerHTML;
+        return { summary, detailsHTML: details, timestamp: new Date().toISOString() };
+      } catch (e) { return null; }
     }
-    initializePageData();
-  });
+    function collectCurrentTrainingJSON() {
+      try {
+        const container = document.getElementById('treino-render');
+        if (!container || !container.children.length) return null;
+        const summary = document.getElementById('objetivo_treino').value || '';
+        const details = container.innerHTML;
+        return { summary, detailsHTML: details, timestamp: new Date().toISOString() };
+      } catch (e) { return null; }
+    }
+    function downloadJSON(obj, filename) {
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Inicia tentativa de autenticação / carregar perfil (manter compatibilidade)
+    (async function initialLoad() {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!data || !data.user) {
+          document.getElementById('welcome-msg').textContent = 'Bem-vindo(a) — sessão demo';
+          return;
+        }
+        const user = data.user;
+        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
+        // busca perfil
+        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (error) {
+          console.warn('Erro ao buscar perfil:', error);
+          return;
+        }
+        // se já existir diet/training no perfil, renderiza
+        if (profile && profile.diet_plan) {
+          renderDietIntoUI(profile.diet_plan, KB_MAP);
+          document.getElementById('objetivo_dieta').value = `Plano carregado do perfil — calorias alvo: ${profile.goal_calories || '—'}`;
+        }
+        if (profile && profile.training_plan) {
+          renderTrainingIntoUI(profile.training_plan);
+          document.getElementById('objetivo_treino').value = `Treino carregado do perfil — frequência: ${profile.training_plan.frequencyPerWeek || '—'}`;
+          document.getElementById('frequencia_treino').value = profile.training_plan.frequencyPerWeek || '';
+        }
+      } catch (e) {
+        console.error('Erro init:', e);
+      }
+    })();
+
+  }); // DOMContentLoaded end
 
 </script>
+
 </body>
 </html>
