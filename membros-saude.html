@@ -8,14 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- CSS (mantive a maior parte do estilo original) --- */
     :root {
       --color-ia-specialist: #007BFF;
       --color-video-lessons: #8A2BE2;
       --color-journey: #DC143C;
       --journey-red-1: #ff2646;
       --journey-red-2: #be123c;
+      --journey-dark: #2a0a12;
     }
+
     html { scroll-behavior: smooth; }
     body {
         font-family: 'Poppins', sans-serif;
@@ -24,679 +25,631 @@
         margin: 0;
         padding: 40px 20px;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    h1,h2,h3 { color: #f0f0f0; text-align: center; margin-top: 20px; margin-bottom: 12px; }
+    .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    h1, h2, h3 { color: #f0f0f0; text-align: center; margin-top: 30px; margin-bottom: 15px; }
 
-    /* menu & sidebar */
-    .menu-toggle{position:fixed;top:25px;left:25px;z-index:1001;background:#333;border:none;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:0}
-    .menu-toggle .bar{width:24px;height:3px;background:#fff;border-radius:2px;transition:all .3s}
-    .sidebar{position:fixed;top:0;left:-300px;width:280px;height:100%;background:#1E1E1E;transition:left .3s;z-index:1000;border-right:1px solid #333;display:flex;flex-direction:column;justify-content:space-between}
-    .sidebar.open{left:0}
-    .sidebar nav{padding-top:100px}
-    .sidebar nav a{display:block;padding:15px 30px;text-decoration:none;font-size:1.1em;font-weight:700;border-left:5px solid transparent}
-    .link-ia{background-image:linear-gradient(90deg,#38b6ff,#0056b3);-webkit-background-clip:text;color:transparent}
-    .link-aulas{background-image:linear-gradient(90deg,#c048f2,#6b21a8);-webkit-background-clip:text;color:transparent}
-    .link-percurso{background-image:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2));-webkit-background-clip:text;color:transparent}
-    .sidebar-footer{padding:20px 30px;text-align:center}
-    .sidebar-config-btn{width:100%;background:transparent;border:1px solid #444;color:#aaa;padding:10px;border-radius:8px;cursor:pointer;font-weight:600}
+    /* --- MENU E SIDEBAR --- */
+    .menu-toggle {
+        position: fixed;
+        top: 25px;
+        left: 25px;
+        z-index: 1001;
+        background: #333;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        padding: 0;
+    }
+    .menu-toggle .bar {
+        width: 24px;
+        height: 3px;
+        background-color: #fff;
+        border-radius: 2px;
+        transition: all 0.3s ease-in-out;
+    }
+    .menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* content */
-    .form-container, .results-container, .percurso-container { background-color: #1E1E1E; padding: 28px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
-    label{display:block;margin-bottom:8px;font-weight:600;color:#BBBBBB}
-    input, select, textarea { width:100%; padding:10px; background:#2C2C2C; border:1px solid #444; border-radius:8px; color:#E0E0E0; box-sizing:border-box; }
-    textarea{min-height:100px; resize:vertical;}
-    button{cursor:pointer}
-    .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:none;font-weight:700}
-    .btn-primary{background:linear-gradient(90deg,#007BFF,#0056b3);color:#fff}
-    .btn-ghost{background:transparent;border:1px solid #444;color:#ddd}
-    .small-note{font-size:13px;color:#cfc;opacity:0.8;margin-top:6px}
-    .log-area{background:#3b0b0d;color:#ffdede;padding:14px;border-radius:8px;margin-top:12px;font-family:monospace;white-space:pre-wrap}
-    .percurso-forms{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
-    .percurso-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.25));border:1px solid rgba(190,18,60,0.12);padding:16px;border-radius:12px}
-    .food-line{display:flex;align-items:center;gap:10px;padding:6px 0}
-    .food-id{background:#0d0d0d;border:1px solid #222;padding:6px 8px;border-radius:8px;font-weight:700;color:#ddd}
-    .meal-title{font-weight:700;margin-bottom:6px}
-    .day-card{background:#111;padding:10px;border-radius:10px;margin-bottom:10px}
-    .copy-button{display:block;width:200px;margin:16px auto 0 auto;padding:10px 15px;background:#007BFF;color:white;border:none;border-radius:8px;cursor:pointer}
-    @media(max-width:900px){ .percurso-forms{grid-template-columns:1fr} body{padding:20px} }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 280px;
+        height: 100%;
+        background-color: #1E1E1E;
+        transition: left 0.3s ease-in-out;
+        z-index: 1000;
+        border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar nav {
+        padding-top: 100px;
+    }
+    .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar nav a {
+        display: block;
+        padding: 15px 30px;
+        text-decoration: none;
+        font-size: 1.1em;
+        font-weight: 700;
+        border-left: 5px solid transparent;
+        transition: background-color 0.2s, border-left 0.2s;
+    }
+    .sidebar nav a:hover { background-color: #2c2c2c; }
+
+    /* TÍTULOS COM DEGRADÊ */
+    .link-ia, .link-aulas, .link-percurso {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .link-ia { background-image: linear-gradient(90deg, #38b6ff, #0056b3); }
+    .link-aulas { background-image: linear-gradient(90deg, #c048f2, #6b21a8); }
+    .link-percurso { background-image: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); }
+    
+    .sidebar .link-ia:hover, .sidebar .link-ia.active { border-left-color: var(--color-ia-specialist); }
+    .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
+    .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
+
+    /* ESTILOS ATUALIZADOS PARA O RODAPÉ DO MENU */
+    .sidebar-footer {
+        padding: 20px 30px;
+        text-align: center;
+    }
+    .sidebar-config-btn {
+        width: 100%;
+        background: transparent;
+        border: 1px solid #444;
+        color: #aaa;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95em;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .sidebar-config-btn:hover {
+        background-color: #333;
+        color: #fff;
+    }
+    .sidebar-action-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9em;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        margin-top: 10px;
+    }
+    .sidebar-reset-btn {
+        background-color: transparent;
+        border: 1px solid var(--color-ia-specialist);
+        color: var(--color-ia-specialist);
+    }
+    .sidebar-reset-btn:hover {
+        background-color: var(--color-ia-specialist);
+        color: #fff;
+    }
+    .sidebar-logout-btn {
+        background-color: #be123c;
+        border: 1px solid #be123c;
+        color: #fff;
+    }
+    .sidebar-logout-btn:hover {
+        background-color: #ff4757;
+        border-color: #ff4757;
+    }
+    .hidden {
+        display: none;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+
+    .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; }
+    #welcome-msg { color: #bbb; }
+
+    /* Estilos do conteúdo principal (sem alterações) */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-wrapper, .results-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
+    .form-container, .results-container, .percurso-container { background-color: #1E1E1E; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid #333; }
+    .form-group { margin-bottom: 25px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #BBBBBB; }
+    input, select, textarea { width: 100%; padding: 12px; background-color: #2C2C2C; border: 1px solid #444; border-radius: 8px; color: #E0E0E0; font-size: 16px; box-sizing: border-box; }
+    textarea { resize: vertical; min-height: 100px; }
+    .goal-section { background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border: 1px solid #444; padding: 30px; margin-bottom: 40px; border-radius: 10px; text-align: center; }
+    .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
+    .iframe-container { border-radius: 12px; overflow: hidden; height: auto; position: relative; } /* position relative to support overlay */
+    #prompt-output { background-color: #2c2c2c; border: 1px solid #444; padding: 20px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; border-radius: 8px; }
+    .copy-button { display: block; width: 200px; margin: 20px auto 0 auto; padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
+    .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
+    .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px; }
+    .countdown-container { text-align: center; margin-top: 20px; }
+    .countdown-days { font-size: 4rem; font-weight: 700; color: #fff; line-height: 1; }
+    .countdown-label { font-size: 1rem; color: #aaa; }
+    .text-glow-blue { text-shadow: 0 0 8px rgba(0, 198, 255, 0.6); }
+    .playlist-section { text-align: center; margin: 40px 0; }
+    .playlist-btn { background-color: #007BFF; color: white; border: none; padding: 12px 24px; font-size: 1.1em; cursor: pointer; border-radius: 8px; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 25px; border-radius: 12px; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .percurso-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+    .percurso-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border: 1px solid rgba(190,18,60,0.12); padding: 20px; border-radius: 12px; }
+    .percurso-card h4 { margin-top: 0; color: white; }
+    .paste-btn { --h: 36px; display: inline-flex; align-items: center; justify-content: center; height: var(--h); min-width: 160px; padding: 8px 24px; border-radius: 999px; background: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); border: none; box-shadow: 0 6px 18px rgba(203,20,47,0.28), inset 0 -3px 6px rgba(0,0,0,0.15); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; position: relative; overflow: visible; transition: transform 160ms ease, box-shadow 160ms ease; }
+    .paste-btn:active { transform: translateY(1px) scale(0.997); }
+    .paste-btn:disabled { cursor: default; opacity: 0.92; filter: saturate(0.95); box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset 0 -3px 6px rgba(0,0,0,0.28); }
+    .paste-btn .hole { position: absolute; left: 18px; width: 18px; height: 18px; border-radius: 50%; background: #1f0b0f; box-shadow: 0 0 0 4px rgba(0,0,0,0.25), inset 0 -2px 6px rgba(255,255,255,0.04); transform-origin: center; transform: translateX(0) scale(1); transition: transform 420ms cubic-bezier(.2,.9,.2,1), left 420ms cubic-bezier(.2,.9,.2,1), background 220ms; z-index: 2; }
+    .paste-btn .hole::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.8)); transform: scale(1); transition: transform 320ms ease; }
+    .paste-btn .label { display: inline-block; transform: translateX(8px); transition: transform 320ms ease; z-index: 1; }
+    .paste-btn.pasted { box-shadow: 0 4px 10px rgba(0,0,0,0.45), inset 0 -4px 10px rgba(0,0,0,0.25); }
+    .paste-btn.pasted .hole { left: 20px; width: 22px; height: 22px; transform: translateX(-6px) scale(1.05); background: #000; animation: hole-pulse 900ms ease; }
+    .paste-btn.pasted .hole::after { transform: scale(0.6); }
+    .paste-btn.pasted .label { transform: translateX(14px); }
+    .paste-btn.done { background: linear-gradient(90deg, #7a0f18, #3e0610); color: #ffecec; box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4); }
+    .paste-btn.done .label { letter-spacing: 0.2px; }
+    .paste-btn.appearing { animation: btn-enter 350ms ease; }
+    @keyframes btn-enter { from { transform: translateY(6px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    @keyframes hole-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 40% { box-shadow: 0 0 0 6px rgba(255,255,255,0.03); transform: translateX(-3px) scale(1.02); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: translateX(-6px) scale(1.05); } }
+    @media (max-width: 900px) { .percurso-forms { grid-template-columns: 1fr; } .paste-btn { min-width: 140px; } }
+    .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
+
+    /* =============================================
+        MAIOR E MAIS ESCURO: BORDA & FAIXA DO CHAT (VERSÃO ATUALIZADA)
+        ============================================= */
+
+    #dify-container { position: relative; width: 100%; margin: 18px auto 0 auto; padding: 0; }
+
+    .dify-frame {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0b0b0b, #121212);
+      border: 3px solid rgba(0,0,0,0.9);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
+      min-height: 780px;
+    }
+
+    .dify-frame iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      min-height: 740px;
+      background: transparent;
+    }
+
+    .dify-top-strip {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      height: 64px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
+      z-index: 200; /* elevado */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-radius: 12px;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px) saturate(140%);
+      pointer-events: none;
+      opacity: 0.995;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .dify-top-strip .mvp-label {
+      color: #fff;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0.85));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.6));
+    }
+
+    .dify-top-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      height: 36px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.02);
+      color: #e6e6e6;
+      font-size: 14px;
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 201;
+    }
+
+    /* por padrão nada visível (desktop) */
+    .dify-bottom-mask { display: none; }
+
+    @media (max-width: 900px) {
+      /* ajustes mobile gerais */
+      body { padding: 20px 12px; }
+      .container { padding: 0 12px; }
+      .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
+      .menu-toggle .bar { width: 20px; height: 3px; }
+      .sidebar { width: 260px; left: -260px; }
+      .sidebar.open { left: 0; }
+      .sidebar nav { padding-top: 84px; }
+      .sidebar nav a { padding: 12px 20px; font-size: 1em; }
+      .form-container, .results-container, .percurso-container { padding: 18px; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
+      .goal-section { padding: 18px; margin-bottom: 28px; }
+      .goal-title { font-size: 22px; }
+      label { font-size: 14px; margin-bottom: 6px; }
+      input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
+      textarea { min-height: 90px; }
+      button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
+      .copy-button { width: 180px; padding: 9px 12px; font-size: 14px; }
+      .countdown-days { font-size: 2.5rem; }
+      .progress-section { padding: 14px; }
+      .progress-bar { height: 16px; }
+      .video-container { margin-top: 18px; border-radius: 10px; }
+      .percurso-forms { gap: 14px; }
+      .percurso-card { padding: 14px; border-radius: 10px; }
+      .paste-btn { --h: 32px; min-width: 120px; padding: 6px 18px; font-size: 14px; }
+      .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
+      .paste-btn .hole::after { inset: 3px; }
+
+      /* deixa o chat mais alto no mobile */
+      .dify-frame {
+        height: calc(100vh - 140px);
+        min-height: 420px;
+        max-height: calc(100vh - 120px);
+        border-radius: 12px;
+        border: 2px solid rgba(0,0,0,0.85);
+        box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+      }
+      .dify-frame iframe {
+        height: 100%;
+        min-height: 380px;
+      }
+      .dify-top-strip {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        height: 44px;
+        padding: 0 10px;
+        border-radius: 9px;
+        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
+      }
+      .dify-top-strip .mvp-label { font-size: 12px; }
+      .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
+
+      .header { margin-bottom: 12px; }
+      h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
+      #prompt-output { padding: 12px; font-size: 13px; }
+      .percurso-forms { grid-template-columns: 1fr; }
+      .playlist-btn { padding: 10px 18px; font-size: 14px; }
+      .overlay { background-color: rgba(0,0,0,0.65); }
+      .small-note { font-size: 12px; }
+      .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
+
+      /*
+        MÁSCARA MÓVEL: totalmente opaca/preta para esconder completamente a logo Dify
+      */
+      .dify-frame .dify-bottom-mask {
+        display: block;
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        width: calc(100% - 24px);
+        height: clamp(48px, 7.5vh, 110px);
+        bottom: -8px;
+        background: #000;               /* totalmente preta e opaca */
+        background-color: #000;
+        opacity: 1;                     /* garante opacidade total */
+        border-radius: 20px;
+        box-shadow: 0 -10px 30px rgba(0,0,0,1), inset 0 6px 18px rgba(0,0,0,1);
+        pointer-events: none;
+        z-index: 9999;                  /* garantir que fique acima do iframe */
+        backdrop-filter: none;          /* remover blur/transparência */
+        transition: height 180ms ease, bottom 180ms ease, background 180ms ease;
+      }
+
+      /* fallback para telas muito pequenas: aumenta levemente sem cobrir o input */
+      @media (max-height: 620px) and (max-width: 420px) {
+        .dify-frame .dify-bottom-mask {
+          height: clamp(64px, 12vh, 140px);
+          bottom: -10px;
+          left: 10px;
+          right: 10px;
+          border-radius: 18px;
+        }
+      }
+    }
   </style>
 </head>
 <body>
-  <button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-  <div class="sidebar" id="sidebar">
-    <nav>
-      <ul style="list-style:none;padding-left:0;margin:0">
-        <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
-        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
-        <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
-      </ul>
-    </nav>
-    <div class="sidebar-footer">
-      <button id="config-btn" class="sidebar-config-btn">⚙️ Configurações</button>
+
+<button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+<div class="sidebar" id="sidebar"><nav><ul><li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li><li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li><li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li></ul></nav><div class="sidebar-footer"><button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button><button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button><button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button></div></div>
+<div class="overlay" id="overlay"></div>
+<div class="container"><div class="header"><p id="welcome-msg">A carregar...</p></div>
+
+<div id="ia-planejamento" class="tab-content active">
+  <div class="form-wrapper" id="form-wrapper" style="display: none;">
+    <div class="form-container">
+      <h1>Crie a sua Meta</h1>
+      <form id="ia-fit-form">
+        <div class="goal-section">
+          <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
+          <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo..." required></textarea>
+          <div id="prazo-group" class="form-group" style="margin-top: 20px; text-align: left; display: none;">
+            <label for="prazo">Qual o prazo para esta meta?</label>
+            <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, até o verão..." required>
+          </div>
+        </div>
+
+        <h3>Informações Básicas e Realidade Atual</h3>
+        <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
+        <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
+        <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
+        <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
+        <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
+        <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
+        <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
+        <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+        <div class="form-group" id="suplementos-detalhes-group" style="display: none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
+        <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label><select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
+        <button type="submit">Crie seu próprio caminho</button>
+      </form>
     </div>
   </div>
 
-  <div class="container">
-    <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:18px"><p id="welcome-msg" style="color:#bbb">A carregar...</p></div>
+  <div class="results-wrapper" id="results-wrapper" style="display: none;">
+    <div class="results-container">
+      <h2>Seu Plano de Ação</h2>
+      <pre id="prompt-output"></pre>
+      <button id="copy-btn" class="copy-button">Copiar Pedido</button>
 
-    <!-- IA Especialista (formulário principal) -->
-    <div id="ia-planejamento" class="tab-content active">
-      <div class="form-container">
-        <h1>Crie a sua Meta</h1>
-        <form id="ia-fit-form">
-          <div style="margin-bottom:12px">
-            <label for="objetivo">Qual é a sua Grande Meta?</label>
-            <textarea id="objetivo" name="objetivo" placeholder="Ex: perder 6kg, ganhar massa..." required></textarea>
-          </div>
+      <h3>Comece sua Conversa com a IA</h3>
+      <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div>
-              <label for="sexo">Sexo</label>
-              <select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
-            </div>
-            <div>
-              <label for="idade">Idade</label>
-              <input id="idade" name="idade" type="number" min="10" max="120" placeholder="Ex: 28" required>
-            </div>
-          </div>
+      <div id="dify-container" class="iframe-container"></div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-            <div>
-              <label for="altura">Altura (m)</label>
-              <input id="altura" name="altura" type="text" inputmode="decimal" placeholder="Ex: 1.75" required>
-            </div>
-            <div>
-              <label for="peso">Peso (kg)</label>
-              <input id="peso" name="peso" type="number" placeholder="Ex: 75" required>
-            </div>
-          </div>
+      <div class="playlist-section" id="playlist-section" style="display: none;">
+        <h4>Roteiro de Aulas Sugerido</h4>
+        <p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
+        <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
+      </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-            <div>
-              <label for="disponibilidade">Dias por semana para treinar</label>
-              <input id="disponibilidade" name="disponibilidade" type="number" min="0" max="7" placeholder="Ex: 4" required>
-            </div>
-            <div>
-              <label for="local_treino">Onde vai treinar?</label>
-              <select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select>
-            </div>
-          </div>
+      <div class="progress-section">
+        <h3>Sua Jornada</h3>
+        <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
+        <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-            <div>
-              <label for="nivel">Seu nível em atividades físicas</label>
-              <select id="nivel" name="nivel" required><option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select>
-            </div>
-            <div>
-              <label for="uso_suplemento">Pretende usar suplementos?</label>
-              <select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Nao">Não</option></select>
-            </div>
-          </div>
+<div id="video-aulas" class="tab-content">
+  <h2>Nossas Aulas</h2>
+  <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen></iframe></div></div>
+  <div id="video-block-2"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen></iframe></div></div>
+  <div id="video-block-3"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen></iframe></div></div>
+</div>
 
-          <div style="margin-top:14px">
-            <label for="prazo">Prazo (ex: 3 meses / até o verão / final do ano)</label>
-            <input id="prazo" name="prazo" placeholder="Ex: 3 meses" required>
-          </div>
-
-          <div style="margin-top:16px">
-            <button id="submit-goal" class="btn btn-primary" type="submit">Gerar Planos (Formato B)</button>
-          </div>
-        </form>
-
-        <div id="generated-summary" style="margin-top:18px;display:none" class="results-container">
-          <h3>Resumo gerado</h3>
-          <div id="summary-content" style="white-space:pre-wrap;color:#ddd;padding:8px"></div>
+<div id="percurso" class="tab-content">
+  <div class="percurso-container">
+    <h2>Meu Percurso</h2>
+    <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
+    <div class="percurso-forms">
+      <div class="percurso-card" id="treino-card">
+        <h4>Formulário: Treino</h4>
+        <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
+        <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
+        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
+          <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
+          <div class="small-note">Clique para colar (simulação)</div>
         </div>
+      </div>
 
+      <div class="percurso-card" id="dieta-card">
+        <h4>Formulário: Dieta</h4>
+        <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta</label><textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea></div>
+        <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
+        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
+          <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
+          <div class="small-note">Clique para colar (simulação)</div>
+        </div>
       </div>
     </div>
 
-    <!-- Video aulas (mantive como antes) -->
-    <div id="video-aulas" class="tab-content" style="display:none">
-      <h2>Nossas Aulas</h2>
-      <div style="margin-bottom:16px"><h3>Aula 1: Introdução ao Treino Estético</h3>
-        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
-      </div>
-      <div style="margin-bottom:16px"><h3>Aula 2: Fundamentos da Nutrição</h3>
-        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
-      </div>
-      <div><h3>Aula 3: Desvendando a Hipertrofia</h3>
-        <div style="border-radius:8px;overflow:hidden"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen style="width:100%;height:360px;border:0;"></iframe></div>
-      </div>
-    </div>
+    <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). Eles apenas alternam o estado visual por enquanto.</p>
+  </div>
+</div>
 
-    <!-- Percurso: aqui aparecerão os formulários gerados automaticamente -->
-    <div id="percurso" class="tab-content" style="display:none">
-      <div class="percurso-container">
-        <h2>Meu Percurso</h2>
-        <p style="text-align:center;color:#bbb">Aqui estão os formulários (Dieta e Treino) gerados automaticamente pelo sistema (Formato B).</p>
-
-        <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <label style="margin:0;font-weight:700">Cole seu KB (opcional) — linhas: <code>id[TAB]descrição</code></label>
-        </div>
-        <textarea id="kb-input" placeholder="Opcional: cole KB completo (id[tab]descrição). Ex: 290	Pão, trigo, sovado — (processado)" style="margin-top:8px"></textarea>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="load-kb" class="btn btn-ghost">Carregar KB</button>
-          <div class="small-note">Se carregar o KB, a interface irá tentar mostrar nomes reais para os IDs usados nas refeições.</div>
-        </div>
-
-        <div class="percurso-forms" style="margin-top:20px">
-          <!-- Card Dieta -->
-          <div class="percurso-card" id="dieta-card">
-            <h4>Formulário: Dieta</h4>
-            <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta (gerado)</label><textarea id="objetivo_dieta" placeholder="Será preenchido automaticamente"></textarea></div>
-            <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
-            <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
-              <button id="copy-dieta-json" class="btn btn-primary">Copiar Dieta (JSON)</button>
-              <button id="download-dieta" class="btn btn-ghost">Baixar Dieta (JSON)</button>
-            </div>
-            <div id="dieta-render" style="margin-top:12px"></div>
-          </div>
-
-          <!-- Card Treino -->
-          <div class="percurso-card" id="treino-card">
-            <h4>Formulário: Treino</h4>
-            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino (gerado)</label><textarea id="objetivo_treino" placeholder="Será preenchido automaticamente"></textarea></div>
-            <div class="form-group"><label for="frequencia_treino">Frequência semanal (gerado)</label><input id="frequencia_treino" type="number" min="0" max="7" placeholder="Ex: 4"></div>
-            <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
-              <button id="copy-treino-json" class="btn btn-primary">Copiar Treino (JSON)</button>
-              <button id="download-treino" class="btn btn-ghost">Baixar Treino (JSON)</button>
-            </div>
-            <div id="treino-render" style="margin-top:12px"></div>
-          </div>
-        </div>
-
-        <div id="percurso-log" class="log-area" style="display:none"></div>
-
-      </div>
-    </div>
-
-  </div> <!-- container -->
-
-  <!-- Dify container (chat advisor) -->
-  <div id="dify-container" style="max-width:1200px;margin:18px auto 80px;"></div>
-
+</div> 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
+    // ====== CONFIGURAÇÃO ======
+    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  // ================== CONFIGURAÇÃO ==================
-  const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
+    // --- FUNÇÕES DE LÓGICA (sem alterações) ---
+    function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
+    function calculateEndDate(prazoText) { if(!prazoText) return null; const now = new Date(); const year = now.getFullYear(); let prazoLower = prazoText.toLowerCase(); if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) { return new Date(year, 11, 31); } let match = prazoLower.match(/(\d+)\s+mes(es)?/); if (match) { let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d; } match = prazoLower.match(/(\d+)\s+dia(s)?/); if (match) { let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d; } if (prazoLower.includes('verao')||prazoLower.includes('verão')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); } if (prazoLower.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); } if (prazoLower.includes('ano novo')) { return new Date(year+1,0,1); } if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); } return null; }
+    function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
+    function analyzeGoal(text) { const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento']; const musculoKeywords = ['ganhar musculo', 'hipertrofia', 'sheipado', 'crescer', 'massa muscular', 'ficar forte', 'músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword => lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword => lowerText.includes(keyword)); if (hasEmagrecer && !hasMusculo) return 'emagrecer'; if (hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; }
+    function reorderVideos(order) { const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b.remove()); order.forEach(i=>c.appendChild(v[i])); }
 
-  // ================== UTILITÁRIOS NUTRI/CALORIAS (simples) ==================
-  // Pequena base interna de alimentos com estimativa kcal/100g e nomes (usada para gerar a dieta).
-  // Se você tiver KB com ids reais e calorias, podemos substituir.
-  const INTERNAL_FOOD_DB = {
-    "290": { name: "Pão, trigo, sovado", kcal_per_100g: 265 },
-    "237": { name: "Arroz, tipo 1 - cozido", kcal_per_100g: 130 },
-    "512": { name: "Frango, peito, sem pele - grelhado", kcal_per_100g: 165 },
-    "229": { name: "Sardinha - assada", kcal_per_100g: 208 },
-    "238": { name: "Aveia, flocos", kcal_per_100g: 389 },
-    "541": { name: "Iogurte, natural", kcal_per_100g: 60 },
-    "551": { name: "Leite, integral", kcal_per_100g: 60 },
-    "309": { name: "Geleia, mocotó - natural", kcal_per_100g: 250 },
-    "312": { name: "Maria mole, coco queimado", kcal_per_100g: 350 },
-    "160": { name: "Morango", kcal_per_100g: 32 },
-    // adicione mais conforme necessidade...
-  };
+    // --- LÓGICA PRINCIPAL ---
+    document.addEventListener('DOMContentLoaded', () => {
+        let user = null;
+        const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
+        const switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active'); };
+        const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+        menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', closeMenu);
+        navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const tabId = link.dataset.tab; switchTab(tabId); closeMenu(); }); });
+        configBtn.addEventListener('click', (e) => { e.preventDefault(); logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
+        logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
+        resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null, }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
 
-  // Parser KB simples: transforma linhas "id[TAB]descrição" em mapa
-  function parseKB(text) {
-    const lines = (text || "").split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-    const map = {};
-    for (const line of lines) {
-      const m = line.match(/^\s*(\d{1,4})\s+[\t\- ]\s*(.+)$/) || line.match(/^\s*(\d{1,4})\t(.+)$/) || line.match(/^\s*(\d{1,4})\s+(.+)$/);
-      if (m) {
-        map[String(parseInt(m[1],10))] = m[2].trim();
-      } else {
-        const mm = line.match(/^\s*(\d{1,4})\s*(.*)$/);
-        if (mm) map[String(parseInt(mm[1],10))] = (mm[2]||"").trim();
-      }
-    }
-    return map;
-  }
+        async function initializePageData() {
+            const { data } = await supabase.auth.getUser();
+            if (!data.user) { window.location.replace('/login.html'); return; }
+            user = data.user;
+            document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
+            if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
 
-  // ================== CALCULOS (BMR/TDEE) ==================
-  function parseNumberSafe(v) {
-    if (v===undefined || v===null) return NaN;
-    const s = String(v).replace(',', '.').trim();
-    return parseFloat(s);
-  }
+            // =========================================================================
+            // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e máscara inferior
+            // =========================================================================
+            function loadFreshDifyChat() {
+                const difyContainer = document.getElementById('dify-container');
+                if (!difyContainer) return;
 
-  function calculateBMR(sex, weightKg, heightM, age) {
-    // Mifflin-St Jeor
-    const heightCm = heightM * 100;
-    const w = weightKg;
-    const h = heightCm;
-    const a = age;
-    if (sex === 'masculino') {
-      return 10*w + 6.25*h - 5*a + 5;
-    } else {
-      return 10*w + 6.25*h - 5*a - 161;
-    }
-  }
-  function activityFactorFromDisponibilidade(daysPerWeek) {
-    const d = Number(daysPerWeek);
-    if (d <= 0) return 1.2;
-    if (d <= 2) return 1.35;
-    if (d <= 4) return 1.5;
-    if (d <= 5) return 1.65;
-    return 1.8;
-  }
-  function calculateTDEE(bmr, factor) {
-    return bmr * factor;
-  }
+                difyContainer.innerHTML = '';
 
-  // ================== GERAR DIETA (2 dias × 3 refeições) ==================
-  function generateDietPlan(profile, kcalTargetPerDay) {
-    // Estrutura: 2 dias, cada dia com 3 refeições
-    // Repartimos calorias: 30% café, 40% almoço, 30% jantar
-    const dayCount = 2;
-    const mealDistribution = [0.30, 0.40, 0.30];
-    // alimentos a usar (preferir KB carregado, se existir)
-    // choose recommended items sequence (we'll try to use internal db)
-    const foodPool = Object.keys(INTERNAL_FOOD_DB);
-    function pickFoodsForMeal(mealCal) {
-      // strategy: choose 2 items: um fonte de carbo (rice/bread/oats), uma fonte de proteína (chicken/sardinha) / ou fruta
-      // keep simple: rotate pool
-      const choices = [];
-      // select first two different items (cyclic)
-      for (let i=0;i<2;i++) {
-        const idx = Math.floor(Math.random() * foodPool.length);
-        choices.push(foodPool[idx]);
-      }
-      // compute grams such that sum(kcal) ~ mealCal
-      // distribute calories evenly between the 2 choices
-      const half = mealCal / choices.length;
-      const items = choices.map(id => {
-        const info = INTERNAL_FOOD_DB[id] || { kcal_per_100g: 120 };
-        const grams = Math.max(10, Math.round((half / info.kcal_per_100g) * 100));
-        return { id: String(id), qty_g: grams, name: info.name, kcal_per_100g: info.kcal_per_100g, kcal: Math.round(info.kcal_per_100g * grams / 100) };
-      });
-      // adjust rounding difference
-      const totalKcal = items.reduce((s,i)=>s+i.kcal,0);
-      const diff = Math.round(mealCal - totalKcal);
-      if (Math.abs(diff) > 0) {
-        // adjust first item grams a bit
-        const first = items[0];
-        const deltaGrams = Math.round((diff / first.kcal_per_100g) * 100);
-        first.qty_g = Math.max(5, first.qty_g + deltaGrams);
-        first.kcal = Math.round(first.kcal_per_100g * first.qty_g / 100);
-      }
-      return items;
-    }
+                const frameWrap = document.createElement('div');
+                frameWrap.className = 'dify-frame';
 
-    const days = [];
-    for (let d=1; d<=dayCount; d++) {
-      const meals = [];
-      for (let m=0;m<3;m++) {
-        const mealCal = Math.round(kcalTargetPerDay * mealDistribution[m]);
-        const mealItems = pickFoodsForMeal(mealCal);
-        meals.push({ mealIndex: m+1, target_kcal: mealCal, items: mealItems });
-      }
-      days.push({ dayIndex: d, meals });
-    }
-    return { days, kcalTargetPerDay };
-  }
+                const iframe = document.createElement('iframe');
+                const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+                const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
 
-  // ================== GERAR PLANO DE TREINO (2 dias exemplo) ==================
-  function generateTrainingPlan(profile) {
-    // Simples: cria 2 dias com exercícios baseados em nível e disponibilidade
-    const nivel = profile.nivel || 'iniciante';
-    const freq = Math.max(1, Math.min(7, Number(profile.disponibilidade || 3)));
-    const days = [];
-    const baseExercises = {
-      iniciante: [
-        { name: "Agachamento (peso corporal)", sets: 3, reps: "10-12" },
-        { name: "Flexão de braço (joelhos se necessário)", sets: 3, reps: "8-12" },
-        { name: "Remada austral (ou remada com halteres)", sets: 3, reps: "10-12" }
-      ],
-      intermediario: [
-        { name: "Agachamento com barra", sets: 4, reps: "8-10" },
-        { name: "Supino reto", sets: 4, reps: "8-10" },
-        { name: "Remada curvada", sets: 4, reps: "8-10" }
-      ],
-      avancado: [
-        { name: "Agachamento pesado", sets: 5, reps: "5-6" },
-        { name: "Supino pesado", sets: 5, reps: "5-6" },
-        { name: "Levantamento terra", sets: 4, reps: "4-6" }
-      ]
-    };
-    // day A: superior/empurrar / day B: inferior/puxar (simplificado)
-    const day1 = { dayIndex: 1, focus: "Parte superior (empurrar +/core)", exercises: baseExercises[nivel].slice(0,3) };
-    const day2 = { dayIndex: 2, focus: "Parte inferior + posterior", exercises: baseExercises[nivel].slice(0,3).map(e => ({ ...e, name: e.name + (nivel==='iniciante' ? " (variante leve)" : "") })) };
-    days.push(day1); days.push(day2);
-    return { frequencyPerWeek: freq, days };
-  }
+                iframe.src = difyUrl;
+                iframe.allow = 'microphone';
+                frameWrap.appendChild(iframe);
 
-  // ================== FUNÇÕES DE RENDER / UI ==================
-  function showLog(msg, show=true) {
-    const el = document.getElementById('percurso-log');
-    el.style.display = show ? 'block' : 'none';
-    el.textContent = msg;
-  }
+                // faixa superior
+                const strip = document.createElement('div');
+                strip.className = 'dify-top-strip';
+                strip.setAttribute('aria-hidden', 'true');
+                const badge = document.createElement('div');
+                badge.className = 'dify-top-badge';
+                badge.textContent = 'Fale com a IA';
+                const label = document.createElement('span');
+                label.className = 'mvp-label';
+                label.textContent = 'MVPia';
+                strip.appendChild(badge);
+                strip.appendChild(label);
 
-  function renderDietIntoUI(dietPlan, kbMap) {
-    // fill objetivo_dieta textarea with summary and render detailed cards below
-    const target = document.getElementById('objetivo_dieta');
-    const summaryLines = [`Calorias alvo por dia: ${dietPlan.kcalTargetPerDay} kcal`, `Dias gerados: ${dietPlan.days.length}`];
-    target.value = summaryLines.join("\n");
-    const render = document.getElementById('dieta-render'); render.innerHTML = '';
-    for (const day of dietPlan.days) {
-      const dayCard = document.createElement('div');
-      dayCard.className = 'day-card';
-      dayCard.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:700">Dia ${day.dayIndex}</div><div style="color:#aaa">kcal/dia ~ ${day.meals.reduce((s,m)=>s+m.items.reduce((ss,it)=>ss+it.kcal,0),0)}</div></div>`;
-      day.meals.forEach(m=>{
-        const mealWrap = document.createElement('div'); mealWrap.style.marginTop='8px';
-        mealWrap.innerHTML = `<div class="meal-title">Refeição ${m.mealIndex} — alvo ${m.target_kcal} kcal</div>`;
-        m.items.forEach(it=>{
-          const line = document.createElement('div'); line.className='food-line';
-          const idp = document.createElement('div'); idp.className='food-id'; idp.textContent = `ID:${it.id}`;
-          const namep = document.createElement('div'); namep.style.flex='1';
-          namep.textContent = (kbMap && kbMap[it.id]) ? kbMap[it.id] : (INTERNAL_FOOD_DB[it.id] ? INTERNAL_FOOD_DB[it.id].name : `ID:${it.id} (nome não encontrado)`);
-          const qtyp = document.createElement('div'); qtyp.style.minWidth='70px'; qtyp.style.textAlign='right'; qtyp.textContent = `${it.qty_g} g`;
-          line.appendChild(idp); line.appendChild(namep); line.appendChild(qtyp);
-          mealWrap.appendChild(line);
-        });
-        dayCard.appendChild(mealWrap);
-      });
-      render.appendChild(dayCard);
-    }
-  }
+                // máscara inferior (cobre o credit dentro da moldura)
+                const bottomMask = document.createElement('div');
+                bottomMask.className = 'dify-bottom-mask';
+                bottomMask.setAttribute('aria-hidden', 'true');
 
-  function renderTrainingIntoUI(trainingPlan) {
-    const target = document.getElementById('objetivo_treino');
-    target.value = `Plano de treino — frequência: ${trainingPlan.frequencyPerWeek}x/sem\nDias: ${trainingPlan.days.length}`;
-    const render = document.getElementById('treino-render'); render.innerHTML = '';
-    trainingPlan.days.forEach(d=>{
-      const dayCard = document.createElement('div'); dayCard.className='day-card';
-      dayCard.innerHTML = `<div style="font-weight:700">Dia ${d.dayIndex} — ${d.focus}</div>`;
-      d.exercises.forEach(ex=>{
-        const exEl = document.createElement('div'); exEl.style.marginTop='8px';
-        exEl.innerHTML = `<div style="font-weight:600">${ex.name}</div><div style="color:#aaa">S: ${ex.sets} • R: ${ex.reps}</div>`;
-        dayCard.appendChild(exEl);
-      });
-      render.appendChild(dayCard);
-    });
-  }
-
-  // ================== DIFY CHAT (conselheiro 24/7) ==================
-  function loadFreshDifyChat() {
-    const difyContainer = document.getElementById('dify-container');
-    if(!difyContainer) return;
-    difyContainer.innerHTML = '';
-    const frameWrap = document.createElement('div'); frameWrap.className='dify-frame';
-    const iframe = document.createElement('iframe');
-    const randomSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&_=${Date.now()}`;
-    iframe.src = difyUrl; iframe.allow='microphone';
-    frameWrap.appendChild(iframe);
-    // top strip
-    const strip = document.createElement('div'); strip.className='dify-top-strip';
-    strip.setAttribute('aria-hidden','true');
-    const badge = document.createElement('div'); badge.className='dify-top-badge'; badge.textContent='Fale com a IA';
-    const label = document.createElement('span'); label.className='mvp-label'; label.textContent='MVPia';
-    strip.appendChild(badge); strip.appendChild(label);
-    const bottomMask = document.createElement('div'); bottomMask.className='dify-bottom-mask';
-    frameWrap.appendChild(strip); frameWrap.appendChild(bottomMask);
-    difyContainer.appendChild(frameWrap);
-  }
-
-  // ================== LÓGICA PRINCIPAL (inicialização + submit handler) ==================
-  document.addEventListener('DOMContentLoaded', () => {
-    // toggle sidebar
-    const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar');
-    menuToggle.addEventListener('click', ()=> { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); });
-
-    // navigation tabs
-    document.querySelectorAll('.nav-link').forEach(link=>{
-      link.addEventListener('click', (e)=>{
-        e.preventDefault();
-        document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
-        document.getElementById(link.dataset.tab).style.display='block';
-        document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
-        link.classList.add('active');
-        // close sidebar on mobile
-        sidebar.classList.remove('open');
-        menuToggle.classList.remove('open');
-      });
-    });
-
-    // Load Dify advisor chat
-    loadFreshDifyChat();
-
-    // KB loader
-    let KB_MAP = {};
-    document.getElementById('load-kb').addEventListener('click', (e)=>{
-      e.preventDefault();
-      const raw = document.getElementById('kb-input').value || '';
-      KB_MAP = parseKB(raw);
-      showLog(`KB carregado: ${Object.keys(KB_MAP).length} entradas.`, true);
-    });
-
-    // INITIAL: try to autoload a small KB so UI names are friendly (optional)
-    const sampleKB = `290\tPão, trigo, sovado — (processado)
-237\tArroz, tipo 1 — cozido
-512\tFrango, peito, sem pele — grelhado
-229\tSardinha — assada
-238\tAveia, flocos
-541\tIogurte, natural
-551\tLeite, integral
-309\tGeleia, mocotó, natural
-312\tMaria mole, coco queimado
-160\tMorango`;
-    document.getElementById('kb-input').value = sampleKB;
-    KB_MAP = parseKB(sampleKB);
-
-    // Submit handler: Formulário principal -> GERA DIETA E TREINO AUTOMATICAMENTE (Formato B)
-    const iaForm = document.getElementById('ia-fit-form');
-    iaForm.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      try {
-        // read form data
-        const form = ev.target;
-        const objetivo = form.objetivo.value.trim();
-        const sexo = form.sexo.value;
-        const idade = parseInt(form.idade.value,10);
-        const altura = parseNumberSafe(form.altura.value); // metros
-        const peso = parseNumberSafe(form.peso.value);
-        const disponibilidade = parseInt(form.disponibilidade.value,10);
-        const local_treino = form.local_treino.value;
-        const nivel = form.nivel.value;
-        const uso_suplemento = form.uso_suplemento.value;
-        const prazoText = form.prazo.value;
-
-        // validate
-        if (!objetivo || !sexo || !idade || !altura || !peso) {
-          showLog('Por favor preencha os campos obrigatórios.', true);
-          return;
-        }
-
-        // Calcula BMR e TDEE
-        const bmr = Math.round(calculateBMR(sexo, peso, altura, idade));
-        const factor = activityFactorFromDisponibilidade(disponibilidade);
-        const tdee = Math.round(calculateTDEE(bmr, factor));
-
-        // Determina tipo de meta
-        const lowerObj = objetivo.toLowerCase();
-        let goalType = 'ambos';
-        const emagrecerKeywords = ['emagrecer','perder peso','secar','definir'];
-        const musculoKeywords = ['ganhar musculo','hipertrofia','massa muscular','ganhar massa','músculo','ficar forte'];
-        const hasE = emagrecerKeywords.some(k=>lowerObj.includes(k));
-        const hasM = musculoKeywords.some(k=>lowerObj.includes(k));
-        if (hasE && !hasM) goalType='emagrecer';
-        else if (hasM && !hasE) goalType='musculo';
-        else goalType='ambos';
-
-        // Aplica ajuste de calorias:
-        let kcalTarget = tdee;
-        if (goalType === 'emagrecer') kcalTarget = Math.round(tdee * 0.80); // -20%
-        else if (goalType === 'musculo') kcalTarget = Math.round(tdee * 1.10); // +10%
-        else kcalTarget = Math.round(tdee * 1.00); // manutenção
-
-        // Gera planos (dieta + treino)
-        const profile = { objetivo, sexo, idade, altura, peso, disponibilidade, local_treino, nivel, uso_suplemento };
-        const dietPlan = generateDietPlan(profile, kcalTarget);
-        const trainingPlan = generateTrainingPlan(profile);
-
-        // Renderiza na UI (percurso)
-        renderDietIntoUI(dietPlan, KB_MAP);
-        renderTrainingIntoUI(trainingPlan);
-
-        // Preenche inputs do percurso (para formatação/salvamento manual)
-        const orcamentoInput = document.getElementById('orcamento_dieta');
-        if (orcamentoInput && form.orcamento) orcamentoInput.value = form.orcamento ? form.orcamento.value : '';
-
-        // Preenche frequencia treino
-        const freqInput = document.getElementById('frequencia_treino');
-        if (freqInput) freqInput.value = trainingPlan.frequencyPerWeek || disponibilidade || 3;
-
-        // Guarda texto resumido nos textareas (objetivo)
-        document.getElementById('objetivo_dieta').value = `Plano gerado automaticamente — ${goalType.toUpperCase()} • Calorias alvo/dia: ${kcalTarget} kcal\nObjetivo: ${objetivo}`;
-        document.getElementById('objetivo_treino').value = `Plano de treino gerado automaticamente — ${goalType.toUpperCase()} • Frequência sugerida: ${trainingPlan.frequencyPerWeek}x/sem\nObjetivo: ${objetivo}`;
-
-        // Exibe resumo ao usuário
-        const summary = [
-          `BMR estimado: ${bmr} kcal/dia`,
-          `TDEE estimado: ${tdee} kcal/dia (fator atividade: ${factor.toFixed(2)})`,
-          `Meta detectada: ${goalType}`,
-          `Calorias alvo por dia: ${kcalTarget} kcal`,
-          `Dieta gerada: ${dietPlan.days.length} dias x 3 refeições`,
-          `Treino gerado: ${trainingPlan.days.length} dias`
-        ].join("\n");
-        document.getElementById('summary-content').textContent = summary;
-        document.getElementById('generated-summary').style.display = 'block';
-
-        // Gera estrutura JSON para salvar no Supabase (ajuste conforme seu schema)
-        const now = new Date();
-        const endDate = (function() {
-          // tenta interpretar prazo: se "3 meses" -> adiciona 3 meses; se "verão"/"final do ano" mantém heurística simples
-          const pt = (prazoText || '').toLowerCase();
-          if (!pt) return null;
-          const m = pt.match(/(\d+)\s+mes/);
-          if (m) { const d = new Date(); d.setMonth(d.getMonth() + parseInt(m[1],10)); return d; }
-          if (pt.includes('final') || pt.includes('fim')) { const d=new Date(); d.setMonth(11); d.setDate(31); return d; }
-          return null;
-        })();
-        const saveObj = {
-          goal_start_date: now.toISOString(),
-          goal_end_date: endDate ? endDate.toISOString() : null,
-          goal_type: goalType,
-          goal_calories: kcalTarget,
-          goal_prompt: null, // Formato B não usa prompt para gerar planos
-          diet_plan: dietPlan,
-          training_plan: trainingPlan
-        };
-
-        // Salva no Supabase (se o usuário estiver logado)
-        try {
-          const { data: authData } = await supabase.auth.getUser();
-          if (authData && authData.user) {
-            const user = authData.user;
-            const { error: upError } = await supabase.from('profiles').update(saveObj).eq('id', user.id);
-            if (upError) {
-              showLog(`Aviso: não foi possível salvar a meta no Supabase: ${upError.message}`, true);
-            } else {
-              showLog('Planos gerados e salvos no seu perfil.', true);
+                frameWrap.appendChild(strip);
+                frameWrap.appendChild(bottomMask);
+                difyContainer.appendChild(frameWrap);
             }
-          } else {
-            showLog('Planos gerados (usuário não autenticado — não foi salvo).', true);
-          }
-        } catch (e) {
-          showLog('Erro ao tentar salvar no Supabase: ' + (e.message || e), true);
-        }
 
-      } catch (err) {
-        // Log robusto: inclui dump de contexto e stack
-        console.error(err);
-        const msg = typeof err === 'object' && err !== null ? (err.message || JSON.stringify(err)) : String(err);
-        const stack = err && err.stack ? err.stack : '(sem stack)';
-        showLog(`Erro interno ao gerar planos:\n${msg}\n\nStack:\n${stack}`, true);
-      }
+            loadFreshDifyChat();
+            // =========================================================================
+
+            // restante da lógica (sem alterações)
+            const objetivoInput = document.getElementById('objetivo'); if (objetivoInput) { objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; }); }
+            const usoSuplementoSelect = document.getElementById('uso_suplemento'); if (usoSuplementoSelect) { usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; }); }
+            const iaFitForm = document.getElementById('ia-fit-form'); if(iaFitForm) { iaFitForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const formElements = event.target.elements;
+                const prazoText = formElements.prazo.value;
+                const endDate = calculateEndDate(prazoText);
+                if (!endDate) { console.error("Prazo da meta inválido."); return; }
+                const startDate = new Date(); startDate.setHours(0,0,0,0);
+                const objetivoText = formElements.objetivo.value;
+                const goalType = analyzeGoal(objetivoText);
+                const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
+                const orcamentoValue = formElements.orcamento.value.replace(',', '.');
+                const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
+                let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
+                if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
+                const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
+                const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
+                if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); } else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display = 'block'; displayProgress(startDate, endDate); }
+            }); }
+
+            const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) { playlistBtn.addEventListener('click', function() { if (!profile) return; let videoOrder; if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];} reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' }); }); }
+
+            const copyBtn = document.getElementById('copy-btn'); if(copyBtn) { copyBtn.addEventListener('click', function() {
+                const textToCopy=document.getElementById('prompt-output').textContent;
+                const textArea=document.createElement("textarea");
+                textArea.value=textToCopy;
+                textArea.style.position="fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
+                document.body.removeChild(textArea);
+            }); }
+
+            const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
+            function simulatePaste(buttonEl, targetTextareaId) {
+                const txtOutput = document.getElementById('prompt-output').textContent || '';
+                const target = document.getElementById(targetTextareaId);
+                const label = buttonEl.querySelector('.label');
+                if (buttonEl.disabled) return;
+                buttonEl.classList.remove('appearing');
+                void buttonEl.offsetWidth;
+                buttonEl.classList.add('appearing');
+                if (txtOutput.trim() && target) { target.value = txtOutput; } else if (target) { target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]'; }
+                if (label) label.textContent = 'Formulário pronto ✓';
+                buttonEl.classList.add('pasted', 'done');
+                buttonEl.setAttribute('aria-pressed', 'true');
+                buttonEl.disabled = true;
+                buttonEl.setAttribute('aria-disabled', 'true');
+                if (target) { try { target.focus(); } catch (e) {} }
+            }
+            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
+            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+        }
+        initializePageData();
     });
-
-    // copiar/baixar JSON diet & treino
-    document.getElementById('copy-dieta-json').addEventListener('click', (e)=>{
-      e.preventDefault();
-      // pega dados do render (reconstrói JSON simples)
-      const dietJson = collectCurrentDietJSON();
-      if (!dietJson) { showLog('Nenhuma dieta disponível para copiar.', true); return; }
-      navigator.clipboard.writeText(JSON.stringify(dietJson, null, 2)).then(()=>showLog('Dieta copiada para a área de transferência.', true)).catch(err=>showLog('Erro ao copiar dieta: '+err, true));
-    });
-    document.getElementById('copy-treino-json').addEventListener('click', (e)=>{
-      e.preventDefault();
-      const trJson = collectCurrentTrainingJSON();
-      if (!trJson) { showLog('Nenhum treino disponível para copiar.', true); return; }
-      navigator.clipboard.writeText(JSON.stringify(trJson, null, 2)).then(()=>showLog('Treino copiado para a área de transferência.', true)).catch(err=>showLog('Erro ao copiar treino: '+err, true));
-    });
-    document.getElementById('download-dieta').addEventListener('click', (e)=>{ e.preventDefault(); const j = collectCurrentDietJSON(); if(!j) return showLog('Nada para baixar.', true); downloadJSON(j, 'dieta.json'); });
-    document.getElementById('download-treino').addEventListener('click', (e)=>{ e.preventDefault(); const j = collectCurrentTrainingJSON(); if(!j) return showLog('Nada para baixar.', true); downloadJSON(j, 'treino.json'); });
-
-    function collectCurrentDietJSON() {
-      try {
-        // coletar a partir do DOM (dieta-render)
-        const container = document.getElementById('dieta-render');
-        if (!container || !container.children.length) return null;
-        // Mais simples: pegamos texto objetivo_dieta + detalhes estruturais (se quiser salvar a estrutura real, podemos criar estado global)
-        const summary = document.getElementById('objetivo_dieta').value || '';
-        // Para simplicidade retornamos summary + markup interno (para export)
-        const details = container.innerHTML;
-        return { summary, detailsHTML: details, timestamp: new Date().toISOString() };
-      } catch (e) { return null; }
-    }
-    function collectCurrentTrainingJSON() {
-      try {
-        const container = document.getElementById('treino-render');
-        if (!container || !container.children.length) return null;
-        const summary = document.getElementById('objetivo_treino').value || '';
-        const details = container.innerHTML;
-        return { summary, detailsHTML: details, timestamp: new Date().toISOString() };
-      } catch (e) { return null; }
-    }
-    function downloadJSON(obj, filename) {
-      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    // Inicia tentativa de autenticação / carregar perfil (manter compatibilidade)
-    (async function initialLoad() {
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (!data || !data.user) {
-          document.getElementById('welcome-msg').textContent = 'Bem-vindo(a) — sessão demo';
-          return;
-        }
-        const user = data.user;
-        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-        // busca perfil
-        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (error) {
-          console.warn('Erro ao buscar perfil:', error);
-          return;
-        }
-        // se já existir diet/training no perfil, renderiza
-        if (profile && profile.diet_plan) {
-          renderDietIntoUI(profile.diet_plan, KB_MAP);
-          document.getElementById('objetivo_dieta').value = `Plano carregado do perfil — calorias alvo: ${profile.goal_calories || '—'}`;
-        }
-        if (profile && profile.training_plan) {
-          renderTrainingIntoUI(profile.training_plan);
-          document.getElementById('objetivo_treino').value = `Treino carregado do perfil — frequência: ${profile.training_plan.frequencyPerWeek || '—'}`;
-          document.getElementById('frequencia_treino').value = profile.training_plan.frequencyPerWeek || '';
-        }
-      } catch (e) {
-        console.error('Erro init:', e);
-      }
-    })();
-
-  }); // DOMContentLoaded end
-
 </script>
-
 </body>
 </html>
