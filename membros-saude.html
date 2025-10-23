@@ -196,8 +196,6 @@
     .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
     .iframe-container { border-radius: 12px; overflow: hidden; height: auto; position: relative; } /* position relative to support overlay */
-    #prompt-output { background-color: #2c2c2c; border: 1px solid #444; padding: 20px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; border-radius: 8px; }
-    .copy-button { display: block; width: 200px; margin: 20px auto 0 auto; padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 8px; cursor: pointer; }
     .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
     .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
     .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
@@ -213,22 +211,6 @@
     .percurso-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
     .percurso-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border: 1px solid rgba(190,18,60,0.12); padding: 20px; border-radius: 12px; }
     .percurso-card h4 { margin-top: 0; color: white; }
-    .paste-btn { --h: 36px; display: inline-flex; align-items: center; justify-content: center; height: var(--h); min-width: 160px; padding: 8px 24px; border-radius: 999px; background: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2)); border: none; box-shadow: 0 6px 18px rgba(203,20,47,0.28), inset 0 -3px 6px rgba(0,0,0,0.15); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; position: relative; overflow: visible; transition: transform 160ms ease, box-shadow 160ms ease; }
-    .paste-btn:active { transform: translateY(1px) scale(0.997); }
-    .paste-btn:disabled { cursor: default; opacity: 0.92; filter: saturate(0.95); box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset 0 -3px 6px rgba(0,0,0,0.28); }
-    .paste-btn .hole { position: absolute; left: 18px; width: 18px; height: 18px; border-radius: 50%; background: #1f0b0f; box-shadow: 0 0 0 4px rgba(0,0,0,0.25), inset 0 -2px 6px rgba(255,255,255,0.04); transform-origin: center; transform: translateX(0) scale(1); transition: transform 420ms cubic-bezier(.2,.9,.2,1), left 420ms cubic-bezier(.2,.9,.2,1), background 220ms; z-index: 2; }
-    .paste-btn .hole::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.8)); transform: scale(1); transition: transform 320ms ease; }
-    .paste-btn .label { display: inline-block; transform: translateX(8px); transition: transform 320ms ease; z-index: 1; }
-    .paste-btn.pasted { box-shadow: 0 4px 10px rgba(0,0,0,0.45), inset 0 -4px 10px rgba(0,0,0,0.25); }
-    .paste-btn.pasted .hole { left: 20px; width: 22px; height: 22px; transform: translateX(-6px) scale(1.05); background: #000; animation: hole-pulse 900ms ease; }
-    .paste-btn.pasted .hole::after { transform: scale(0.6); }
-    .paste-btn.pasted .label { transform: translateX(14px); }
-    .paste-btn.done { background: linear-gradient(90deg, #7a0f18, #3e0610); color: #ffecec; box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 -4px 12px rgba(0,0,0,0.4); }
-    .paste-btn.done .label { letter-spacing: 0.2px; }
-    .paste-btn.appearing { animation: btn-enter 350ms ease; }
-    @keyframes btn-enter { from { transform: translateY(6px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-    @keyframes hole-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 40% { box-shadow: 0 0 0 6px rgba(255,255,255,0.03); transform: translateX(-3px) scale(1.02); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: translateX(-6px) scale(1.05); } }
-    @media (max-width: 900px) { .percurso-forms { grid-template-columns: 1fr; } .paste-btn { min-width: 140px; } }
     .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
     /* =============================================
@@ -325,17 +307,13 @@
       input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
       textarea { min-height: 90px; }
       button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
-      .copy-button { width: 180px; padding: 9px 12px; font-size: 14px; }
       .countdown-days { font-size: 2.5rem; }
       .progress-section { padding: 14px; }
       .progress-bar { height: 16px; }
       .video-container { margin-top: 18px; border-radius: 10px; }
       .percurso-forms { gap: 14px; }
       .percurso-card { padding: 14px; border-radius: 10px; }
-      .paste-btn { --h: 32px; min-width: 120px; padding: 6px 18px; font-size: 14px; }
-      .paste-btn .hole { left: 14px; width: 14px; height: 14px; }
-      .paste-btn .hole::after { inset: 3px; }
-
+      
       /* deixa o chat mais alto no mobile */
       .dify-frame {
         height: calc(100vh - 140px);
@@ -363,12 +341,11 @@
 
       .header { margin-bottom: 12px; }
       h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
-      #prompt-output { padding: 12px; font-size: 13px; }
       .percurso-forms { grid-template-columns: 1fr; }
       .playlist-btn { padding: 10px 18px; font-size: 14px; }
       .overlay { background-color: rgba(0,0,0,0.65); }
       .small-note { font-size: 12px; }
-      .menu-toggle, .paste-btn, button[type="submit"], .playlist-btn, .copy-button { min-height: 40px; }
+      .menu-toggle, button[type="submit"], .playlist-btn { min-height: 40px; }
 
       /*
         MÁSCARA MÓVEL: totalmente opaca/preta para esconder completamente a logo Dify
@@ -381,7 +358,7 @@
         width: calc(100% - 24px);
         height: clamp(48px, 7.5vh, 110px);
         bottom: -8px;
-        background: #000;               /* totalmente preta e opaca */
+        background: #000;              /* totalmente preta e opaca */
         background-color: #000;
         opacity: 1;                     /* garante opacidade total */
         border-radius: 20px;
@@ -444,21 +421,13 @@
 
   <div class="results-wrapper" id="results-wrapper" style="display: none;">
     <div class="results-container">
-      <h2>Seu Plano de Ação</h2>
-      <pre id="prompt-output"></pre>
-      <button id="copy-btn" class="copy-button">Copiar Pedido</button>
-
-      <h3>Comece sua Conversa com a IA</h3>
-      <p style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: #bbb;">Copie o pedido acima e cole no chat para receber o seu plano personalizado.</p>
-
+      <h2>Fale com a IA</h2>
       <div id="dify-container" class="iframe-container"></div>
-
       <div class="playlist-section" id="playlist-section" style="display: none;">
         <h4>Roteiro de Aulas Sugerido</h4>
         <p style="color: #bbb; margin-top: -10px;">Com base na sua meta, preparámos um roteiro para acelerar os seus resultados.</p>
         <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
       </div>
-
       <div class="progress-section">
         <h3>Sua Jornada</h3>
         <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
@@ -485,24 +454,14 @@
         <h4>Formulário: Treino</h4>
         <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
         <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
-        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-          <button class="paste-btn appearing" id="paste-treino" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
-          <div class="small-note">Clique para colar (simulação)</div>
-        </div>
       </div>
 
       <div class="percurso-card" id="dieta-card">
         <h4>Formulário: Dieta</h4>
         <div class="form-group"><label for="objetivo_dieta">Objetivo de Dieta</label><textarea id="objetivo_dieta" placeholder="Ex: déficit calórico para secar..."></textarea></div>
         <div class="form-group"><label for="orcamento_dieta">Orçamento mensal (R$)</label><input id="orcamento_dieta" type="text" placeholder="Ex: 500"></div>
-        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-start;margin-top:8px;">
-          <button class="paste-btn appearing" id="paste-dieta" aria-pressed="false" title="Colar conteúdo do pedido"><span class="hole" aria-hidden="true"></span><span class="label">Colar plano</span></button>
-          <div class="small-note">Clique para colar (simulação)</div>
-        </div>
       </div>
     </div>
-
-    <p style="text-align:center; color:#888; margin-top:18px;">Os botões "Colar" simulam colar o conteúdo gerado no painel IA (quando ativo). Eles apenas alternam o estado visual por enquanto.</p>
   </div>
 </div>
 
@@ -526,6 +485,7 @@
     // --- LÓGICA PRINCIPAL ---
     document.addEventListener('DOMContentLoaded', () => {
         let user = null;
+        let currentProfile = null;
         const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
         const switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); navLinks.forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[data-tab="${tabId}"]`).classList.add('active'); };
         const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
@@ -543,7 +503,14 @@
             document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
             if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
-            if (profile.goal_end_date) { displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); document.getElementById('prompt-output').textContent = profile.goal_prompt; if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; } else { document.getElementById('form-wrapper').style.display = 'block'; }
+            currentProfile = profile;
+            
+            if (profile.goal_end_date) { 
+                displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date)); 
+                if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block'; 
+            } else { 
+                document.getElementById('form-wrapper').style.display = 'block'; 
+            }
 
             // =========================================================================
             // IMPLEMENTAÇÃO DO CHAT: injeta iframe, moldura, faixa superior e máscara inferior
@@ -603,50 +570,23 @@
                 const startDate = new Date(); startDate.setHours(0,0,0,0);
                 const objetivoText = formElements.objetivo.value;
                 const goalType = analyzeGoal(objetivoText);
-                const daysRemaining = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-                const prazoOtimizado = `${daysRemaining} dias (meta: ${prazoText})`;
-                const orcamentoValue = formElements.orcamento.value.replace(',', '.');
-                const formData={objetivo:objetivoText,prazo:prazoOtimizado,sexo:formElements.sexo.value,altura:formElements.altura.value,peso:formElements.peso.value,idade:formElements.idade.value,disponibilidade:formElements.disponibilidade.value,local_treino:formElements.local_treino.value,orcamento:orcamentoValue,uso_suplemento:formElements.uso_suplemento.value,quais_suplementos:formElements.quais_suplementos.value,nivel:formElements.nivel.value};
-                let suplementoInfo=`Pretende usar suplementos: ${formData.uso_suplemento}.`;
-                if(formData.uso_suplemento==='Sim'&&formData.quais_suplementos){suplementoInfo+=` Os suplementos são: ${formData.quais_suplementos}.`}else if(formData.uso_suplemento==='Sim'){suplementoInfo+=` Ainda não decidi quais.`;}
-                const initialMessage = `\n**GERAR PLANO DE AÇÃO COMPLETO**\n**INSTRUÇÃO:** Aja como um coach de elite e crie um plano de ação detalhado com base nos seguintes dados do utilizador:\n**- Objetivo Principal:** ${formData.objetivo}\n**- Prazo para a Meta:** ${formData.prazo}\n**- Perfil do Utilizador:**\n  - Idade: ${formData.idade} anos\n  - Sexo: ${formData.sexo}\n  - Peso: ${formData.peso} kg\n  - Altura: ${formData.altura} m\n  - Nível de Experiência: ${formData.nivel}\n**- Logística e Recursos:**\n  - Disponibilidade: ${formData.disponibilidade} dias/semana\n  - Local de Treino: ${formData.local_treino}\n  - Orçamento Mensal (Dieta/Sups): R$${formData.orcamento}\n  - ${suplementoInfo}\n**TAREFA:** Crie um plano prescritivo e completo, abordando treino, dieta e recomendações de estilo de vida para atingir a meta no prazo estipulado.`.trim();
-                const { error: updateError } = await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(), goal_prompt: initialMessage, goal_type: goalType }).eq('id', user.id);
-                if (updateError) { console.error("Erro ao salvar a meta: " + updateError.message); } else { document.getElementById('prompt-output').textContent = initialMessage; document.getElementById('playlist-section').style.display = 'block'; displayProgress(startDate, endDate); }
+                
+                const { error: updateError } = await supabase.from('profiles').update({ 
+                    goal_start_date: startDate.toISOString(), 
+                    goal_end_date: endDate.toISOString(), 
+                    goal_prompt: '', 
+                    goal_type: goalType 
+                }).eq('id', user.id);
+                
+                if (updateError) { 
+                    console.error("Erro ao salvar a meta: " + updateError.message); 
+                } else { 
+                    document.getElementById('playlist-section').style.display = 'block'; 
+                    displayProgress(startDate, endDate); 
+                }
             }); }
 
-            const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) { playlistBtn.addEventListener('click', function() { if (!profile) return; let videoOrder; if(profile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(profile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];} reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' }); }); }
-
-            const copyBtn = document.getElementById('copy-btn'); if(copyBtn) { copyBtn.addEventListener('click', function() {
-                const textToCopy=document.getElementById('prompt-output').textContent;
-                const textArea=document.createElement("textarea");
-                textArea.value=textToCopy;
-                textArea.style.position="fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try { document.execCommand('copy'); const btn=document.getElementById('copy-btn'); btn.textContent='Copiado!'; setTimeout(()=> {btn.textContent='Copiar Pedido';}, 2000); } catch(err) { console.error('Erro ao copiar', err); }
-                document.body.removeChild(textArea);
-            }); }
-
-            const pasteTreino = document.getElementById('paste-treino'); const pasteDieta = document.getElementById('paste-dieta');
-            function simulatePaste(buttonEl, targetTextareaId) {
-                const txtOutput = document.getElementById('prompt-output').textContent || '';
-                const target = document.getElementById(targetTextareaId);
-                const label = buttonEl.querySelector('.label');
-                if (buttonEl.disabled) return;
-                buttonEl.classList.remove('appearing');
-                void buttonEl.offsetWidth;
-                buttonEl.classList.add('appearing');
-                if (txtOutput.trim() && target) { target.value = txtOutput; } else if (target) { target.value = '[Sem conteúdo gerado ainda — gere a meta no painel IA primeiro]'; }
-                if (label) label.textContent = 'Formulário pronto ✓';
-                buttonEl.classList.add('pasted', 'done');
-                buttonEl.setAttribute('aria-pressed', 'true');
-                buttonEl.disabled = true;
-                buttonEl.setAttribute('aria-disabled', 'true');
-                if (target) { try { target.focus(); } catch (e) {} }
-            }
-            if (pasteTreino) { pasteTreino.addEventListener('click', () => simulatePaste(pasteTreino, 'objetivo_treino')); }
-            if (pasteDieta) { pasteDieta.addEventListener('click', () => simulatePaste(pasteDieta, 'objetivo_dieta')); }
+            const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) { playlistBtn.addEventListener('click', function() { if (!currentProfile) return; let videoOrder; if(currentProfile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(currentProfile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];} reorderVideos(videoOrder); switchTab('video-aulas'); document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' }); }); }
         }
         initializePageData();
     });
