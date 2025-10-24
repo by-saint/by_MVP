@@ -173,11 +173,83 @@
     }
     /* --- FIM AJUSTE CHATBOT DIFY --- */
 
+    /* --- INÍCIO: Day Selector UI (NOVO) --- */
+    .day-selector-container {
+        background-color: #2C2C2C;
+        border: 1px solid #444;
+        border-radius: 8px;
+    }
+    .day-selector-summary {
+        padding: 12px;
+        font-weight: 600;
+        color: #BBBBBB;
+        cursor: pointer;
+        list-style: none; /* Remove seta padrão */
+        position: relative;
+    }
+    .day-selector-summary::-webkit-details-marker { display: none; } /* Chrome/Safari */
+    .day-selector-summary::marker { display: none; } /* Firefox */
+    .day-selector-summary::after { /* Seta personalizada */
+        content: '▼';
+        font-size: 0.8em;
+        position: absolute;
+        right: 15px;
+        top: 14px;
+        transition: transform 0.2s;
+    }
+    .day-selector-container[open] .day-selector-summary::after {
+        transform: rotate(180deg);
+    }
+    .day-selector-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0 12px 12px 12px;
+        justify-content: center;
+    }
+    .day-circle-input {
+        display: none; /* Oculta o checkbox real */
+    }
+    .day-circle-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #555;
+        background-color: #333;
+        color: #E0E0E0;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        user-select: none;
+    }
+    .day-circle-label:hover {
+        border-color: #777;
+    }
+    .day-circle-input:checked + .day-circle-label {
+        background-color: var(--color-ia-specialist);
+        border-color: var(--color-ia-specialist);
+        color: #fff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+    /* --- FIM: Day Selector UI --- */
 
     @media(max-width:900px){
       .percurso-forms { grid-template-columns:1fr; }
       .plan-days { grid-template-columns:1fr; }
       body { padding: 20px 12px; }
+      
+      .day-circle-label { /* Círculos um pouco menores no mobile */
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+      }
+      .day-selector-grid {
+        gap: 8px;
+      }
     }
     
     /* --- AJUSTE CHATBOT DIFY (MOBILE) --- */
@@ -218,7 +290,28 @@
         <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
         <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
         <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
-        <div class="form-group"><label for="disponibilidade">Dias por semana para treinar</label><input type="number" id="disponibilidade" name="disponibilidade" placeholder="Ex: 4" min="1" max="7" required></div>
+        
+        <div class="form-group">
+            <details class="day-selector-container">
+                <summary class="day-selector-summary">Dias de treino</summary>
+                <div class="day-selector-grid">
+                    <input type="checkbox" name="dias_treino" value="seg" id="dia-seg" class="day-circle-input">
+                    <label for="dia-seg" class="day-circle-label">Seg</label>
+                    <input type="checkbox" name="dias_treino" value="ter" id="dia-ter" class="day-circle-input">
+                    <label for="dia-ter" class="day-circle-label">Ter</label>
+                    <input type="checkbox" name="dias_treino" value="qua" id="dia-qua" class="day-circle-input">
+                    <label for="dia-qua" class="day-circle-label">Qua</label>
+                    <input type="checkbox" name="dias_treino" value="qui" id="dia-qui" class="day-circle-input">
+                    <label for="dia-qui" class="day-circle-label">Qui</label>
+                    <input type="checkbox" name="dias_treino" value="sex" id="dia-sex" class="day-circle-input">
+                    <label for="dia-sex" class="day-circle-label">Sex</label>
+                    <input type="checkbox" name="dias_treino" value="sab" id="dia-sab" class="day-circle-input">
+                    <label for="dia-sab" class="day-circle-label">Sáb</label>
+                    <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input">
+                    <label for="dia-dom" class="day-circle-label">Dom</label>
+                </div>
+            </details>
+        </div>
         <div class="form-group"><label for="local_treino">Onde vai treinar?</label><select id="local_treino" name="local_treino" required><option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option></select></div>
         <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
         <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label><select id="uso_suplemento" name="uso_suplemento" required><option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
@@ -1012,18 +1105,45 @@ const SuperDietEngine = (function(){
     const weeksPerMonth = 4.345;
     return _round(m / weeksPerMonth, 2);
   }
-  function buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy){
+  
+  // ============================================
+  // INÍCIO: ALTERAÇÃO ALGORITMO (buildWeekTemplate)
+  // ============================================
+  function buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy, selectedDaysArr = []){
     const week = Array.from({length:7}).map(()=>({ baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
-    const dt = Math.max(0, _safeNum(diasTreino, 3));
-    if(dt > 0){
-      const step = Math.floor(7 / dt) || 1;
-      let idx = 0;
-      for(let i=0;i<dt;i++){
-        week[idx].isTrainingDay = true;
-        week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08);
-        idx = (idx + step) % 7;
-      }
+
+    // Mapeia os dias da semana (JS: 0=Dom, 1=Seg... 6=Sab)
+    // Nossos valores do form: 'seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'
+    const dayMap = { 'dom': 0, 'seg': 1, 'ter': 2, 'qua': 3, 'qui': 4, 'sex': 5, 'sab': 6 };
+    
+    if (selectedDaysArr.length > 0) {
+        // O usuário selecionou dias específicos
+        selectedDaysArr.forEach(dayKey => {
+            const idx = dayMap[dayKey];
+            if (idx !== undefined && week[idx]) {
+                week[idx].isTrainingDay = true;
+                week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); // Aumenta calorias no dia de treino
+            }
+        });
+    } else {
+        // Fallback: se nenhum dia foi selecionado, usa a lógica antiga de espalhar
+        // Usa o 'diasTreino' (count) que já foi calculado a partir do array (ou default)
+        const dt = Math.max(0, _safeNum(diasTreino, 3));
+        if (dt > 0) {
+            const step = Math.floor(7 / dt) || 1;
+            let idx = 1; // Começa na Segunda (index 1)
+            for (let i = 0; i < dt; i++) {
+                if(week[idx]) {
+                    week[idx].isTrainingDay = true;
+                    week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08);
+                }
+                idx = (idx + step);
+                if (idx > 6) idx = (idx % 7) + 1; // wrap around, mas evita Domingo
+                if (idx === 0) idx = 1;
+            }
+        }
     }
+
     if(cheatPolicy && cheatPolicy.freqPerWeek > 0){
       let idx = 6;
       for(let i=6;i>=0;i--){ if(!week[i].isTrainingDay){ idx = i; break; } }
@@ -1032,6 +1152,10 @@ const SuperDietEngine = (function(){
     }
     return week;
   }
+  // ============================================
+  // FIM: ALTERAÇÃO ALGORITMO (buildWeekTemplate)
+  // ============================================
+
   function compensateCheatWeek(weekArr){
     const baseTotal = weekArr.reduce((s,d)=>s + d.baseCalories,0);
     const cheatDay = weekArr.find(d => d.isCheatDay);
@@ -1138,7 +1262,18 @@ const SuperDietEngine = (function(){
     })();
     const dailyTargetCalories = profileTargets.targetCalories;
     const weeklyBudget = options.weeklyBudgetOverride || weeklyBudgetFromMonthly(profile.orcamento_mes_R$ || profile.orcamento || 0);
-    const diasTreino = _safeNum(profile.diasPorSemana || profile.disponibilidade || profile.dias_treino_sem || profile.dias_treino, 3);
+    
+    // ============================================
+    // INÍCIO: ALTERAÇÃO ALGORITMO (planLongTerm)
+    // ============================================
+    // O 'diasTreino' agora é o *número* de dias selecionados
+    const diasTreino = _safeNum(profile.disponibilidade, 3);
+    // O 'selectedDaysArr' são os dias específicos
+    const selectedDaysArr = profile.selected_days || [];
+    // ============================================
+    // FIM: ALTERAÇÃO ALGORITMO (planLongTerm)
+    // ============================================
+
     const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek: 1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
     const totalWeeks = Math.max(1, Math.round(months * 4.345));
     const timeline_weeks = [];
@@ -1177,7 +1312,15 @@ const SuperDietEngine = (function(){
 
 
     for(let w=0; w<totalWeeks; w++){
-      let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy);
+      // ============================================
+      // INÍCIO: ALTERAÇÃO ALGORITMO (Chamada)
+      // ============================================
+      // Passa o 'selectedDaysArr' para a função
+      let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy, selectedDaysArr);
+      // ============================================
+      // FIM: ALTERAÇÃO ALGORITMO (Chamada)
+      // ============================================
+      
       weekTemplate = compensateCheatWeek(weekTemplate);
       const days = [];
       for(let dIdx=0; dIdx<7; dIdx++){
@@ -1269,7 +1412,8 @@ const SuperDietEngine = (function(){
           });
         } // meals
         days.push({
-          dayIndex: dIdx+1,
+          dayIndex: dIdx+1, // 1-based index for display
+          dayOfWeek: (new Date(0, 0, dIdx)).toLocaleString('pt-BR', { weekday: 'long' }), // Debug: 'domingo', 'segunda', etc.
           baseCalories: daySpec.baseCalories,
           isTrainingDay: isTraining,
           isCheatDay: isCheat,
@@ -1313,7 +1457,7 @@ const SuperDietEngine = (function(){
     const credibilityScore = computeCredibility(meta);
 
     const payload = {
-      version: 'super-algo-v3-smart-surplus', // Versão atualizada
+      version: 'super-algo-v3-smart-surplus-days', // Versão atualizada
       created_at: nowISO(),
       profile_snapshot: profile,
       targets: profileTargets,
@@ -1428,10 +1572,28 @@ function renderMonth(monthObj, contentArea){
     });
   });
   const daysWrap = document.createElement('div'); daysWrap.className = 'plan-days';
-  days.forEach(d => {
+  
+  // ============================================
+  // INÍCIO: ALTERAÇÃO UI (renderMonth)
+  // ============================================
+  // Mapeia os dias da semana (JS: 0=Dom, 1=Seg... 6=Sab)
+  const dayNameMap = { 0: 'Dom', 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sab' };
+  
+  days.forEach((d, dIdx_in_month) => {
+    // O 'dayIndex' vindo do algoritmo é 1-7 (Dia 1 a Dia 7 da semana)
+    // Precisamos do dia da semana real (0-6)
+    const dayOfWeekIndex = (new Date(d.weekStartISO + 'T12:00:00Z').getUTCDay() + (d.dayIndex - 1)) % 7;
+    const dayName = dayNameMap[dayOfWeekIndex] || 'Dia';
+
     const dayCard = document.createElement('div'); dayCard.className = 'plan-day';
     const dayTitle = document.createElement('div'); dayTitle.style.display='flex'; dayTitle.style.justifyContent='space-between'; dayTitle.style.alignItems='center';
-    const left = document.createElement('div'); left.innerHTML = `<strong>Dia ${d.dayIndex}</strong><div style="color:#aaa;font-size:13px">Semana ${d.weekIndex} — ${d.isTrainingDay ? 'Dia de treino' : 'Dia normal'} ${d.isCheatDay ? '• Cheat' : ''}</div>`;
+    
+    // Mostra o nome do dia (Seg, Ter, etc.)
+    const left = document.createElement('div'); left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#aaa'};font-size:13px;font-weight:700;">${d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso'}</div>`;
+    // ============================================
+    // FIM: ALTERAÇÃO UI (renderMonth)
+    // ============================================
+
     const right = document.createElement('div'); right.style.textAlign='right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
     dayTitle.appendChild(left); dayTitle.appendChild(right);
     dayCard.appendChild(dayTitle);
@@ -1709,7 +1871,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!endDate){ alert('Prazo inválido. Use algo como "3 meses" ou "até o verão".'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
       const startDate = new Date(); startDate.setHours(0,0,0,0);
       const objetivoText = formElements.objetivo.value;
-      const goalType = (function(text){ const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; const musculoKeywords = ['ganhar musculo','hipertrofia','crescer','massa muscular','ficar forte','músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword=>lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword=>lowerText.includes(keyword)); if(hasEmagrecer && !hasMusculo) return 'emagrecer'; if(hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; })(objetivoText);
+      const goalType = (function(text){ const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; const musculoKeywords = ['ganhar musculo','hipertrofia','crescer','massa muscular','ficar forte','músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword=>lowerText.includes(keyword)); const hasMusculo = musKewywords.some(keyword=>lowerText.includes(keyword)); if(hasEmagrecer && !hasMusculo) return 'emagrecer'; if(hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; })(objetivoText);
+
+      // ============================================
+      // INÍCIO: ALTERAÇÃO JS (Leitura do Formulário)
+      // ============================================
+      // Novo: Ler os dias de treino selecionados
+      const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
+      const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
+
+      if (selectedDaysArray.length === 0) {
+          alert('Por favor, selecione pelo menos um dia de treino.');
+          submitButton.disabled = false;
+          submitButton.textContent = 'Crie seu próprio caminho';
+          // Abre o seletor de dias se estiver fechado
+          const details = document.querySelector('.day-selector-container');
+          if (details && !details.open) {
+              details.open = true;
+          }
+          return;
+      }
+      // ============================================
+      // FIM: ALTERAÇÃO JS (Leitura do Formulário)
+      // ============================================
+
 
       const { error: updateError } = await supabase.from('profiles').update({
         goal_start_date: startDate.toISOString(),
@@ -1731,7 +1916,14 @@ document.addEventListener('DOMContentLoaded', () => {
         altura: parseFloat(formElements.altura.value) || 1.7,
         peso: parseFloat(formElements.peso.value) || 70,
         idade: parseInt(formElements.idade.value, 10) || 30,
-        disponibilidade: parseInt(formElements.disponibilidade.value,10) || 3,
+        // ============================================
+        // INÍCIO: ALTERAÇÃO JS (Envio para Engine)
+        // ============================================
+        disponibilidade: selectedDaysArray.length, // O *número* de dias
+        selected_days: selectedDaysArray, // O *array* de dias (ex: ['seg', 'qua', 'sex'])
+        // ============================================
+        // FIM: ALTERAÇÃO JS (Envio para Engine)
+        // ============================================
         local_treino: formElements.local_treino.value,
         orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
         orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
