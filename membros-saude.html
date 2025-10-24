@@ -649,7 +649,7 @@ const alimentosDB = [
 "Pupunha cozida",
 "Noz crua (incluí)",
 "Presunto, com capa de gordura (processado)",
-"Presunto, sem capa de gordordura (processado)",
+"Presunto, sem capa de gordura (processado)",
 "Quibe assado",
 "Quibe frito",
 "Salame (processado)",
@@ -763,23 +763,24 @@ const SuperDietEngine = (function(){
   function normalizeName(s){ if(!s) return ''; return s.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,' ').trim(); }
   function nowISO(){ return (new Date()).toISOString(); }
 
-  // seed minimal (nutrição e preços de exemplo). Você pode enriquecer via loadExternalNutrition/loadExternalPrices.
+  // REQ 1 (Coesão): Categorias de refeição atualizadas no DB seed
   const masterDB = {
-    "arroz tipo 1 cozido": { id:'arroz_tipo1', name:'Arroz, tipo 1 cozido', nutrition:{ kcal:130, protein_g:2.7, carb_g:28.0, fat_g:0.2, fiber_g:1.0 }, price_per_kg:6.0, category:'cereal', preps:['cozido'] },
-    "arroz integral cozido": { id:'arroz_integral', name:'Arroz integral cozido', nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 }, price_per_kg:6.5, category:'cereal', preps:['cozido'] },
-    "feijao carioca cozido": { id:'feijao_carioca', name:'Feijão carioca cozido', nutrition:{ kcal:347, protein_g:21.1, carb_g:62.4, fat_g:1.4, fiber_g:16.6 }, price_per_kg:8.5, category:'leguminosa', preps:['cozido'] },
-    "frango peito sem pele cozido": { id:'frango_peito', name:'Frango peito sem pele cozido', nutrition:{ kcal:165, protein_g:31.0, carb_g:0, fat_g:3.6 }, price_per_kg:18.0, category:'proteina_animal', preps:['grelhado','cozido','assado'] },
-    "ovo inteiro cozido": { id:'ovo_cozido', name:'Ovo inteiro cozido', nutrition:{ kcal:155, protein_g:13.0, carb_g:1.1, fat_g:11.0 }, price_per_kg:15.0, category:'proteina_animal', preps:['cozido','frito'] },
+    "arroz tipo 1 cozido": { id:'arroz_tipo1', name:'Arroz, tipo 1 cozido', nutrition:{ kcal:130, protein_g:2.7, carb_g:28.0, fat_g:0.2, fiber_g:1.0 }, price_per_kg:6.0, category:'cereal_main', preps:['cozido'] },
+    "arroz integral cozido": { id:'arroz_integral', name:'Arroz integral cozido', nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 }, price_per_kg:6.5, category:'cereal_main', preps:['cozido'] },
+    "feijao carioca cozido": { id:'feijao_carioca', name:'Feijão carioca cozido', nutrition:{ kcal:347, protein_g:21.1, carb_g:62.4, fat_g:1.4, fiber_g:16.6 }, price_per_kg:8.5, category:'leguminosa_main', preps:['cozido'] },
+    "frango peito sem pele cozido": { id:'frango_peito', name:'Frango peito sem pele cozido', nutrition:{ kcal:165, protein_g:31.0, carb_g:0, fat_g:3.6 }, price_per_kg:18.0, category:'proteina_main', preps:['grelhado','cozido','assado'] },
+    "ovo inteiro cozido": { id:'ovo_cozido', name:'Ovo inteiro cozido', nutrition:{ kcal:155, protein_g:13.0, carb_g:1.1, fat_g:11.0 }, price_per_kg:15.0, category:'proteina_breakfast_snack', preps:['cozido','frito'] },
     "banana nanica": { id:'banana_nanica', name:'Banana nanica', nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, price_per_kg:4.0, category:'fruta', preps:['crua','assada'] },
     "abacaxi cru": { id:'abacaxi', name:'Abacaxi cru', nutrition:{ kcal:50, protein_g:0.5, carb_g:13.0, fat_g:0.1, fiber_g:1.4 }, price_per_kg:7.59, category:'fruta', preps:['crua'] },
     "alface americana": { id:'alface', name:'Alface americana', nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, price_per_kg:6.0, category:'verdura', preps:['crua'] },
     "brocolis cozido": { id:'brocolis', name:'Brócolis cozido', nutrition:{ kcal:55, protein_g:3.7, carb_g:11.1, fat_g:0.6, fiber_g:3.3 }, price_per_kg:7.0, category:'verdura', preps:['cozido','grelhado'] },
     "batata inglesa cozida": { id:'batata', name:'Batata inglesa cozida', nutrition:{ kcal:87, protein_g:1.9, carb_g:20.1, fat_g:0.1, fiber_g:1.8 }, price_per_kg:3.0, category:'tuberculo', preps:['cozido','assado','purê'] },
-    "aveia flocos crua": { id:'aveia', name:'Aveia flocos', nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, price_per_kg:9.5, category:'cereal', preps:['crua','cozida'] },
-    "lentilha cozida": { id:'lentilha', name:'Lentilha cozida', nutrition:{ kcal:116, protein_g:9.0, carb_g:20.1, fat_g:0.4, fiber_g:7.9 }, price_per_kg:10.0, category:'leguminosa', preps:['cozido'] },
-    "queijo minas frescal": { id:'queijo_minas', name:'Queijo minas frescal', nutrition:{ kcal:250, protein_g:18.0, carb_g:2.0, fat_g:20.0 }, price_per_kg:28.0, category:'laticinio', preps:['fresco'] },
-    "sardinha conserva em oleo": { id:'sardinha', name:'Sardinha conserva em óleo', nutrition:{ kcal:208, protein_g:24.6, carb_g:0.0, fat_g:11.5 }, price_per_kg:22.0, category:'peixe', preps:['conserva'] },
-    // fallback generic: if food not found, module will create a minimal record
+    "aveia flocos crua": { id:'aveia', name:'Aveia flocos', nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, price_per_kg:9.5, category:'cereal_breakfast_snack', preps:['crua','cozida'] },
+    "lentilha cozida": { id:'lentilha', name:'Lentilha cozida', nutrition:{ kcal:116, protein_g:9.0, carb_g:20.1, fat_g:0.4, fiber_g:7.9 }, price_per_kg:10.0, category:'leguminosa_main', preps:['cozido'] },
+    "queijo minas frescal": { id:'queijo_minas', name:'Queijo minas frescal', nutrition:{ kcal:250, protein_g:18.0, carb_g:2.0, fat_g:20.0 }, price_per_kg:28.0, category:'laticinio_breakfast_snack', preps:['fresco'] },
+    "sardinha conserva em oleo": { id:'sardinha', name:'Sardinha conserva em óleo', nutrition:{ kcal:208, protein_g:24.6, carb_g:0.0, fat_g:11.5 }, price_per_kg:22.0, category:'peixe', preps:['conserva'] }, // Peixe pode ser lanche
+    "pao frances": { id:'pao_frances', name:'Pão Francês', nutrition:{ kcal:289, protein_g:8.0, carb_g:58.5, fat_g:2.0 }, price_per_kg:12.0, category:'pao_breakfast_snack', preps:['crua'] },
+    "iogurte natural": { id:'iogurte_nat', name:'Iogurte Natural', nutrition:{ kcal:53, protein_g:4.0, carb_g:5.5, fat_g:1.8 }, price_per_kg:15.0, category:'laticinio_breakfast_snack', preps:['crua'] }
   };
 
   // build lookup
@@ -842,8 +843,14 @@ const SuperDietEngine = (function(){
     const idade = _safeNum(profile.idade, 30);
     const sexo = (profile.sexo || '').toString().toLowerCase();
     const hcm = Math.round(altura_m * 100);
-    if(sexo.startsWith('m')) return Math.round(10 * peso + 6.25 * hcm - 5 * idade + 5);
-    return Math.round(10 * peso + 6.25 * hcm - 5 * idade - 161);
+    
+    // REQ 2 (Calorias): Troca da fórmula TMB para Harris-Benedict (revisada), mais precisa para jovens/atletas
+    if(sexo.startsWith('m')) {
+        // TMB (Masc) = 88.362 + (13.397 * peso) + (4.799 * hcm) - (5.677 * idade)
+        return Math.round(88.362 + (13.397 * peso) + (4.799 * hcm) - (5.677 * idade));
+    }
+    // TMB (Fem) = 447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade)
+    return Math.round(447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade));
   }
   function activityFactor(profile){
     const nivel = (profile.nivel || '').toString().toLowerCase();
@@ -858,11 +865,20 @@ const SuperDietEngine = (function(){
     const af = activityFactor(profile);
     const tdee = Math.round(bmr * af);
     const goalText = (profile.grande_meta || profile.goal || profile.goal_prompt || '').toString().toLowerCase();
-    let targetCalories = tdee;
-    if(/emagrec|perder|secar|definição|definir/.test(goalText)) targetCalories = Math.round(tdee * 0.80);
     
-    // REQ #3: Melhora superávit para ganho de massa (Superávit modesto de +350kcal)
-    if(/ganhar|massa|hipertrof|crescer|forte/.test(goalText)) targetCalories = tdee + 350; 
+    let targetCalories = tdee;
+    
+    // REQ 2 (Calorias): Lógica de déficit/superávit mais precisa e agressiva
+    if(/emagrec|perder|secar|definição|definir/.test(goalText)) {
+        // Déficit de 20%, mas limitado a 750kcal no máximo
+        const deficit = Math.min(tdee * 0.20, 750);
+        targetCalories = Math.round(tdee - deficit);
+    }
+    if(/ganhar|massa|hipertrof|crescer|forte/.test(goalText)) {
+        // Superávit de 15%, mas limitado a 500kcal no máximo (Ex: 2900 TDEE -> 3335 kcal)
+        const surplus = Math.min(tdee * 0.15, 500);
+        targetCalories = Math.round(tdee + surplus);
+    }
 
     const peso = _safeNum(profile.peso, 70);
     let protPerKg = 1.4;
@@ -1131,17 +1147,31 @@ const SuperDietEngine = (function(){
     if(!options.alternatesByCategory){
       const byCat = {};
       for(const nm in _lookup.byName){ const r = _lookup.byName[nm]; byCat[r.category] = byCat[r.category] || []; byCat[r.category].push(r.name); }
-      alternatesByCategory.cereal = (byCat.cereal || []).slice(0,10);
-      alternatesByCategory.leguminosa = (byCat.leguminosa || []).slice(0,10);
-      alternatesByCategory.proteina_animal = (byCat.proteina_animal || []).slice(0,10);
+      alternatesByCategory.cereal = (byCat.cereal_main || []).slice(0,10);
+      alternatesByCategory.leguminosa = (byCat.leguminosa_main || []).slice(0,10);
+      alternatesByCategory.proteina_animal = (byCat.proteina_main || []).slice(0,10);
       alternatesByCategory.verdura = (byCat.verdura || []).slice(0,10);
       alternatesByCategory.fruta = (byCat.fruta || []).slice(0,10);
     }
     
-    // create candidate lists with rank (done once)
-    const allCandidateProteins = _rankFoodsByCategory(['proteina_animal','leguminosa','peixe','laticinio'], profile);
-    const allCandidateCarbs = _rankFoodsByCategory(['cereal','tuberculo','pasta'], profile);
-    const allCandidateVeg = _rankFoodsByCategory(['verdura','fruta'], profile);
+    // REQ 1 (Coesão): Criar listas de candidatos específicas para o tipo de refeição (Top 7 de cada)
+    const mainProteins = _rankFoodsByCategory(['proteina_main', 'peixe'], profile).slice(0, 7);
+    const mainCarbs = _rankFoodsByCategory(['cereal_main', 'tuberculo'], profile).slice(0, 7);
+    const mainLegumes = _rankFoodsByCategory(['leguminosa_main'], profile).slice(0, 7);
+    const snackProteins = _rankFoodsByCategory(['proteina_breakfast_snack', 'laticinio_breakfast_snack', 'oleaginosa'], profile).slice(0, 7);
+    const snackCarbs = _rankFoodsByCategory(['cereal_breakfast_snack', 'pao_breakfast_snack'], profile).slice(0, 7);
+    const commonVeg = _rankFoodsByCategory(['verdura'], profile).slice(0, 7);
+    const commonFruit = _rankFoodsByCategory(['fruta'], profile).slice(0, 7);
+
+    // Fallbacks
+    const get = (list, idx) => list[idx % list.length] || list[0];
+    const fProt = [{ name: 'Frango peito sem pele cozido' }];
+    const fCarb = [{ name: 'Arroz, tipo 1 cozido' }];
+    const fLeg = [{ name: 'Feijão carioca cozido' }];
+    const fSProt = [{ name: 'Ovo inteiro cozido' }];
+    const fSCarb = [{ name: 'Aveia flocos crua' }];
+    const fVeg = [{ name: 'Alface americana' }];
+    const fFru = [{ name: 'Banana nanica' }];
 
 
     for(let w=0; w<totalWeeks; w++){
@@ -1173,43 +1203,42 @@ const SuperDietEngine = (function(){
           const carbsForMeal = Math.round((profileTargets.carbs_g / totalW) * weight);
           const fatForMeal = Math.round((profileTargets.fat_g / totalW) * weight);
           
-          // REQ #2 (Continuação) e REQ #5 (Evita repetição)
-          const mealType = /almoço|jantar/i.test(mealName) ? 'main' : 'snack';
-          
-          // Filtra candidatos para lanches (mais leves) e pega o Top 5
-          const proteinCandidates = allCandidateProteins.filter(p => {
-              if(mealType === 'snack') return /ovo|laticinio|queijo|iogurte|fruta|whey|suplemento|atum/.test(normalizeName(p.name));
-              return true; // Todas proteínas para refeições principais
-          }).slice(0, 5); // Pega os 5 melhores
+          // REQ 1 (Coesão): Selecionar alimentos com base no nome da refeição
+          let protPick, carbPick, vegPick;
+          const mealType = mealName.toLowerCase();
+          const pickIdx = (dIdx * 3 + m) % 7; // Rotação diária + intra-dia
 
-          const carbCandidates = allCandidateCarbs.filter(c => {
-               if(mealType === 'snack') return /aveia|fruta|pao|cereal|tapioca/.test(normalizeName(c.name));
-               return true; // Todos carbos para refeições principais
-          }).slice(0, 5); // Pega os 5 melhores
-          
-          const vegCandidates = allCandidateVeg.slice(0, 5); // Top 5 vegetais/frutas
+          let componentsToCalc = {};
+          let extraComponents = []; // Para saladas, etc.
 
-          // Rotaciona dentro da lista do Top 5 com base no dia da semana
-          const dayOfWeek = dIdx % 7;
-          const protPick = proteinCandidates[dayOfWeek % proteinCandidates.length] || allCandidateProteins[0] || { name:'Feijão carioca cozido' };
-          const carbPick = carbCandidates[dayOfWeek % carbCandidates.length] || allCandidateCarbs[0] || { name:'Arroz, tipo 1 cozido' };
-          const vegPick = vegCandidates[dayOfWeek % vegCandidates.length] || allCandidateVeg[0] || { name:'Alface americana' };
-          
-          const components = { protein: protPick.name, carb: carbPick.name, veg: vegPick.name };
-          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, components);
-          // form group (carb+legume common)
-          const group = [];
-          const nProt = normalizeName(protPick.name);
-          const nCarb = normalizeName(carbPick.name);
-          if(nProt.includes('feijao') && nCarb.includes('arroz')){
-            group.push({ food: carbPick.name, grams: grams.carb_grams, role:'carbo' });
-            group.push({ food: protPick.name, grams: grams.protein_grams, role:'proteina' });
+          if (mealType.includes('almoço') || mealType.includes('jantar')) {
+              // Refeição Principal (Almoço/Jantar)
+              protPick = get(mainProteins, pickIdx) || fProt[0];
+              carbPick = get(mainCarbs, pickIdx) || fCarb[0];
+              vegPick = get(mainLegumes, pickIdx) || fLeg[0]; // 'veg' principal é a leguminosa
+              componentsToCalc = { protein: protPick.name, carb: carbPick.name, veg: vegPick.name };
+              
+              const extraVeg = get(commonVeg, pickIdx) || fVeg[0];
+              if(extraVeg.name !== vegPick.name) extraComponents.push({ food: extraVeg.name, grams: 75, role: 'veg' }); // 75g de salada
+
           } else {
-            group.push({ food: protPick.name, grams: grams.protein_grams, role:'proteina' });
-            group.push({ food: carbPick.name, grams: grams.carb_grams, role:'carbo' });
+              // Refeição Leve (Café/Lanche)
+              protPick = get(snackProteins, pickIdx) || fSProt[0];
+              carbPick = get(snackCarbs, pickIdx) || fSCarb[0];
+              vegPick = get(commonFruit, pickIdx) || fFru[0]; // 'veg' principal é a fruta
+              componentsToCalc = { protein: protPick.name, carb: carbPick.name, veg: vegPick.name };
           }
-          group.push({ food: vegPick.name, grams: grams.veg_grams, role:'veg' });
           
+          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, componentsToCalc);
+          
+          const group = [];
+          group.push({ food: componentsToCalc.protein, grams: grams.protein_grams, role:'proteina' });
+          group.push({ food: componentsToCalc.carb, grams: grams.carb_grams, role:'carbo' });
+          group.push({ food: componentsToCalc.veg, grams: grams.veg_grams, role:'veg' });
+          
+          // Adicionar extras (ex: salada no almoço)
+          extraComponents.forEach(comp => group.push(comp));
+
           // compute group kcal
           let groupKcal = 0;
           const groupDetailed = group.map(gItem => {
@@ -1218,8 +1247,8 @@ const SuperDietEngine = (function(){
             if(kcal) groupKcal += kcal;
             return { ...gItem, kcal };
           });
-
-          // REQ #1: Filtra componentes com 0g (ou menos de 10g)
+          
+          // Filtra componentes com 0g (ou menos de 10g)
           const finalComponents = groupDetailed.filter(comp => comp.grams >= 10);
           
           // Recalcula o Kcal total apenas com os componentes válidos
@@ -1282,14 +1311,14 @@ const SuperDietEngine = (function(){
     const credibilityScore = computeCredibility(meta);
 
     const payload = {
-      version: 'super-algo-v1',
+      version: 'super-algo-v2-hb', // Versão atualizada
       created_at: nowISO(),
       profile_snapshot: profile,
       targets: profileTargets,
       timeline_weeks,
       estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: profileTargets.tdee, bmr: profileTargets.bmr },
       credibility: { score: credibilityScore, breakdown: meta },
-      provenance: { food_db_version: 'seed-1', built_with: 'super-diet-engine' }
+      provenance: { food_db_version: 'seed-2-meals', built_with: 'super-diet-engine' }
     };
     if(options.debug) payload._internal = { lookup_snapshot: _lookup, weeklyDeficitNeeded, rawOptions: options };
     return payload;
@@ -1344,7 +1373,13 @@ function renderPlanToContainer(container, planPayload, options = {}){
   const header = document.createElement('div');
   header.style.display = 'flex'; header.style.justifyContent = 'space-between'; header.style.alignItems = 'center'; header.style.gap = '12px';
   const title = document.createElement('h4'); title.textContent = 'Plano de Dieta — visão geral';
-  const meta = document.createElement('div'); meta.style.color = '#bbb'; meta.textContent = `Credibilidade: ${planPayload.credibility.score} | Cals/dia alvo: ${planPayload.estimates.dailyTargetCalories || planPayload.targets?.targetCalories || ''}`;
+  const meta = document.createElement('div'); meta.style.color = '#bbb'; 
+  
+  // Exibe TDEE e BMR para debug/confiança
+  const targetCals = planPayload.estimates.dailyTargetCalories || planPayload.targets?.targetCalories || '...';
+  const tdee = planPayload.estimates.tdee || '...';
+  meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <span style="font-size: 11px; color: #888;">(TDEE: ${tdee} kcal)</span>`;
+  
   header.appendChild(title); header.appendChild(meta);
   container.appendChild(header);
 
@@ -1470,7 +1505,11 @@ function clearDietaCardContent(){
 function renderGeneratedPlanEditor(container, planPayload, existingId=null){
   container.innerHTML = '';
   const title = document.createElement('h4'); title.textContent = 'Formulário: Dieta — Plano gerado';
-  const meta = document.createElement('p'); meta.style.color='#bbb'; meta.textContent = `Meta: ${planPayload.profile_snapshot.grande_meta || planPayload.profile_snapshot.goal_prompt || ''} | Calorias alvo: ${planPayload.targets.targetCalories || ''} kcal`;
+  const meta = document.createElement('p'); meta.style.color='#bbb'; 
+  const targetCals = planPayload.targets.targetCalories || '...';
+  const tdee = planPayload.estimates.tdee || '...';
+  meta.innerHTML = `Meta: ${planPayload.profile_snapshot.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size: 11px; color: #888;">(TDEE: ${tdee} kcal)</span>`;
+
   container.appendChild(title); container.appendChild(meta);
 
   const planView = document.createElement('div');
@@ -1561,14 +1600,14 @@ async function renderPercursoDietArea(){
   const latest = await fetchLatestUserDiet();
   if(latest && latest.payload){
     // if payload is our plan structure (super-algo), render full editor that allows save/update
-    if(latest.payload.version === 'super-algo-v1' || latest.payload.targets){
+    if(latest.payload.version && (latest.payload.version.startsWith('super-algo-v') || latest.payload.targets)){
       renderGeneratedPlanEditor(targetContainer, latest.payload, latest.id);
       enableAllNavLinks();
     } else if(latest.payload.form){
       // backward compatibility: older shape (form property)
       // convert to new payload shape minimally
       const converted = {
-        version: 'super-algo-v1',
+        version: 'super-algo-v1-compat',
         created_at: new Date().toISOString(),
         profile_snapshot: latest.payload.meta_inicial || {},
         targets: deriveTargets(latest.payload.meta_inicial || {}),
@@ -1586,7 +1625,8 @@ async function renderPercursoDietArea(){
   } else {
     const p = document.createElement('p'); p.style.color='#bbb'; p.textContent = 'Ainda não há formulário de dieta salvo. Gere a sua meta no painel principal para criar o seu plano.';
     targetContainer.appendChild(p);
-    disableNonPercursoNavLinks();
+    // Não desabilitar mais a navegação
+    // disableNonPercursoNavLinks();
   }
 }
 
@@ -1656,11 +1696,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const iaFitForm = document.getElementById('ia-fit-form');
   if(iaFitForm) iaFitForm.addEventListener('submit', async function(event){
     event.preventDefault();
+    const submitButton = iaFitForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'A gerar o seu plano...';
+
     try{
       const formElements = event.target.elements;
       const prazoText = formElements.prazo.value;
       const endDate = calculateEndDate(prazoText);
-      if(!endDate){ alert('Prazo inválido. Use algo como "3 meses" ou "até o verão".'); return; }
+      if(!endDate){ alert('Prazo inválido. Use algo como "3 meses" ou "até o verão".'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
       const startDate = new Date(); startDate.setHours(0,0,0,0);
       const objetivoText = formElements.objetivo.value;
       const goalType = (function(text){ const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; const musculoKeywords = ['ganhar musculo','hipertrofia','crescer','massa muscular','ficar forte','músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword=>lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword=>lowerText.includes(keyword)); if(hasEmagrecer && !hasMusculo) return 'emagrecer'; if(hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; })(objetivoText);
@@ -1671,7 +1715,7 @@ document.addEventListener('DOMContentLoaded', () => {
         goal_prompt: objetivoText,
         goal_type: goalType
       }).eq('id', (await getCurrentUser()).id);
-      if(updateError){ console.error("Erro ao salvar a meta:", updateError); alert('Erro ao salvar sua meta. Tente novamente.'); return; }
+      if(updateError){ console.error("Erro ao salvar a meta:", updateError); alert('Erro ao salvar sua meta. Tente novamente.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
       // REQ #7: O formulário desaparece após submit (chama displayProgress)
       displayProgress(startDate, endDate);
@@ -1699,11 +1743,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // months: try to infer from prazo (e.g., '3 meses')
       const match = (inputs.prazo||'').match(/(\d+)\s*mes/);
       const months = match ? Math.max(1, parseInt(match[1],10)) : 3;
+      
+      // Geração do plano (pode demorar um pouco)
       const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false });
 
       // save plan using engine
       const currentUser = await getCurrentUser();
-      if(!currentUser) { alert('Usuário não autenticado.'); return; }
+      if(!currentUser) { alert('Usuário não autenticado.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
       await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
 
       // switch to percurso and render plan
@@ -1712,10 +1758,14 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Libera a navegação
       enableAllNavLinks();
+      submitButton.disabled = false;
+      submitButton.textContent = 'Crie seu próprio caminho';
 
     } catch(err){
       console.error('Erro no fluxo de criação da meta:', err);
       alert('Erro interno: ' + (err.message || JSON.stringify(err)));
+      submitButton.disabled = false;
+      submitButton.textContent = 'Crie seu próprio caminho';
     }
   });
 
