@@ -78,7 +78,6 @@
     .goal-section { background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border: 1px solid #444; padding: 30px; margin-bottom: 40px; border-radius: 10px; text-align: center; }
     .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
-    .iframe-container { border-radius: 12px; overflow: hidden; height: auto; position: relative; }
     .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
     .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
     .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
@@ -110,11 +109,87 @@
     .meal-name { font-weight:700; color:#fff; }
     .meal-kcal { font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; }
 
+    /* --- AJUSTE CHATBOT DIFY (REQ #8) --- */
+    .iframe-container { 
+        border-radius: 12px; 
+        overflow: hidden; 
+        position: relative; /* Garante que os filhos absolutos fiquem contidos */
+        height: 70vh; /* Altura principal do chat */
+        min-height: 500px;
+        max-height: 700px;
+        background: #000; /* Fundo preto para o iframe */
+    }
+    .dify-frame {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+    }
+    .dify-frame iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+    /* Máscara superior para cobrir o "Powered by Dify" */
+    .dify-top-strip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 50px; /* Altura da marca d'água superior */
+        background-color: #000000; /* Cor de fundo do chat */
+        z-index: 2;
+        pointer-events: none; /* Permite cliques através */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+    .dify-top-badge {
+        font-weight: 700;
+        font-size: 1.1em;
+        color: #fff;
+        background: linear-gradient(90deg, #007BFF, #0056b3);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .mvp-label {
+         font-size: 10px;
+         font-weight: 700;
+         color: #555;
+         text-transform: uppercase;
+         letter-spacing: 0.5px;
+    }
+    /* Máscara inferior para cobrir a marca d'água no input */
+    .dify-bottom-mask {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 42px; /* Altura da marca d'água inferior */
+        background-color: #000000; /* Cor de fundo do chat */
+        z-index: 2;
+        pointer-events: none; /* Permite cliques através */
+    }
+    /* --- FIM AJUSTE CHATBOT DIFY --- */
+
+
     @media(max-width:900px){
       .percurso-forms { grid-template-columns:1fr; }
       .plan-days { grid-template-columns:1fr; }
       body { padding: 20px 12px; }
     }
+    
+    /* --- AJUSTE CHATBOT DIFY (MOBILE) --- */
+    @media (max-width: 768px) {
+        .dify-bottom-mask {
+            height: 38px; /* Ajuste fino para mobile */
+        }
+        .dify-top-strip {
+            height: 45px;
+        }
+    }
+    /* --- FIM AJUSTE CHATBOT DIFY (MOBILE) --- */
   </style>
 </head>
 <body>
@@ -193,7 +268,6 @@
 
       <div class="percurso-card generated-diet-card" id="dieta-card">
         <h4>Formulário: Dieta</h4>
-        <!-- conteúdo dinâmico será substituído pelo algoritmo -->
         <div id="dieta-card-content">
           <p style="color: #bbb;">Seu formulário de dieta será exibido aqui após você criar sua meta.</p>
         </div>
@@ -206,8 +280,8 @@
 
 <script type="module">
 /* ============================================
-   Supabase client (import)
-   ============================================ */
+    Supabase client (import)
+    ============================================ */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
@@ -216,8 +290,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
 /* ============================================
-   alimentosDB (sua lista completa, parte 1)
-   ============================================ */
+    alimentosDB (sua lista completa, parte 1)
+    ============================================ */
 const alimentosDB = [
 "Abóbora, cabotián cozida",
 "Abóbora, moranga refogada",
@@ -575,7 +649,7 @@ const alimentosDB = [
 "Pupunha cozida",
 "Noz crua (incluí)",
 "Presunto, com capa de gordura (processado)",
-"Presunto, sem capa de gordura (processado)",
+"Presunto, sem capa de gordordura (processado)",
 "Quibe assado",
 "Quibe frito",
 "Salame (processado)",
@@ -677,10 +751,10 @@ const alimentosDB = [
 ];
 
 /* ============================================
-   SuperDietEngine (módulo embutido)
-   - implementação adaptada do seu "SUPER ALGORITMO FINAL"
-   - contem: masterDB seed; funções: init/loadExternal*, generatePlan, savePlan, loadLatestPlan, findFood
-   ============================================ */
+    SuperDietEngine (módulo embutido)
+    - implementação adaptada do seu "SUPER ALGORITMO FINAL"
+    - contem: masterDB seed; funções: init/loadExternal*, generatePlan, savePlan, loadLatestPlan, findFood
+    ============================================ */
 const SuperDietEngine = (function(){
 
   // utilitários
@@ -786,7 +860,10 @@ const SuperDietEngine = (function(){
     const goalText = (profile.grande_meta || profile.goal || profile.goal_prompt || '').toString().toLowerCase();
     let targetCalories = tdee;
     if(/emagrec|perder|secar|definição|definir/.test(goalText)) targetCalories = Math.round(tdee * 0.80);
-    if(/ganhar|massa|hipertrof|crescer|forte/.test(goalText)) targetCalories = Math.round(tdee * 1.12);
+    
+    // REQ #3: Melhora superávit para ganho de massa (Superávit modesto de +350kcal)
+    if(/ganhar|massa|hipertrof|crescer|forte/.test(goalText)) targetCalories = tdee + 350; 
+
     const peso = _safeNum(profile.peso, 70);
     let protPerKg = 1.4;
     if(/ganhar|massa|hipertrof/.test(goalText)) protPerKg = 1.6;
@@ -879,10 +956,10 @@ const SuperDietEngine = (function(){
     const vegNut = findFood(vegFood) ? findFood(vegFood).nutrition : null;
     const out = { protein_grams:0, carb_grams:0, veg_grams:0, details:{} };
     if(protNut && _safeNum(protNut.protein_g,0) > 0){
-      out.protein_grams = Math.max(0, Math.round( mealMacroTargets.prot_g / (protNut.protein_g / 100) ));
+      out.protein_grams = Math.max(10, Math.round( mealMacroTargets.prot_g / (protNut.protein_g / 100) ));
     } else out.protein_grams = 120;
     if(carbNut && _safeNum(carbNut.carb_g,0) > 0){
-      out.carb_grams = Math.max(0, Math.round( mealMacroTargets.carbs_g / (carbNut.carb_g / 100) ));
+      out.carb_grams = Math.max(10, Math.round( mealMacroTargets.carbs_g / (carbNut.carb_g / 100) ));
     } else out.carb_grams = 150;
     out.veg_grams = 100;
     function kcalFrom(foodName, grams){
@@ -900,7 +977,9 @@ const SuperDietEngine = (function(){
       const targetCarbKcal = Math.max(0, desired - withoutCarb);
       if(carbNut && _safeNum(carbNut.kcal,0) > 0){
         const newCarbGrams = Math.round((targetCarbKcal / carbNut.kcal) * 100);
-        out.carb_grams = Math.max(0, newCarbGrams);
+        
+        // REQ #1: Evita "Arroz (0g)"
+        out.carb_grams = Math.max(10, newCarbGrams); // Mínimo de 10g se for calculado
       }
       totalKcal = kcalFrom(protFood, out.protein_grams) + kcalFrom(carbFood, out.carb_grams) + kcalFrom(vegFood, out.veg_grams);
     }
@@ -1000,10 +1079,10 @@ const SuperDietEngine = (function(){
   function computeCredibility(c){
     const wCalories = 0.30, wBudget = 0.25, wPractical = 0.20, wVariety = 0.15, wFeas = 0.10;
     const score = ( (c.adherenceToCaloriesPct||0) * wCalories +
-                    (c.adherenceToBudgetPct||0) * wBudget +
-                    (c.practicalityPct||0) * wPractical +
-                    (c.varietyScore||0) * wVariety +
-                    (c.feasibilityPct||0) * wFeas ) * 100;
+                      (c.adherenceToBudgetPct||0) * wBudget +
+                      (c.practicalityPct||0) * wPractical +
+                      (c.varietyScore||0) * wVariety +
+                      (c.feasibilityPct||0) * wFeas ) * 100;
     return _round(score,1);
   }
 
@@ -1058,6 +1137,12 @@ const SuperDietEngine = (function(){
       alternatesByCategory.verdura = (byCat.verdura || []).slice(0,10);
       alternatesByCategory.fruta = (byCat.fruta || []).slice(0,10);
     }
+    
+    // create candidate lists with rank (done once)
+    const allCandidateProteins = _rankFoodsByCategory(['proteina_animal','leguminosa','peixe','laticinio'], profile);
+    const allCandidateCarbs = _rankFoodsByCategory(['cereal','tuberculo','pasta'], profile);
+    const allCandidateVeg = _rankFoodsByCategory(['verdura','fruta'], profile);
+
 
     for(let w=0; w<totalWeeks; w++){
       let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy);
@@ -1069,13 +1154,17 @@ const SuperDietEngine = (function(){
         const isCheat = daySpec.isCheatDay || false;
         const mealsCount = Math.min(6, Math.max(3, 3 + Math.floor(diasTreino / 2)));
         const mealNames = ["Café da manhã","Lanche manhã","Almoço","Lanche tarde","Jantar","Ceia"].slice(0, mealsCount);
-        const mealWeights = mealNames.map(m => /almoço|almoco|jantar/i.test(m) ? 1.6 : (/café/i.test(m) ? 1.0 : 0.8));
+        
+        // REQ #2: Refeições pesadas em cafés/lanches (pesos ajustados)
+        const mealWeights = mealNames.map(m => {
+            if(/almoço|almoco|jantar/i.test(m)) return 1.8; // Refeições principais
+            if(/café/i.test(m)) return 1.2; // Café da manhã
+            return 0.6; // Lanches e Ceia
+        });
+        
         const totalW = mealWeights.reduce((a,b)=>a+b,0);
         const dayMeals = [];
-        // create candidate lists with rank
-        const candidateProteins = _rankFoodsByCategory(['proteina_animal','leguminosa','peixe','laticinio'], profile);
-        const candidateCarbs = _rankFoodsByCategory(['cereal','tuberculo','pasta'], profile);
-        const candidateVeg = _rankFoodsByCategory(['verdura','fruta'], profile);
+
         for(let m=0; m<mealsCount; m++){
           const mealName = mealNames[m];
           const weight = mealWeights[m];
@@ -1083,13 +1172,29 @@ const SuperDietEngine = (function(){
           const protForMeal = Math.round((profileTargets.protein_g / totalW) * weight);
           const carbsForMeal = Math.round((profileTargets.carbs_g / totalW) * weight);
           const fatForMeal = Math.round((profileTargets.fat_g / totalW) * weight);
-          // pick top candidates but rotate by day to avoid identical picks
-          const pickIndex = (w*7 + dIdx + m) % Math.max(1, candidateProteins.length);
-          const protPick = candidateProteins[pickIndex] || candidateProteins[0] || { name:'Feijão carioca cozido' };
-          const pickIndexC = (w*3 + dIdx + m*2) % Math.max(1, candidateCarbs.length);
-          const carbPick = candidateCarbs[pickIndexC] || { name:'Arroz, tipo 1 cozido' };
-          const pickIndexV = (w*5 + dIdx + m*3) % Math.max(1, candidateVeg.length);
-          const vegPick = candidateVeg[pickIndexV] || { name:'Alface americana' };
+          
+          // REQ #2 (Continuação) e REQ #5 (Evita repetição)
+          const mealType = /almoço|jantar/i.test(mealName) ? 'main' : 'snack';
+          
+          // Filtra candidatos para lanches (mais leves) e pega o Top 5
+          const proteinCandidates = allCandidateProteins.filter(p => {
+              if(mealType === 'snack') return /ovo|laticinio|queijo|iogurte|fruta|whey|suplemento|atum/.test(normalizeName(p.name));
+              return true; // Todas proteínas para refeições principais
+          }).slice(0, 5); // Pega os 5 melhores
+
+          const carbCandidates = allCandidateCarbs.filter(c => {
+               if(mealType === 'snack') return /aveia|fruta|pao|cereal|tapioca/.test(normalizeName(c.name));
+               return true; // Todos carbos para refeições principais
+          }).slice(0, 5); // Pega os 5 melhores
+          
+          const vegCandidates = allCandidateVeg.slice(0, 5); // Top 5 vegetais/frutas
+
+          // Rotaciona dentro da lista do Top 5 com base no dia da semana
+          const dayOfWeek = dIdx % 7;
+          const protPick = proteinCandidates[dayOfWeek % proteinCandidates.length] || allCandidateProteins[0] || { name:'Feijão carioca cozido' };
+          const carbPick = carbCandidates[dayOfWeek % carbCandidates.length] || allCandidateCarbs[0] || { name:'Arroz, tipo 1 cozido' };
+          const vegPick = vegCandidates[dayOfWeek % vegCandidates.length] || allCandidateVeg[0] || { name:'Alface americana' };
+          
           const components = { protein: protPick.name, carb: carbPick.name, veg: vegPick.name };
           const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, components);
           // form group (carb+legume common)
@@ -1104,6 +1209,7 @@ const SuperDietEngine = (function(){
             group.push({ food: carbPick.name, grams: grams.carb_grams, role:'carbo' });
           }
           group.push({ food: vegPick.name, grams: grams.veg_grams, role:'veg' });
+          
           // compute group kcal
           let groupKcal = 0;
           const groupDetailed = group.map(gItem => {
@@ -1112,11 +1218,18 @@ const SuperDietEngine = (function(){
             if(kcal) groupKcal += kcal;
             return { ...gItem, kcal };
           });
+
+          // REQ #1: Filtra componentes com 0g (ou menos de 10g)
+          const finalComponents = groupDetailed.filter(comp => comp.grams >= 10);
+          
+          // Recalcula o Kcal total apenas com os componentes válidos
+          groupKcal = finalComponents.reduce((acc, comp) => acc + (comp.kcal || 0), 0);
+
           dayMeals.push({
             mealIndex: m,
             mealName,
             mealCaloriesTarget: mealCalories,
-            components: groupDetailed,
+            components: finalComponents, // Usa a lista filtrada
             isTrainingDay: isTraining,
             isCheatDay: isCheat,
             gramsComputed: grams.details || {},
@@ -1141,7 +1254,7 @@ const SuperDietEngine = (function(){
       });
     } // weeks
 
-    // apply rotation per month using alternatesByCategory
+    // REQ #4: Aplica rotação mensal (Já estava implementado e é mantido)
     timeline_weeks.forEach((week,wIdx) => {
       const monthIndex = Math.floor(wIdx / 4.345);
       week.days.forEach(day => {
@@ -1186,6 +1299,7 @@ const SuperDietEngine = (function(){
   let _supabase = null;
   function init({ supabase } = {}){ if(!supabase) throw new Error('supabase client required'); _supabase = supabase; }
 
+  // REQ #6: Persistência com Supabase (Funções mantidas para compatibilidade)
   async function savePlan(userId, planPayload, options = {}){
     if(!_supabase) throw new Error('Supabase client not initialized.');
     const title = options.title || `Plano - ${planPayload.targets ? planPayload.targets.targetCalories + ' kCal' : nowISO()}`;
@@ -1211,16 +1325,20 @@ const SuperDietEngine = (function(){
 })(); // end SuperDietEngine
 
 /* ============================================
-   Helper functions reused in UI
-   ============================================ */
+    Helper functions reused in UI
+    ============================================ */
 function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
 function calculateEndDate(prazoText) { if(!prazoText) return null; const now = new Date(); const year = now.getFullYear(); let prazoLower = prazoText.toLowerCase(); if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) { return new Date(year, 11, 31); } let match = prazoLower.match(/(\d+)\s+mes(es)?/); if (match) { let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d; } match = prazoLower.match(/(\d+)\s+dia(s)?/); if (match) { let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d; } if (prazoLower.includes('verao')||prazoLower.includes('verão')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); } if (prazoLower.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); } if (prazoLower.includes('ano novo')) { return new Date(year+1,0,1); } if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); } return null; }
-function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
+function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; 
+    // REQ #7: Garante que o formulário desapareça e os resultados apareçam
+    document.getElementById('form-wrapper').style.display='none'; 
+    document.getElementById('results-wrapper').style.display='block'; 
+}
 
 /* ============================================
-   UI: render plan (percurso)
-   - Render monthly tabs with days and meals
-   ============================================ */
+    UI: render plan (percurso)
+    - Render monthly tabs with days and meals
+    ============================================ */
 function renderPlanToContainer(container, planPayload, options = {}){
   container.innerHTML = '';
   const header = document.createElement('div');
@@ -1286,8 +1404,11 @@ function renderMonth(monthObj, contentArea){
       const mealLeft = document.createElement('div'); mealLeft.className='meal-left';
       const name = document.createElement('div'); name.className='meal-name'; name.textContent = m.mealName;
       const listPreview = document.createElement('div'); listPreview.style.color='#bbb'; listPreview.style.fontSize='13px';
+      
+      // REQ #1: Garante que o preview não mostre "Arroz (0g)" pois já foi filtrado
       const items = m.components.map(c => `${c.food.split(',')[0]} (${c.grams}g)`).join(' • ');
       listPreview.textContent = items;
+      
       mealLeft.appendChild(name); mealLeft.appendChild(listPreview);
       const mealRight = document.createElement('div'); mealRight.style.display='flex'; mealRight.style.flexDirection='column'; mealRight.style.alignItems='flex-end';
       const kcal = document.createElement('div'); kcal.className='meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
@@ -1321,9 +1442,9 @@ function openMealEditModal(meal){
 }
 
 /* ============================================
-   Supabase CRUD helpers (compat com seu fluxo)
-   - usamos as funções internas do super engine para salvar/recuperar
-   ============================================ */
+    Supabase CRUD helpers (compat com seu fluxo)
+    - usamos as funções internas do super engine para salvar/recuperar
+    ============================================ */
 async function getCurrentUser(){
   const { data } = await supabase.auth.getUser();
   return data && data.user ? data.user : null;
@@ -1337,9 +1458,9 @@ async function fetchLatestUserDiet(){
 }
 
 /* ============================================
-   UI: renderFormObjectToContainer (salvar / atualizar)
-   - uses SuperDietEngine.savePlan to persist
-   ============================================ */
+    UI: renderFormObjectToContainer (salvar / atualizar)
+    - uses SuperDietEngine.savePlan to persist
+    ============================================ */
 function clearDietaCardContent(){
   const dietaCard = document.getElementById('dieta-card');
   const content = dietaCard.querySelector('#dieta-card-content');
@@ -1416,8 +1537,8 @@ function renderGeneratedPlanEditor(container, planPayload, existingId=null){
 }
 
 /* ============================================
-   Disable/enable navigation helpers
-   ============================================ */
+    Disable/enable navigation helpers
+    ============================================ */
 function disableNonPercursoNavLinks(){
   document.querySelectorAll('.nav-link').forEach(link => {
     if(link.dataset.tab !== 'percurso') link.classList.add('hidden');
@@ -1428,8 +1549,8 @@ function enableAllNavLinks(){
 }
 
 /* ============================================
-   Render percurso area (loads latest plan, if any)
-   ============================================ */
+    Render percurso area (loads latest plan, if any)
+    ============================================ */
 async function renderPercursoDietArea(){
   const dietaCard = document.getElementById('dieta-card');
   clearDietaCardContent();
@@ -1470,8 +1591,8 @@ async function renderPercursoDietArea(){
 }
 
 /* ============================================
-   Dify chat loader (same pattern)
-   ============================================ */
+    Dify chat loader (same pattern)
+    ============================================ */
 function loadFreshDifyChat(){
   const difyContainer = document.getElementById('dify-container');
   if(!difyContainer) return;
@@ -1491,8 +1612,8 @@ function loadFreshDifyChat(){
 }
 
 /* ============================================
-   Initialization & event handlers
-   ============================================ */
+    Initialization & event handlers
+    ============================================ */
 document.addEventListener('DOMContentLoaded', () => {
   // UI interactions (menu, nav)
   let user = null;
@@ -1552,6 +1673,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }).eq('id', (await getCurrentUser()).id);
       if(updateError){ console.error("Erro ao salvar a meta:", updateError); alert('Erro ao salvar sua meta. Tente novamente.'); return; }
 
+      // REQ #7: O formulário desaparece após submit (chama displayProgress)
+      displayProgress(startDate, endDate);
+      if(goalType) document.getElementById('playlist-section').style.display = 'block';
+
       // prepare profile object for engine
       const inputs = {
         grande_meta: objetivoText,
@@ -1584,8 +1709,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // switch to percurso and render plan
       switchTab('percurso');
       await renderPercursoDietArea();
-      // after generation, force percurso visible and hide others until saved by user
-      disableNonPercursoNavLinks();
+      
+      // Libera a navegação
+      enableAllNavLinks();
+
     } catch(err){
       console.error('Erro no fluxo de criação da meta:', err);
       alert('Erro interno: ' + (err.message || JSON.stringify(err)));
