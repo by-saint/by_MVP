@@ -949,7 +949,8 @@ const SuperDietEngine = (function(){
   function activityFactor(profile){
     // REQ 2 (Calorias): Fatores de atividade (AF) aumentados para serem mais realistas para quem treina.
     const nivel = (profile.nivel || '').toString().toLowerCase();
-    const dias = _safeNum(profile.diasPorSemana || profile.disponibilidade || profile.dias_treino_sem || profile.dias_treino, 3);
+    // Usa o número de dias SELECIONADOS para o cálculo do AF
+    const dias = _safeNum(profile.disponibilidade, 3); // 'disponibilidade' é atualizado com o count dos dias selecionados
     
     if(nivel.includes('inic') || dias <= 2) return 1.3; // Sedentário + treino leve (era 1.2)
     if(nivel.includes('inter') || dias <= 4) return 1.55; // Treino 3-4 dias (era 1.375)
@@ -1138,17 +1139,29 @@ const SuperDietEngine = (function(){
                     week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08);
                 }
                 idx = (idx + step);
-                if (idx > 6) idx = (idx % 7) + 1; // wrap around, mas evita Domingo
-                if (idx === 0) idx = 1;
+                if (idx > 6) idx = (idx % 7); // wrap around simples
             }
         }
     }
 
     if(cheatPolicy && cheatPolicy.freqPerWeek > 0){
-      let idx = 6;
-      for(let i=6;i>=0;i--){ if(!week[i].isTrainingDay){ idx = i; break; } }
-      week[idx].isCheatDay = true;
-      week[idx].cheatLimit = cheatPolicy.cheatCaloriesLimit || Math.round(dailyTargetCalories * 1.5);
+      let idx = 6; // Tenta Sábado por padrão
+      if (!week[idx].isTrainingDay) { // Se Sábado não for treino, usa Sábado
+         week[idx].isCheatDay = true;
+      } else { // Se Sábado for treino, tenta Domingo
+          idx = 0; // Domingo
+          if (!week[idx].isTrainingDay) {
+              week[idx].isCheatDay = true;
+          } else { // Se ambos forem treino, acha o primeiro dia de descanso
+              idx = week.findIndex(d => !d.isTrainingDay);
+              if (idx !== -1) week[idx].isCheatDay = true;
+              else week[6].isCheatDay = true; // Se todos os dias são treino, usa Sábado mesmo
+          }
+      }
+       
+      if (week[idx].isCheatDay) {
+          week[idx].cheatLimit = cheatPolicy.cheatCaloriesLimit || Math.round(dailyTargetCalories * 1.5);
+      }
     }
     return week;
   }
@@ -1165,6 +1178,7 @@ const SuperDietEngine = (function(){
     const excess = newTotal - baseTotal;
     if(excess <= 0) return weekArr;
     const nonCheat = weekArr.filter(d=>!d.isCheatDay);
+     if (nonCheat.length === 0) return weekArr; // Evita divisão por zero se todos os dias forem cheat
     const perDayReduction = Math.ceil(excess / nonCheat.length);
     for(const d of nonCheat){
       const minAllowed = Math.round(d.baseCalories * 0.6);
@@ -1412,8 +1426,8 @@ const SuperDietEngine = (function(){
           });
         } // meals
         days.push({
-          dayIndex: dIdx+1, // 1-based index for display
-          dayOfWeek: (new Date(0, 0, dIdx)).toLocaleString('pt-BR', { weekday: 'long' }), // Debug: 'domingo', 'segunda', etc.
+          dayIndex: dIdx+1, // 1-based index for display (Usado no renderMonth antigo)
+          // dayOfWeek: (new Date(0, 0, dIdx)).toLocaleString('pt-BR', { weekday: 'long' }), // Debug: 'domingo', 'segunda', etc.
           baseCalories: daySpec.baseCalories,
           isTrainingDay: isTraining,
           isCheatDay: isCheat,
@@ -1580,15 +1594,15 @@ function renderMonth(monthObj, contentArea){
   const dayNameMap = { 0: 'Dom', 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sab' };
   
   days.forEach((d, dIdx_in_month) => {
-    // O 'dayIndex' vindo do algoritmo é 1-7 (Dia 1 a Dia 7 da semana)
-    // Precisamos do dia da semana real (0-6)
-    const dayOfWeekIndex = (new Date(d.weekStartISO + 'T12:00:00Z').getUTCDay() + (d.dayIndex - 1)) % 7;
+    // Calcula o dia da semana real (0-6) baseado na data de início da semana e no índice do dia (1-7)
+    const weekStartDate = new Date(d.weekStartISO + 'T12:00:00Z'); // Use UTC para evitar problemas de fuso
+    const dayOfWeekIndex = (weekStartDate.getUTCDay() + (d.dayIndex - 1)) % 7;
     const dayName = dayNameMap[dayOfWeekIndex] || 'Dia';
 
     const dayCard = document.createElement('div'); dayCard.className = 'plan-day';
     const dayTitle = document.createElement('div'); dayTitle.style.display='flex'; dayTitle.style.justifyContent='space-between'; dayTitle.style.alignItems='center';
     
-    // Mostra o nome do dia (Seg, Ter, etc.)
+    // Mostra o nome do dia (Seg, Ter, etc.) e se é treino ou descanso
     const left = document.createElement('div'); left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#aaa'};font-size:13px;font-weight:700;">${d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso'}</div>`;
     // ============================================
     // FIM: ALTERAÇÃO UI (renderMonth)
@@ -1871,7 +1885,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!endDate){ alert('Prazo inválido. Use algo como "3 meses" ou "até o verão".'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
       const startDate = new Date(); startDate.setHours(0,0,0,0);
       const objetivoText = formElements.objetivo.value;
-      const goalType = (function(text){ const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; const musculoKeywords = ['ganhar musculo','hipertrofia','crescer','massa muscular','ficar forte','músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword=>lowerText.includes(keyword)); const hasMusculo = musKewywords.some(keyword=>lowerText.includes(keyword)); if(hasEmagrecer && !hasMusculo) return 'emagrecer'; if(hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; })(objetivoText);
+      
+      // ============================================
+      // INÍCIO: CORREÇÃO DO ERRO (goalType)
+      // ============================================
+      const goalType = (function(text){ 
+          const lowerText = (text||'').toLowerCase(); 
+          const emagrecerKeywords = ['emagrecer','perder peso','secar','definir','perder gordura','definição','emagrecimento']; 
+          const musculoKeywords = ['ganhar musculo','hipertrofia','crescer','massa muscular','ficar forte','músculo']; 
+          const hasEmagrecer = emagrecerKeywords.some(keyword=>lowerText.includes(keyword)); 
+          // CORRIGIDO: musKewywords -> musculoKeywords
+          const hasMusculo = musculoKeywords.some(keyword=>lowerText.includes(keyword)); 
+          if(hasEmagrecer && !hasMusculo) return 'emagrecer'; 
+          if(hasMusculo && !hasEmagrecer) return 'musculo'; 
+          return 'ambos'; 
+      })(objetivoText);
+      // ============================================
+      // FIM: CORREÇÃO DO ERRO (goalType)
+      // ============================================
 
       // ============================================
       // INÍCIO: ALTERAÇÃO JS (Leitura do Formulário)
