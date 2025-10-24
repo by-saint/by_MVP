@@ -852,35 +852,47 @@ const SuperDietEngine = (function(){
     // TMB (Fem) = 447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade)
     return Math.round(447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade));
   }
+  
   function activityFactor(profile){
+    // REQ 2 (Calorias): Fatores de atividade (AF) aumentados para serem mais realistas para quem treina.
     const nivel = (profile.nivel || '').toString().toLowerCase();
     const dias = _safeNum(profile.diasPorSemana || profile.disponibilidade || profile.dias_treino_sem || profile.dias_treino, 3);
-    if(nivel.includes('inic') || dias <= 1) return 1.2;
-    if(nivel.includes('inter') || dias <= 3) return 1.375;
-    if(nivel.includes('avanc') || dias >=5) return 1.55;
-    return 1.375;
+    
+    if(nivel.includes('inic') || dias <= 2) return 1.3; // Sedentário + treino leve (era 1.2)
+    if(nivel.includes('inter') || dias <= 4) return 1.55; // Treino 3-4 dias (era 1.375)
+    if(nivel.includes('avanc') || dias >= 5) return 1.75; // Treino 5+ dias (era 1.55)
+    
+    return 1.55; // Default para intermediário
   }
+  
   function deriveTargets(profile){
     const bmr = calcBMR(profile);
     const af = activityFactor(profile);
     const tdee = Math.round(bmr * af);
     const goalText = (profile.grande_meta || profile.goal || profile.goal_prompt || '').toString().toLowerCase();
-    
+    const idade = _safeNum(profile.idade, 30);
+    const peso = _safeNum(profile.peso, 70);
+
     let targetCalories = tdee;
     
-    // REQ 2 (Calorias): Lógica de déficit/superávit mais precisa e agressiva
+    // REQ 2 (Calorias): Lógica de déficit/superávit inteligente baseada em idade e peso.
     if(/emagrec|perder|secar|definição|definir/.test(goalText)) {
-        // Déficit de 20%, mas limitado a 750kcal no máximo
-        const deficit = Math.min(tdee * 0.20, 750);
+        // Déficit inteligente
+        let deficitPercent = 0.20; // 20% Padrão
+        if (peso > 100) deficitPercent = 0.25; // Mais agressivo se peso > 100kg
+        
+        const deficit = Math.min(tdee * deficitPercent, 1000); // Limite máximo de 1000 kcal
         targetCalories = Math.round(tdee - deficit);
     }
     if(/ganhar|massa|hipertrof|crescer|forte/.test(goalText)) {
-        // Superávit de 15%, mas limitado a 500kcal no máximo (Ex: 2900 TDEE -> 3335 kcal)
-        const surplus = Math.min(tdee * 0.15, 500);
+        // Superávit inteligente
+        let surplusPercent = 0.15; // 15% Padrão
+        if (idade < 20) surplusPercent = 0.20; // Mais agressivo se idade < 20 (metabolismo alto)
+
+        const surplus = Math.min(tdee * surplusPercent, 750); // Limite máximo de 750 kcal
         targetCalories = Math.round(tdee + surplus);
     }
 
-    const peso = _safeNum(profile.peso, 70);
     let protPerKg = 1.4;
     if(/ganhar|massa|hipertrof/.test(goalText)) protPerKg = 1.6;
     if(/emagrec|perder/.test(goalText)) protPerKg = 1.6;
@@ -955,16 +967,6 @@ const SuperDietEngine = (function(){
   }
 
   // grams calculators
-  function gramsFromMacroTarget(foodName, target_g, macro='protein'){
-    const rec = findFood(foodName);
-    if(!rec || !rec.nutrition) return null;
-    const nut = rec.nutrition;
-    const per100 = _safeNum(nut[macro + '_g'] || nut[macro] || 0, 0);
-    if(per100 <= 0) return null;
-    const grams = (target_g / (per100 / 100));
-    return Math.round(grams);
-  }
-
   function computeGramAmountsForMeal(foodDBFindFn, mealMacroTargets, components){
     const protFood = components.protein, carbFood = components.carb, vegFood = components.veg;
     const protNut = findFood(protFood) ? findFood(protFood).nutrition : null;
@@ -1311,7 +1313,7 @@ const SuperDietEngine = (function(){
     const credibilityScore = computeCredibility(meta);
 
     const payload = {
-      version: 'super-algo-v2-hb', // Versão atualizada
+      version: 'super-algo-v3-smart-surplus', // Versão atualizada
       created_at: nowISO(),
       profile_snapshot: profile,
       targets: profileTargets,
