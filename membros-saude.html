@@ -15,6 +15,7 @@
       --journey-red-1: #ff2646;
       --journey-red-2: #be123c;
       --journey-dark: #2a0a12;
+      --accent-red-border: rgba(190,18,60,0.95);
     }
 
     html { scroll-behavior: smooth; }
@@ -92,7 +93,6 @@
     }
     .sidebar nav a:hover { background-color: #2c2c2c; }
 
-    /* TÍTULOS COM DEGRADÊ */
     .link-ia, .link-aulas, .link-percurso {
         background-clip: text;
         -webkit-background-clip: text;
@@ -106,7 +106,6 @@
     .sidebar .link-aulas:hover, .sidebar .link-aulas.active { border-left-color: var(--color-video-lessons); }
     .sidebar .link-percurso:hover, .sidebar .link-percurso.active { border-left-color: var(--color-journey); }
 
-    /* ESTILOS ATUALIZADOS PARA O RODAPÉ DO MENU */
     .sidebar-footer {
         padding: 20px 30px;
         text-align: center;
@@ -183,7 +182,7 @@
     .header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; }
     #welcome-msg { color: #bbb; }
 
-    /* Estilos do conteúdo principal (sem alterações) */
+    /* Estilos do conteúdo principal */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .form-wrapper, .results-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
@@ -195,7 +194,7 @@
     .goal-section { background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border: 1px solid #444; padding: 30px; margin-bottom: 40px; border-radius: 10px; text-align: center; }
     .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
-    .iframe-container { border-radius: 12px; overflow: hidden; height: auto; position: relative; } /* position relative to support overlay */
+    .iframe-container { border-radius: 12px; overflow: hidden; height: auto; position: relative; }
     .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
     .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
     .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
@@ -204,182 +203,30 @@
     .countdown-days { font-size: 4rem; font-weight: 700; color: #fff; line-height: 1; }
     .countdown-label { font-size: 1rem; color: #aaa; }
     .text-glow-blue { text-shadow: 0 0 8px rgba(0, 198, 255, 0.6); }
-    .playlist-section { text-align: center; margin: 40px 0; }
-    .playlist-btn { background-color: #007BFF; color: white; border: none; padding: 12px 24px; font-size: 1.1em; cursor: pointer; border-radius: 8px; }
-    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 25px; border-radius: 12px; }
-    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-    .percurso-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
-    .percurso-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border: 1px solid rgba(190,18,60,0.12); padding: 20px; border-radius: 12px; }
-    .percurso-card h4 { margin-top: 0; color: white; }
-    .small-note { font-size: 13px; color: #cfc; opacity: 0.7; margin-top: 6px; }
 
-    /* =============================================
-        MAIOR E MAIS ESCURO: BORDA & FAIXA DO CHAT (VERSÃO ATUALIZADA)
-        ============================================= */
+    /* Percurso layout specifics (new) */
+    .percurso-months { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .month-tab { padding:8px 14px; border-radius:999px; background:rgba(255,255,255,0.03); cursor:pointer; font-weight:700; border:1px solid rgba(255,255,255,0.02); }
+    .month-tab.active { border-color: var(--accent-red-border); box-shadow: 0 6px 18px rgba(190,18,60,0.12); }
+    .month-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    .month-card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18)); border-radius:12px; padding:16px; border: 1px solid rgba(255,255,255,0.02); }
+    .day-card-percurso { background:#0f0f0f; border-radius:10px; padding:12px; border-left: 6px solid var(--accent-red-border); }
+    .day-card-percurso h4 { margin:0 0 8px 0; color:#fff; font-size:16px; }
+    .meal-row { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+    .group-row { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.25)); border:1px solid rgba(190,18,60,0.06); }
+    .group-left { display:flex; gap:10px; align-items:center; }
+    .food-chip { min-width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; background: rgba(255,255,255,0.03); }
+    .group-info { font-size:14px; color:#ddd; }
+    .group-kcal { font-weight:800; color:#fff; font-size:14px; }
+    .input-grams { width:84px; padding:6px; border-radius:8px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.04); color:#fff; text-align:right; }
+    .prep-select { padding:6px; border-radius:8px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.04); color:#fff; }
+    .credibility { margin-top:12px; padding:10px; border-radius:8px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2)); border:1px solid rgba(255,255,255,0.02); color:#fff; display:flex; justify-content:space-between; align-items:center; }
+    .cred-score { font-weight:800; color:var(--accent-red-border); font-size:20px; }
 
-    #dify-container { position: relative; width: 100%; margin: 18px auto 0 auto; padding: 0; }
-
-    .dify-frame {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      background: linear-gradient(180deg, #0b0b0b, #121212);
-      border: 3px solid rgba(0,0,0,0.9);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
-      min-height: 780px;
+    @media (max-width:900px){
+      .month-grid { grid-template-columns: 1fr; }
     }
 
-    .dify-frame iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      min-height: 740px;
-      background: transparent;
-    }
-
-    .dify-top-strip {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
-      height: 64px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.995), rgba(18,18,18,0.98));
-      z-index: 200; /* elevado */
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      border-radius: 12px;
-      box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px) saturate(140%);
-      pointer-events: none;
-      opacity: 0.995;
-      border: 1px solid rgba(255,255,255,0.02);
-    }
-
-    .dify-top-strip .mvp-label {
-      color: #fff;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 15px;
-      letter-spacing: 0.2px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0.85));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.6));
-    }
-
-    .dify-top-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      height: 36px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.02);
-      color: #e6e6e6;
-      font-size: 14px;
-      font-weight: 700;
-      pointer-events: none;
-      z-index: 201;
-    }
-
-    /* por padrão nada visível (desktop) */
-    .dify-bottom-mask { display: none; }
-
-    @media (max-width: 900px) {
-      /* ajustes mobile gerais */
-      body { padding: 20px 12px; }
-      .container { padding: 0 12px; }
-      .menu-toggle { top: 14px; left: 14px; width: 44px; height: 44px; }
-      .menu-toggle .bar { width: 20px; height: 3px; }
-      .sidebar { width: 260px; left: -260px; }
-      .sidebar.open { left: 0; }
-      .sidebar nav { padding-top: 84px; }
-      .sidebar nav a { padding: 12px 20px; font-size: 1em; }
-      .form-container, .results-container, .percurso-container { padding: 18px; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.45); }
-      .goal-section { padding: 18px; margin-bottom: 28px; }
-      .goal-title { font-size: 22px; }
-      label { font-size: 14px; margin-bottom: 6px; }
-      input, select, textarea { padding: 10px; font-size: 15px; border-radius: 8px; }
-      textarea { min-height: 90px; }
-      button[type="submit"] { padding: 12px; font-size: 15px; border-radius: 8px; }
-      .countdown-days { font-size: 2.5rem; }
-      .progress-section { padding: 14px; }
-      .progress-bar { height: 16px; }
-      .video-container { margin-top: 18px; border-radius: 10px; }
-      .percurso-forms { gap: 14px; }
-      .percurso-card { padding: 14px; border-radius: 10px; }
-      
-      /* deixa o chat mais alto no mobile */
-      .dify-frame {
-        height: calc(100vh - 140px);
-        min-height: 420px;
-        max-height: calc(100vh - 120px);
-        border-radius: 12px;
-        border: 2px solid rgba(0,0,0,0.85);
-        box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-      }
-      .dify-frame iframe {
-        height: 100%;
-        min-height: 380px;
-      }
-      .dify-top-strip {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        height: 44px;
-        padding: 0 10px;
-        border-radius: 9px;
-        box-shadow: 0 10px 22px rgba(0,0,0,0.45);
-      }
-      .dify-top-strip .mvp-label { font-size: 12px; }
-      .dify-top-badge { height: 26px; font-size: 12px; padding: 4px 8px; gap: 8px; }
-
-      .header { margin-bottom: 12px; }
-      h1, h2, h3 { margin-top: 18px; margin-bottom: 12px; }
-      .percurso-forms { grid-template-columns: 1fr; }
-      .playlist-btn { padding: 10px 18px; font-size: 14px; }
-      .overlay { background-color: rgba(0,0,0,0.65); }
-      .small-note { font-size: 12px; }
-      .menu-toggle, button[type="submit"], .playlist-btn { min-height: 40px; }
-
-      /*
-        MÁSCARA MÓVEL: totalmente opaca/preta para esconder completamente a logo Dify
-      */
-      .dify-frame .dify-bottom-mask {
-        display: block;
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        width: calc(100% - 24px);
-        height: clamp(48px, 7.5vh, 110px);
-        bottom: -8px;
-        background: #000;              /* totalmente preta e opaca */
-        background-color: #000;
-        opacity: 1;                     /* garante opacidade total */
-        border-radius: 20px;
-        box-shadow: 0 -10px 30px rgba(0,0,0,1), inset 0 6px 18px rgba(0,0,0,1);
-        pointer-events: none;
-        z-index: 9999;                  /* garantir que fique acima do iframe */
-        backdrop-filter: none;          /* remover blur/transparência */
-        transition: height 180ms ease, bottom 180ms ease, background 180ms ease;
-      }
-
-      /* fallback para telas muito pequenas: aumenta levemente sem cobrir o input */
-      @media (max-height: 620px) and (max-width: 420px) {
-        .dify-frame .dify-bottom-mask {
-          height: clamp(64px, 12vh, 140px);
-          bottom: -10px;
-          left: 10px;
-          right: 10px;
-          border-radius: 18px;
-        }
-      }
-    }
   </style>
 </head>
 <body>
@@ -448,1114 +295,632 @@
 <div id="percurso" class="tab-content">
   <div class="percurso-container">
     <h2>Meu Percurso</h2>
-    <p style="text-align: center; color: #bbb;">Em breve, você poderá visualizar seu progresso e marcos aqui.</p>
-    <div class="percurso-forms">
-      <div class="percurso-card" id="treino-card">
-        <h4>Formulário: Treino</h4>
-        <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
-        <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
-      </div>
+    <p style="text-align: center; color: #bbb;">Seu plano de dieta aparece abaixo. Edite porções em gramas se necessário; alterações salvam localmente no plano até que você clique em "Salvar Plano".</p>
 
-      <div class="percurso-card" id="dieta-card">
-        <h4>Formulário: Dieta</h4>
-        <!-- o conteúdo aqui será completamente substituído pelo formulário gerado -->
-        <div id="dieta-card-content">
-          <p style="color: #bbb;">Seu formulário de dieta será exibido aqui após você criar sua meta.</p>
-        </div>
-      </div>
+    <div id="percurso-controls" style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+      <button id="btnSavePlan" class="playlist-btn" style="background: linear-gradient(90deg, var(--journey-red-1), var(--journey-red-2));">Salvar Plano</button>
+      <button id="btnReloadPlan" class="playlist-btn" style="background:#333;">Recarregar Plano</button>
+      <div id="credibility-display" style="margin-left:auto;"></div>
+    </div>
+
+    <div id="percurso-app">
+      <!-- Month tabs + content injected here -->
+      <div id="month-tabs" class="percurso-months"></div>
+      <div id="month-content" class="month-grid"></div>
     </div>
   </div>
 </div>
 
-</div>
-
+</div> 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    
-    // ====== CONFIGURAÇÃO ======
-    const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
-
-    // ============================
-    // BASE DE ALIMENTOS (lista completa fornecida)
-    // ============================
-    // OBS: esta lista foi copiada e adaptada do que você enviou. Mantive os textos e descrições.
-    const alimentosDB = [
-"Abóbora, cabotián cozida",
-"Abóbora, moranga refogada",
-"Abobrinha, italiana cozida",
-"Abobrinha, italiana crua",
-"Abobrinha, italiana refogada",
-"Abobrinha, paulista crua",
-"Acelga crua",
-"Agrião cru",
-"Aipo cru",
-"Alface, americana crua",
-"Alface, crespa crua",
-"Alface, lisa crua",
-"Alface, roxa crua",
-"Alfavaca crua",
-"Alho cru (uso culinário cru possível — incluí)",
-"Alho-poró cru",
-"Almeirão cru",
-"Almeirão refogado",
-"Batata, baroa cozida",
-"Batata, doce cozida",
-"Batata frita, tipo chips industrializada",
-"Batata, inglesa cozida",
-"Batata, inglesa frita",
-"Batata, inglesa sauté",
-"Berinjela cozida",
-"Beterraba cozida",
-"Beterraba crua",
-"Brócolis cozido",
-"Brócolis cru",
-"Cará cozido",
-"Canru cru (entrada ambígua — mantive como \"cru\" mas revisar se for outro nome)",
-"Catalonha crua",
-"Catalonha refogada",
-"Cebola crua",
-"Cebolinha crua",
-"Cenoura cozida",
-"Cenoura crua",
-"Chicória crua",
-"Chuchu cozido",
-"Chuchu cru",
-"Coentro, folhas desidratadas",
-"Couve, manteiga crua",
-"Couve, manteiga refogada",
-"Couve-flor cozida",
-"Couve-flor crua",
-"Espinafre, Nova Zelândia cru",
-"Espinafre, Nova Zelândia refogado",
-"Jiló cru (marcado cru na tabela — mantive, embora raro cru)",
-"Mandioca cozida",
-"Manjericão cru",
-"Maxixe cru",
-"Mostarda, folha crua",
-"Nabo cru",
-"Nhoque, batata cozido",
-"Palmito, juçara em conserva",
-"Palmito, pupunha em conserva",
-"Pepino cru",
-"Pimentão, amarelo cru",
-"Pimentão, verde cru",
-"Pimentão, vermelho cru",
-"Quiabo cru (mantive cru; geralmente cozido, mas cru é consumido em algumas preparações)",
-"Rabanete cru",
-"Repolho, branco cru",
-"Repolho, roxo cru",
-"Repolho, roxo refogado",
-"Rúcula crua",
-"Salsa crua",
-"Seleta de legumes enlatada",
-"Serralha crua",
-"Taioba crua",
-"Tomate, com semente cru",
-"Tomate extrato",
-"Tomate molho industrializado",
-"Tomate purê",
-"Tomate salada",
-"Vagem crua",
-"Abacate cru",
-"Abacaxi cru",
-"Abiu cru",
-"Açaí, polpa, com xarope (incluído; polpa com xarope)",
-"Acerola crua",
-"Ameixa, calda enlatada",
-"Ameixa crua",
-"Atemoia crua",
-"Banana, da terra crua",
-"Banana, doce em barra (processado)",
-"Banana, figo crua",
-"Banana, maçã crua",
-"Banana, nanica crua",
-"Banana, ouro crua",
-"Banana, pacova crua",
-"Banana, prata crua",
-"Cacau cru",
-"Cajá-Manga cru",
-"Caju, suco concentrado, envasado",
-"Cajuí, chocolate cru",
-"Carambola crua",
-"Ciriguela crua",
-"Cupuaçu cru",
-"Figo cru",
-"Figo, enlatado em calda",
-"Fruta-pão crua",
-"Goiaba, branca, com casca crua",
-"Goiaba, doce em pasta",
-"Goiaba, doce, cascão",
-"Goiaba, vermelha, com casca crua",
-"Graviola crua",
-"Jabuticaba crua",
-"Jaca crua",
-"Jambo cru",
-"Jamelão cru",
-"Kiwi cru",
-"Laranja, baía crua",
-"Laranja, baía suco",
-"Laranja, da terra crua",
-"Laranja, da terra suco",
-"Laranja, lima crua",
-"Laranja, lima suco",
-"Laranja, pêra crua",
-"Laranja, suco (suco genérico)",
-"Laranja, valência crua",
-"Laranja, valência suco",
-"Limão, cravo suco",
-"Limão, tahiti cru",
-"Maçã, Argentina, com casca crua",
-"Maçã, Fuji, com casca crua",
-"Macaúba cru",
-"Mamão, doce, em calda drenado (processado)",
-"Mamão, formosa cru",
-"Mamão, papaia cru",
-"Mamão verde, doce em calda drenado (processado)",
-"Manga, Haden crua",
-"Manga, Palmer crua",
-"Manga, Tommy Atkins crua",
-"Mangarataia crua",
-"Maracujá, suco concentrado",
-"Melancia crua",
-"Melão cru",
-"Mexerica, Murcote crua",
-"Mexerica, Rio crua",
-"Morango cru",
-"Nêspera cru",
-"Pêra, Park crua",
-"Pêra, Williams crua",
-"Pêssego, Aurora cru",
-"Pêssego, enlatado, em calda",
-"Pinha crua",
-"Pitanga crua",
-"Romã crua",
-"Tamarindo cru",
-"Tangerina, Ponkan crua",
-"Tangerina, Ponkan suco",
-"Tucumã cru",
-"Umbu cru",
-"Uva, Itália crua",
-"Uva, Rubi crua",
-"Uva, suco concentrado, envasado",
-"Azeite, de dendê (óleo/gordura)",
-"Azeite, de oliva, extra virgem (óleo/gordura)",
-"Manteiga, com sal (derivado)",
-"Manteiga, sem sal (derivado)",
-"Margarina, com óleo hidrogenado (derivado)",
-"Óleo, de soja (óleo)",
-"Abadejo, filé, congelado assado",
-"Abadejo, filé, congelado cozido",
-"Abadejo, filé, congelado grelhado",
-"Atum, conserva em óleo (conserva)",
-"Bacalhau, salgado refogado",
-"Cação, posta, com farinha de trigo frita",
-"Cação, posta cozida",
-"Camarão, Rio Grande, grande cozido",
-"Camarão, Sete Barbas, sem cabeça, com casca frito",
-"Caranguejo cozido",
-"Corimbatá assado",
-"Corimbatá cozido",
-"Corvina grande assada",
-"Corvina grande cozida",
-"Dourada de água doce fresca (incluí como fresco)",
-"Lambari, congelado frito",
-"Manjuba frita",
-"Manjuba, com farinha de trigo frita",
-"Manjuba frita (variante)",
-"Merluza, filé assado",
-"Merluza, filé cozido",
-"Pescada, branca frita",
-"Pescada, com farinha de trigo frita",
-"Pescada, filé frita",
-"Pescada, filé molho escabeche",
-"Pintado assado",
-"Pintado grelhado",
-"Salmão, com pele, fresco grelhado",
-"Salmão, sem pele, fresco grelhado",
-"Sardinha assada",
-"Sardinha, conserva em óleo (conserva)",
-"Sardinha frita",
-"Arroz, integral cozido",
-"Arroz, tipo 1 cozido",
-"Aveia, flocos crua (uso cru em mingaus / vitaminas — incluí)",
-"Biscoito, doce, maisena (processado)",
-"Biscoito, doce, recheado com chocolate (processado)",
-"Biscoito, doce, recheado com morango (processado)",
-"Biscoito, doce, wafer, recheado de chocolate (processado)",
-"Biscoito, doce, wafer, recheado de morango (processado)",
-"Biscoito, salgado, cream cracker (processado)",
-"Biscoito, polvilho doce (processado)",
-"Bolo, mistura para (processado)",
-"Bolo, pronto, aipim (processado)",
-"Bolo, pronto, chocolate (processado)",
-"Bolo, pronto, coco (processado)",
-"Canjica, com leite integral (preparado)",
-"Cereais, milho, flocos, com sal (processado)",
-"Cereais, milho, flocos, sem sal (processado)",
-"Cereais, milho, infantil (processado)",
-"Cereais, mistura para vitamina (processado)",
-"Cereal matinal, milho (processado)",
-"Cereal matinal, milho, açúcar (processado)",
-"Creme de arroz, pó (processado)",
-"Creme de milho, pó (processado)",
-"Curau, milho verde (preparado)",
-"Farinha, de arroz, enriquecida (derivado)",
-"Farinha, de centeio, integral (derivado)",
-"Farinha, de milho, amarela (derivado)",
-"Farinha, de rosca (derivado)",
-"Farinha, de trigo (derivado)",
-"Farinha, láctea, de cereais (derivado)",
-"Farinha, de mandioca, torrada (derivado)",
-"Farinha, de puba (derivado)",
-"Feijão, de mandioca (cozido)",
-"Lasanha, massa fresca cozida",
-"Macarrão, instantâneo (processado)",
-"Milho, verde cru (incluí — milho verde é consumido cru/cozido)",
-"Milho, verde, enlatado drenado",
-"Mingau tradicional, pó (processado)",
-"Pamonha, barra para cozimento (preparado)",
-"Pão, aveia, forma (processado)",
-"Pão, de glúten, forma (processado)",
-"Pão, de glúten, forma (variante processado)",
-"Pão, milho, forma (processado)",
-"Pão, trigo, forma, integral (processado)",
-"Pão, trigo, francês (processado)",
-"Pão, trigo, sovado (processado)",
-"Pastel, de queijo frito",
-"Pastel, de queijo frito (variante)",
-"Pastel, massa frita",
-"Pastel, massa frita (variante com outro valor)",
-"Pipoca, com óleo de soja sem sal (preparado)",
-"Polenta, pré-cozida (processado)",
-"Torrada, pão francês (processado)",
-"Açúcar, mascavo (ingrediente)",
-"Açúcar, refinado (ingrediente)",
-"Chocolate, ao leite (processado)",
-"Chocolate, ao leite, com castanha do Pará (processado)",
-"Chocolate, ao leite, dietético (processado)",
-"Chocolate, meio amargo (processado)",
-"Cocada branca (doces)",
-"Doce, de abóbora, cremoso (doces)",
-"Doce, de leite, cremoso (doces)",
-"Geleia, mocotó, natural (doces)",
-"Glicose de milho (ingrediente)",
-"Maria mole (doces)",
-"Maria mole, coco queimado (doces)",
-"Marmelada (doces)",
-"Mel, de abelha (doces)",
-"Melado (doces)",
-"Quindim (doces)",
-"Rapadura (doces)",
-"Café, pó, torrado (bebida/ingrediente)",
-"Capuccino, pó (bebida/ingrediente)",
-"Fermento em pó, químico (ingrediente)",
-"Fermento, biológico, levedura, tablete (ingrediente)",
-"Gelatina, sabores variados, pó (ingrediente)",
-"Sal, dietético (ingrediente)",
-"Sal, grosso (ingrediente)",
-"Shoyu (ingrediente/tempero)",
-"Tempero à base de sal (tempero)",
-"Azeitona, preta conserva",
-"Azeitona, verde conserva",
-"Chantilly, spray, com gordura vegetal (processado)",
-"Leite, de coco (derivado)",
-"Maionese, tradicional com ovos (condimento)",
-"Bebida isotônica (processado)",
-"Café, infusão 10% (bebida)",
-"Cana, aguardente (álcool)",
-"Cana, caldo de (bebida)",
-"Cerveja, pilsen (bebida)",
-"Chá, erva-doce infusão",
-"Chá, mate infusão",
-"Chá, preto infusão",
-"Coco, água de (bebida)",
-"Refrigerante, água tônica (bebida)",
-"Refrigerante, tipo cola (bebida)",
-"Refrigerante, tipo guaraná (bebida)",
-"Refrigerante, tipo laranja (bebida)",
-"Refrigerante, tipo limão (bebida)",
-"Achocolatado, pó (bebida)",
-"Tacacá (prato)",
-"Tapioca, com manteiga (prato)",
-"Tucupi, com pimenta-de-cheiro (prato/molho)",
-"Vaca atolada (prato)",
-"Vatapá (prato)",
-"Virado à paulista (prato)",
-"Yakisoba (prato)",
-"Acarajé (prato)",
-"Arroz carreteiro (prato)",
-"Baião de dois, arroz e feijão-de-corda (prato)",
-"Barreado (prato)",
-"Bife à cavalo, com contra filé (prato)",
-"Bolinho de arroz (prato)",
-"Camarão à baiana (prato)",
-"Charuto, de repolho (prato)",
-"Cuscuz, de milho, cozido com sal (prato)",
-"Cuscuz, paulista (prato)",
-"Cuxá, molho (prato/molho)",
-"Dobradinha (prato)",
-"Estrogonofe de carne (prato)",
-"Estrogonofe de frango (prato)",
-"Feijoada tropeiro mineiro (prato)",
-"Feijoada (prato)",
-"Frango, com açafrão (prato)",
-"Macarrão, molho bolonhesa (prato)",
-"Maniçoba (prato)",
-"Quibebe (prato)",
-"Salada, de legumes, com maionese (prato)",
-"Salada, de legumes, cozida no vapor (prato)",
-"Salpicão, de frango (prato)",
-"Sarapatel (prato)",
-"Tabule (prato)",
-"Amendoim, grão cru (incluí)",
-"Amendoim, torrado, salgado (torrado/salgado)",
-"Ervilha, em vagem (crua/cozida — mantive)",
-"Ervilha, enlatada drenada",
-"Feijão, carioca cozido",
-"Feijão, fradinho cozido",
-"Feijão, jalo cozido",
-"Feijão, preto cozido",
-"Feijão, rajado cozido",
-"Feijão, rosinha cozido",
-"Feijão, roxo cozido",
-"Lentilha cozida",
-"Paçoca, amendoim (processado)",
-"Pé-de-moleque, amendoim (doces)",
-"Soja, farinha (derivado)",
-"Soja, extrato solúvel, natural, fluido (produto)",
-"Soja, extrato solúvel, pó (produto)",
-"Soja, queijo (tofu) (produto)",
-"Tremoço em conserva (conserva)",
-"Amêndoa, torrada, salgada (oleaginosa)",
-"Castanha-de-caju, torrada, salgada (oleaginosa)",
-"Castanha-do-Brasil crua (incluí)",
-"Coco cru (incluí)",
-"Gergelim, semente (semente)",
-"Linhaça, semente (semente)",
-"Pinhão cozido",
-"Pupunha cozida",
-"Noz crua (incluí)",
-"Presunto, com capa de gordura (processado)",
-"Presunto, sem capa de gordura (processado)",
-"Quibe assado",
-"Quibe frito",
-"Salame (processado)",
-"Toucinho frito",
-"Apresentado (linha ambígua — mantive nome)",
-"Caldo de carne, tablete (ingrediente)",
-"Caldo de galinha, tablete (ingrediente)",
-"Carne, bovina, acém, moído, cozido",
-"Carne, bovina, acém, sem gordura, cozido",
-"Carne, bovina, almôndegas, fritas",
-"Carne, bovina, bucho, cozido",
-"Carne, bovina, capa de contra-filé, com gordura grelhada",
-"Carne, bovina, capa de contra-filé, sem gordura grelhada",
-"Carne, bovina, charque, cozido",
-"Carne, bovina, filé à milanesa frita/assada (preparado)",
-"Carne, bovina, contra-filé de costela, grelhado",
-"Carne, bovina, contra-filé, com gordura, grelhado",
-"Carne, bovina, contra-filé, sem gordura, grelhada",
-"Carne, bovina, costela assada",
-"Carne, bovina, coxão duro, sem gordura, cozido",
-"Carne, bovina, coxão mole, sem gordura, cozido",
-"Carne, bovina, cupim assado",
-"Carne, bovina, filé mignon, sem gordura, cozido",
-"Carne, bovina, flanco, sem gordura, cozido",
-"Carne, bovina, fraldinha, com gordura, cozida",
-"Carne, bovina, lagarto, cozido",
-"Carne, bovina, língua cozida",
-"Carne, bovina, maminha grelhada",
-"Carne, bovina, miolo de alcatra, sem gordura, grelhado",
-"Carne, bovina, músculo, sem gordura, cozido",
-"Carne, bovina, paleta, sem gordura, cozida",
-"Carne, bovina, patinho, sem gordura, cozido",
-"Carne, bovina, patinho, sem gordura, grelhado",
-"Carne, bovina, peito, sem gordura, cozido",
-"Carne, bovina, picanha, com gordura, grelhada",
-"Carne, bovina, picanha, sem gordura, grelhada",
-"Carne, bovina, seca cozida",
-"Coxinha de frango frita",
-"Croquete, de carne frito",
-"Empada de frango, pré-cozida assada",
-"Empada de frango, pré-cozida (preparado)",
-"Frango, caipira, inteiro, com pele cozido",
-"Frango, caipira, inteiro, sem pele cozido",
-"Frango, coração grelhado",
-"Frango, coxa, com pele, assada",
-"Frango, coxa, com pele, cozida",
-"Frango, coxa, sem pele, cozida",
-"Frango, filé, à milanesa (preparado)",
-"Frango, inteiro, sem pele, assado",
-"Frango, inteiro, sem pele, cozido",
-"Frango, peito, com pele, assado",
-"Frango, peito, sem pele, cozido",
-"Frango, peito, sem pele, grelhado",
-"Frango, sobrecoxa, com pele, assada",
-"Frango, sobrecoxa, sem pele, assada",
-"Hambúrguer, bovino frito",
-"Hambúrguer, bovino grelhado",
-"Linguiça, frango frita",
-"Linguiça, frango grelhada",
-"Linguiça, porco frita",
-"Linguiça, porco frita (variante)",
-"Linguiça, porco grelhada",
-"Mortadela (processado)",
-"Peru, congelado assado",
-"Porco, bisteca frita",
-"Porco, bisteca grelhada",
-"Porco, costela assada",
-"Porco, lombo assado",
-"Porco, pernil assado",
-"Bebida láctea, pêssego (produto)",
-"Creme de Leite (derivado)",
-"Iogurte, natural (derivado)",
-"Iogurte, natural, desnatado (derivado)",
-"Iogurte, sabor abacaxi (derivado)",
-"Iogurte, sabor morango (derivado)",
-"Iogurte, sabor pêssego (derivado)",
-"Leite, condensado (derivado)",
-"Leite, de cabra (derivado)",
-"Leite, de vaca, achocolatado (derivado)",
-"Leite, de vaca, desnatado, pó (derivado)",
-"Leite, de vaca, desnatado, UHT (derivado)",
-"Leite, de vaca, integral (derivado)",
-"Leite, de vaca, integral, pó (derivado)",
-"Leite, fermentado (derivado)",
-"Queijo, minas, frescal (derivado)",
-"Queijo, minas, meia cura (derivado)",
-"Queijo, mozarela (derivado)",
-"Queijo, parmesão (derivado)",
-"Queijo, pasteurizado (derivado)",
-"Queijo, petit suisse, morango (derivado)",
-"Queijo, prato (derivado)",
-"Queijo, requeijão, cremoso (derivado)",
-"Queijo, ricota (derivado)",
-"Omelete, de queijo (preparado)",
-"Ovo, de galinha, clara cozida/10minutos",
-"Ovo, de galinha, gema cozida/10minutos",
-"Ovo, de galinha, inteiro cozido/10minutos",
-"Ovo, de galinha, inteiro frito"
-    ];
-    // ============================
-    // UTILITÁRIOS / HEURÍSTICAS
-    // ============================
-    function classifyFood(name) {
-      const lower = (name||'').toLowerCase();
-      const protKeywords = ["frango","carne","peixe","salmão","atum","sardinha","camarão","ovo","tofu","soja","presunto","patinho","picanha","peito","hambúrguer","linguiça","porco","peru","abadejo","merluza","pescada","pintado","bife","filé","coxinha"];
-      const carbKeywords = ["arroz","pão","batata","macarrão","milho","mandioca","polenta","aveia","nhoque","lasanha","pipoca","cuscuz","farinha","tapioca","bolo","canjica","pamonha"];
-      const fatKeywords = ["azeite","óleo","manteiga","margarina","abacate","azeite de","óleo de soja","azeite, de dendê"];
-      const frutaKeywords = ["banana","maçã","laranja","manga","melancia","morango","goiaba","uva","abacaxi","mamão","pera","pêssego","kiwi","ameixa","pitanga","caju","açaí","maracujá"];
-      const vegKeywords = ["alface","couve","brócolis","cenoura","tomate","pepino","espinafre","repolho","beterraba","berinjela","abobrinha","quiabo","vagem","chuchu","pimentão"];
-      if (protKeywords.some(k => lower.includes(k))) return "proteína";
-      if (carbKeywords.some(k => lower.includes(k))) return "carboidrato";
-      if (fatKeywords.some(k => lower.includes(k))) return "gordura";
-      if (frutaKeywords.some(k => lower.includes(k))) return "fruta";
-      if (vegKeywords.some(k => lower.includes(k))) return "vegetal";
-      return "outro";
-    }
-
-    function calcBMR({sexo, pesoKg, alturaM, idade}) {
-      const h = alturaM * 100;
-      if (sexo && sexo.toLowerCase().startsWith('m')) {
-        return 10 * pesoKg + 6.25 * h - 5 * idade + 5;
-      } else {
-        return 10 * pesoKg + 6.25 * h - 5 * idade - 161;
-      }
-    }
-
-    function activityFactor(nivel, diasPorSemana) {
-      const l = (nivel || '').toLowerCase();
-      if (l.includes('inic') || l.includes('sedent')) return 1.2;
-      if (l.includes('inter') || diasPorSemana <= 2) return 1.375;
-      if (l.includes('avanc') || diasPorSemana >= 4) return 1.55;
-      return 1.375;
-    }
-
-    function adjustForGoal(calories, goalText) {
-      const g = (goalText || '').toLowerCase();
-      if (g.includes('perder') || g.includes('emagrec') || g.includes('secar')) return Math.round(calories * 0.80);
-      if (g.includes('ganhar') || g.includes('massa') || g.includes('hipert')) return Math.round(calories * 1.15);
-      return Math.round(calories);
-    }
-
-    function macroSplit(calories, goalText, pesoKg) {
-      const g = (goalText || '').toLowerCase();
-      let protPerc = 0.22, fatPerc = 0.25;
-      if (g.includes('perder') || g.includes('emagrec')) protPerc = 0.28;
-      if (g.includes('ganhar') || g.includes('massa') || g.includes('hipert')) protPerc = 0.25;
-      const protCals = calories * protPerc;
-      const fatCals = calories * fatPerc;
-      const carbCals = calories - protCals - fatCals;
-      // also compute protein by g/kg as hint
-      const prot_g_by_kg = Math.round(Math.max(1.2, (g.includes('ganhar')?1.8:1.6)) * (pesoKg || 70));
-      return {
-        calories,
-        protein_g: Math.round(protCals / 4),
-        fat_g: Math.round(fatCals / 9),
-        carbs_g: Math.round(carbCals / 4),
-        protein_by_kg: prot_g_by_kg
-      };
-    }
-
-    // Gera o formulário (objeto + render DOM)
-    function gerarFormularioDieta(inputs) {
-      const bmr = calcBMR({
-        sexo: inputs.sexo,
-        pesoKg: inputs.peso,
-        alturaM: inputs.altura,
-        idade: inputs.idade
-      });
-      const actFactor = activityFactor(inputs.nivel, Number(inputs.disponibilidade));
-      const tdee = Math.round(bmr * actFactor);
-      const targetCalories = adjustForGoal(tdee, inputs.grandeMeta || inputs.objetivo || '');
-      const macros = macroSplit(targetCalories, inputs.grandeMeta || inputs.objetivo || '', inputs.peso);
-
-      // numero de refeicoes heuristica
-      const diasTreino = Number(inputs.disponibilidade) || 3;
-      const refeicoesPorDia = Math.min(6, Math.max(3, 3 + Math.floor(diasTreino / 2)));
-      const mealNames = ["Café da manhã","Lanche manhã","Almoço","Lanche tarde","Jantar","Ceia"].slice(0, refeicoesPorDia);
-
-      const mealWeights = mealNames.map((_,i) => {
-        if (mealNames[i].toLowerCase().includes('almoço') || mealNames[i].toLowerCase().includes('jantar')) return 1.6;
-        if (mealNames[i].toLowerCase().includes('café')) return 1.1;
-        return 0.9;
-      });
-      const totalWeight = mealWeights.reduce((a,b)=>a+b,0);
-
-      function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
-      function buildMealSuggestion() {
-        const proteins = alimentosDB.filter(a => classifyFood(a) === 'proteína');
-        const carbs = alimentosDB.filter(a => classifyFood(a) === 'carboidrato');
-        const vegs = alimentosDB.filter(a => ['vegetal','fruta','outro'].includes(classifyFood(a)));
-        return {
-          proteina: pickRandom(proteins) || pickRandom(alimentosDB),
-          carboidrato: pickRandom(carbs) || null,
-          vegetal: pickRandom(vegs) || null,
-          observacao: ""
-        };
-      }
-
-      const refeicoes = mealNames.map((mname, idx) => {
-        const weight = mealWeights[idx];
-        const calForMeal = Math.round((weight / totalWeight) * macros.calories);
-        const ratio = {
-          protein_g: Math.round((macros.protein_g) * (weight / totalWeight)),
-          fat_g: Math.round((macros.fat_g) * (weight / totalWeight)),
-          carbs_g: Math.round((macros.carbs_g) * (weight / totalWeight))
-        };
-        return {
-          nome: mname,
-          calorias_sugeridas: calForMeal,
-          macros_sugeridos: ratio,
-          itens: buildMealSuggestion()
-        };
-      });
-
-      const formObj = {
-        meta: inputs.grandeMeta || inputs.objetivo,
-        prazo: inputs.prazo || inputs.prazoText,
-        sexo: inputs.sexo,
-        altura_m: inputs.altura,
-        peso_kg: inputs.peso,
-        idade: inputs.idade,
-        dias_treino_semana: inputs.disponibilidade,
-        onde_treina: inputs.local_treino,
-        orcamento_mensal: inputs.orcamento,
-        pretende_suplementos: inputs.uso_suplemento,
-        suplementos: inputs.quais_suplementos || '',
-        nivel_atividade: inputs.nivel,
-        calculos: { bmr, tdee, targetCalories, macros },
-        refeicoes_por_dia: refeicoesPorDia,
-        refeicoes_template: refeicoes,
-        alimentos_db_count: alimentosDB.length,
-        created_at: (new Date()).toISOString()
-      };
-
-      return { formObj };
-    }
-
-    // ============================
-    // FUNÇÕES SUPABASE CRUD para user_diets
-    // ============================
-    async function getCurrentUser() {
-      const { data } = await supabase.auth.getUser();
-      return data && data.user ? data.user : null;
-    }
-
-    async function insertUserDiet(payloadObj) {
-      const user = await getCurrentUser();
-      if (!user) throw new Error('Usuário não autenticado.');
-      const storeObj = {
-        stored_at: new Date().toISOString(),
-        version_label: payloadObj.version_label || ('Plano ' + new Date().toISOString()),
-        meta_inicial: payloadObj.meta_inicial,
-        form: payloadObj.formObj,
-        alimentos_db: payloadObj.includeFullDB ? alimentosDB : undefined
-      };
-      const { data, error } = await supabase.from('user_diets').insert([{
-        user_id: user.id,
-        title: payloadObj.formObj.meta || 'Plano de dieta gerado',
-        payload: storeObj
-      }]).select().limit(1);
-      if (error) throw error;
-      return data && data[0] ? data[0] : null;
-    }
-
-    async function updateUserDiet(dietId, newPayload) {
-      const { data, error } = await supabase.from('user_diets').update({ payload: newPayload }).eq('id', dietId).select().limit(1);
-      if (error) throw error;
-      return data && data[0] ? data[0] : null;
-    }
-
-    async function deleteUserDiet(dietId) {
-      const { data, error } = await supabase.from('user_diets').delete().eq('id', dietId);
-      if (error) throw error;
-      return data;
-    }
-
-    async function fetchUserDiets() {
-      const user = await getCurrentUser();
-      if (!user) return [];
-      const { data, error } = await supabase.from('user_diets').select('id, title, payload, created_at').eq('user_id', user.id).order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    }
-
-    // retorna o mais recente
-    async function fetchLatestUserDiet() {
-      const list = await fetchUserDiets();
-      return list && list.length ? list[0] : null;
-    }
-
-    // ============================
-    // RENDER DO FORMULÁRIO GERADO (DOM SAFE)
-    // ============================
-    function clearDietaCardContent() {
-      const dietaCard = document.getElementById('dieta-card');
-      const content = dietaCard.querySelector('#dieta-card-content');
-      if (content) content.remove();
-    }
-
-    function renderFormObjectToContainer(container, formObj, options = {}) {
-      // options: onSave callback, existingDietId
-      container.innerHTML = ''; // clear
-      const title = document.createElement('h4');
-      title.textContent = 'Formulário: Dieta — Plano gerado';
-      container.appendChild(title);
-
-      const metaP = document.createElement('p');
-      metaP.style.color = '#bbb';
-      metaP.textContent = `Meta: ${formObj.meta || ''} | Prazo: ${formObj.prazo || ''} | Calorias alvo: ${formObj.calculos?.targetCalories || ''} kcal`;
-      container.appendChild(metaP);
-
-      const formEl = document.createElement('form');
-      formEl.id = 'generated-diet-form';
-      formEl.style.marginTop = '12px';
-
-      formObj.refeicoes_template.forEach((r, idx) => {
-        const fieldset = document.createElement('fieldset');
-        fieldset.style.marginBottom = '12px';
-        fieldset.style.padding = '10px';
-        fieldset.style.border = '1px solid rgba(255,255,255,0.04)';
-        fieldset.style.borderRadius = '8px';
-
-        const legend = document.createElement('legend');
-        legend.style.fontWeight = '700';
-        legend.textContent = `${r.nome} — ${r.calorias_sugeridas} kcal`;
-        fieldset.appendChild(legend);
-
-        // Proteína
-        const pLabel = document.createElement('label');
-        pLabel.textContent = 'Proteína sugerida';
-        const pInput = document.createElement('input');
-        pInput.type = 'text';
-        pInput.name = `proteina_${idx}`;
-        pInput.value = r.itens.proteina || '';
-        pInput.style.marginTop = '6px';
-        pInput.style.width = '100%';
-        fieldset.appendChild(pLabel);
-        fieldset.appendChild(pInput);
-
-        // Carboidrato
-        const cLabel = document.createElement('label');
-        cLabel.textContent = 'Carboidrato sugerido';
-        const cInput = document.createElement('input');
-        cInput.type = 'text';
-        cInput.name = `carbo_${idx}`;
-        cInput.value = r.itens.carboidrato || '';
-        cInput.style.marginTop = '6px';
-        cInput.style.width = '100%';
-        fieldset.appendChild(cLabel);
-        fieldset.appendChild(cInput);
-
-        // Vegetal / fruta
-        const vLabel = document.createElement('label');
-        vLabel.textContent = 'Vegetal / fruta';
-        const vInput = document.createElement('input');
-        vInput.type = 'text';
-        vInput.name = `veg_${idx}`;
-        vInput.value = r.itens.vegetal || '';
-        vInput.style.marginTop = '6px';
-        vInput.style.width = '100%';
-        fieldset.appendChild(vLabel);
-        fieldset.appendChild(vInput);
-
-        // Observação
-        const oLabel = document.createElement('label');
-        oLabel.textContent = 'Observação';
-        const oInput = document.createElement('input');
-        oInput.type = 'text';
-        oInput.name = `obs_${idx}`;
-        oInput.value = r.itens.observacao || '';
-        oInput.style.marginTop = '6px';
-        oInput.style.width = '100%';
-        fieldset.appendChild(oLabel);
-        fieldset.appendChild(oInput);
-
-        formEl.appendChild(fieldset);
-      });
-
-      // Buttons area
-      const btnWrap = document.createElement('div');
-      btnWrap.style.display = 'flex';
-      btnWrap.style.gap = '8px';
-      btnWrap.style.marginTop = '10px';
-
-      const saveBtn = document.createElement('button');
-      saveBtn.type = 'button';
-      saveBtn.textContent = options.existingDietId ? 'Salvar alterações' : 'Salvar formulário';
-      saveBtn.style.background = 'linear-gradient(90deg,#007bff,#0056b3)';
-      saveBtn.style.color = '#fff';
-      saveBtn.style.border = 'none';
-      saveBtn.style.padding = '10px 14px';
-      saveBtn.style.borderRadius = '8px';
-      saveBtn.style.cursor = 'pointer';
-
-      const saveNewBtn = document.createElement('button');
-      saveNewBtn.type = 'button';
-      saveNewBtn.textContent = 'Salvar como novo';
-      saveNewBtn.style.background = 'transparent';
-      saveNewBtn.style.border = '1px solid #444';
-      saveNewBtn.style.color = '#ddd';
-      saveNewBtn.style.padding = '10px 14px';
-      saveNewBtn.style.borderRadius = '8px';
-      saveNewBtn.style.cursor = 'pointer';
-
-      const statusSpan = document.createElement('span');
-      statusSpan.style.marginLeft = '12px';
-      statusSpan.style.color = '#aaf';
-
-      btnWrap.appendChild(saveBtn);
-      btnWrap.appendChild(saveNewBtn);
-      btnWrap.appendChild(statusSpan);
-      formEl.appendChild(btnWrap);
-      container.appendChild(formEl);
-
-      // Save handlers
-      saveBtn.addEventListener('click', async () => {
-        statusSpan.textContent = 'Salvando...';
-        try {
-          // construir novo formObj com campos atualizados do DOM
-          const updatedForm = JSON.parse(JSON.stringify(formObj)); // clone
-          const fd = new FormData(formEl);
-          updatedForm.refeicoes_template.forEach((r, idx) => {
-            r.itens.proteina = fd.get(`proteina_${idx}`) || '';
-            r.itens.carboidrato = fd.get(`carbo_${idx}`) || '';
-            r.itens.vegetal = fd.get(`veg_${idx}`) || '';
-            r.itens.observacao = fd.get(`obs_${idx}`) || '';
-          });
-          updatedForm.modified_at = new Date().toISOString();
-
-          if (options.existingDietId) {
-            // fetch existing payload to preserve alimentos_db if any
-            const user = await getCurrentUser();
-            const { data: existing, error: selErr } = await supabase.from('user_diets').select('payload').eq('id', options.existingDietId).single();
-            let mergedPayload = { ...(existing && existing.payload ? existing.payload : {}) };
-            mergedPayload.form = updatedForm;
-            mergedPayload.stored_at = new Date().toISOString();
-            const upd = await updateUserDiet(options.existingDietId, mergedPayload);
-            statusSpan.textContent = 'Salvo (atualizado).';
-            // restore navigation (enable other tabs)
-            enableAllNavLinks();
-          } else {
-            // insert new
-            const user = await getCurrentUser();
-            const newRecord = await insertUserDiet({ formObj: updatedForm, meta_inicial: { grandeMeta: updatedForm.meta }, includeFullDB: true });
-            if (newRecord) {
-              options.existingDietId = newRecord.id;
-              statusSpan.textContent = 'Salvo com sucesso.';
-              // set button label to update going forward
-              saveBtn.textContent = 'Salvar alterações';
-              // enable other tabs
-              enableAllNavLinks();
-            } else {
-              statusSpan.textContent = 'Erro ao salvar (sem resposta).';
-            }
-          }
-        } catch (err) {
-          console.error(err);
-          statusSpan.textContent = 'Erro: ' + (err.message || JSON.stringify(err));
-        }
-      });
-
-      saveNewBtn.addEventListener('click', async () => {
-        statusSpan.textContent = 'Salvando cópia...';
-        try {
-          const updatedForm = JSON.parse(JSON.stringify(formObj));
-          const fd = new FormData(formEl);
-          updatedForm.refeicoes_template.forEach((r, idx) => {
-            r.itens.proteina = fd.get(`proteina_${idx}`) || '';
-            r.itens.carboidrato = fd.get(`carbo_${idx}`) || '';
-            r.itens.vegetal = fd.get(`veg_${idx}`) || '';
-            r.itens.observacao = fd.get(`obs_${idx}`) || '';
-          });
-          const newRecord = await insertUserDiet({ formObj: updatedForm, meta_inicial: { grandeMeta: updatedForm.meta }, includeFullDB: true });
-          if (newRecord) {
-            statusSpan.textContent = 'Cópia salva.';
-            enableAllNavLinks();
-          } else statusSpan.textContent = 'Erro ao salvar cópia.';
-        } catch (err) {
-          console.error(err);
-          statusSpan.textContent = 'Erro: ' + (err.message || JSON.stringify(err));
-        }
-      });
-
-      return formEl;
-    }
-
-    // ============================
-    // UI helpers: desabilitar/habilitar navegação para forçar formulário único inicialmente
-    // ============================
-    function disableNonPercursoNavLinks() {
-      document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.dataset.tab !== 'percurso') {
-          link.classList.add('hidden'); // hide links (keeps percurso visible)
-        }
-      });
-    }
-    function enableAllNavLinks() {
-      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('hidden'));
-    }
-
-    // ============================
-    // INICIALIZAÇÃO E FLUXOS
-    // ============================
-    document.addEventListener('DOMContentLoaded', () => {
-      let user = null;
-      let currentProfile = null;
-      let latestDietRecord = null;
-
-      const menuToggle = document.getElementById('menu-toggle');
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-      const navLinks = document.querySelectorAll('.nav-link');
-      const configBtn = document.getElementById('config-btn');
-      const logoutBtn = document.getElementById('logout-btn');
-      const resetBtn = document.getElementById('reset-btn');
-
-      const switchTab = (tabId) => {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        const el = document.getElementById(tabId);
-        if (el) el.classList.add('active');
-        navLinks.forEach(link => link.classList.remove('active'));
-        const activeLink = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
-        if (activeLink) activeLink.classList.add('active');
-      };
-
-      const closeMenu = () => { menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); };
-      menuToggle.addEventListener('click', () => { menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
-      overlay.addEventListener('click', closeMenu);
-      navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const tabId = link.dataset.tab; switchTab(tabId); closeMenu(); }); });
-      configBtn.addEventListener('click', (e) => { e.preventDefault(); logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
-      logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
-      resetBtn.addEventListener('click', async () => { if (!user) return; const { error: resetError } = await supabase.from('profiles').update({ goal_start_date: null, goal_end_date: null, goal_prompt: null, goal_type: null, }).eq('id', user.id); if (resetError) { console.error('Erro ao resetar a meta: ' + resetError.message); } else { window.location.reload(); } });
-
-      // função que renderiza o formulário salvo (ou placeholder)
-      async function renderPercursoDietArea() {
-        const dietaCard = document.getElementById('dieta-card');
-        // clear existing generated content (if any)
-        clearDietaCardContent();
-        // fetch latest diet
-        try {
-          latestDietRecord = await fetchLatestUserDiet();
-        } catch (err) {
-          console.error('Erro ao buscar dietas:', err);
-        }
-        const targetContainer = document.createElement('div');
-        targetContainer.id = 'dieta-card-content';
-        dietaCard.appendChild(targetContainer);
-
-        if (latestDietRecord && latestDietRecord.payload && latestDietRecord.payload.form) {
-          // render form with update option
-          renderFormObjectToContainer(targetContainer, latestDietRecord.payload.form, { existingDietId: latestDietRecord.id });
-          // since user has saved diet, ensure all nav links visible
-          enableAllNavLinks();
-        } else {
-          // no saved diet: show placeholder and disable other tabs so user is forced to fill
-          const p = document.createElement('p');
-          p.style.color = '#bbb';
-          p.textContent = 'Ainda não há formulário de dieta salvo. Gere a sua meta no painel principal para criar o seu plano.';
-          targetContainer.appendChild(p);
-          // hide other tabs to force immediate attention to this
-          disableNonPercursoNavLinks();
-        }
-      }
-
-      // Helpers to display progress UI (reuse from original)
-      function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
-      function calculateEndDate(prazoText) { if(!prazoText) return null; const now = new Date(); const year = now.getFullYear(); let prazoLower = prazoText.toLowerCase(); if (prazoLower.includes('final do ano') || prazoLower.includes('fim de ano')) { return new Date(year, 11, 31); } let match = prazoLower.match(/(\d+)\s+mes(es)?/); if (match) { let d=new Date(); d.setMonth(d.getMonth()+parseInt(match[1],10)); return d; } match = prazoLower.match(/(\d+)\s+dia(s)?/); if (match) { let d=new Date(); d.setDate(d.getDate()+parseInt(match[1],10)); return d; } if (prazoLower.includes('verao')||prazoLower.includes('verão')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); } if (prazoLower.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); } if (prazoLower.includes('ano novo')) { return new Date(year+1,0,1); } if (prazoLower.includes('pascoa')||prazoLower.includes('páscoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); } return null; }
-      function displayProgress(startDate, endDate) { const now = new Date(); now.setHours(0,0,0,0); const sDate = new Date(startDate); sDate.setHours(0,0,0,0); const eDate = new Date(endDate); eDate.setHours(0,0,0,0); const totalDuration=eDate.getTime()-sDate.getTime(), elapsedDuration=now.getTime()-sDate.getTime(); const daysRemaining=Math.ceil((eDate-now)/(1000*60*60*24)); let progressPercentage=(elapsedDuration/totalDuration)*100; if(progressPercentage<0)progressPercentage=0; if(progressPercentage>100)progressPercentage=100; document.getElementById('progress-bar').style.width=`${progressPercentage}%`; document.getElementById('start-date-label').textContent=sDate.toLocaleDateString('pt-BR'); document.getElementById('end-date-label').textContent=eDate.toLocaleDateString('pt-BR'); document.getElementById('countdown-days').textContent=daysRemaining>=0?daysRemaining:0; document.getElementById('form-wrapper').style.display='none'; document.getElementById('results-wrapper').style.display='block'; }
-
-      // IA chat loader (reuse)
-      function loadFreshDifyChat() {
-        const difyContainer = document.getElementById('dify-container');
-        if (!difyContainer) return;
-        difyContainer.innerHTML = '';
-        const frameWrap = document.createElement('div');
-        frameWrap.className = 'dify-frame';
-        const iframe = document.createElement('iframe');
-        const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-        const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
-        iframe.src = difyUrl;
-        iframe.allow = 'microphone';
-        frameWrap.appendChild(iframe);
-        const strip = document.createElement('div');
-        strip.className = 'dify-top-strip';
-        strip.setAttribute('aria-hidden', 'true');
-        const badge = document.createElement('div');
-        badge.className = 'dify-top-badge';
-        badge.textContent = 'Fale com a IA';
-        const label = document.createElement('span');
-        label.className = 'mvp-label';
-        label.textContent = 'MVPia';
-        strip.appendChild(badge);
-        strip.appendChild(label);
-        const bottomMask = document.createElement('div');
-        bottomMask.className = 'dify-bottom-mask';
-        bottomMask.setAttribute('aria-hidden', 'true');
-        frameWrap.appendChild(strip);
-        frameWrap.appendChild(bottomMask);
-        difyContainer.appendChild(frameWrap);
-      }
-
-      // inicializa dados do usuário e UI
-      async function initializePageData() {
-        const { data } = await supabase.auth.getUser();
-        if (!data.user) { window.location.replace('/login.html'); return; }
-        user = data.user;
-        document.getElementById('welcome-msg').textContent = `Bem-vindo(a), ${user.email}`;
-
-        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (error || !profile) { console.error('Erro ao buscar perfil:', error); await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
-        currentProfile = profile;
-
-        // render progresso ou exibir formulario inicial
-        if (profile.goal_end_date) {
-          displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
-          if (profile.goal_type) document.getElementById('playlist-section').style.display = 'block';
-        } else {
-          document.getElementById('form-wrapper').style.display = 'block';
-        }
-
-        // carrega chat
-        loadFreshDifyChat();
-
-        // render percurso diet area
-        await renderPercursoDietArea();
-      }
-
-      // Lógica de campos do formulário IA
-      const objetivoInput = document.getElementById('objetivo');
-      if (objetivoInput) objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; });
-
-      const usoSuplementoSelect = document.getElementById('uso_suplemento');
-      if (usoSuplementoSelect) usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; });
-
-      // Handler do submit final (IA form)
-      const iaFitForm = document.getElementById('ia-fit-form');
-      if (iaFitForm) iaFitForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        try {
-          const formElements = event.target.elements;
-          const prazoText = formElements.prazo.value;
-          const endDate = calculateEndDate(prazoText);
-          if (!endDate) { alert('Prazo inválido. Use algo como "3 meses" ou "até o verão".'); return; }
-          const startDate = new Date(); startDate.setHours(0,0,0,0);
-          const objetivoText = formElements.objetivo.value;
-          const goalType = (function(text){ const lowerText = (text||'').toLowerCase(); const emagrecerKeywords = ['emagrecer', 'perder peso', 'secar', 'definir', 'perder gordura', 'definição', 'emagrecimento']; const musculoKeywords = ['ganhar musculo', 'hipertrofia', 'crescer', 'massa muscular', 'ficar forte', 'músculo']; const hasEmagrecer = emagrecerKeywords.some(keyword => lowerText.includes(keyword)); const hasMusculo = musculoKeywords.some(keyword => lowerText.includes(keyword)); if (hasEmagrecer && !hasMusculo) return 'emagrecer'; if (hasMusculo && !hasEmagrecer) return 'musculo'; return 'ambos'; })(objetivoText);
-
-          // atualiza profile com datas e tipo
-          const { error: updateError } = await supabase.from('profiles').update({
-            goal_start_date: startDate.toISOString(),
-            goal_end_date: endDate.toISOString(),
-            goal_prompt: objetivoText,
-            goal_type: goalType
-          }).eq('id', user.id);
-
-          if (updateError) {
-            console.error("Erro ao salvar a meta:", updateError);
-            alert('Erro ao salvar sua meta. Tente novamente.');
-            return;
-          }
-
-          // construir inputs iniciais para gerar dieta
-          const inputs = {
-            grandeMeta: objetivoText,
-            prazo: prazoText,
-            sexo: formElements.sexo.value,
-            altura: parseFloat(formElements.altura.value) || 1.7,
-            peso: parseFloat(formElements.peso.value) || 70,
-            idade: parseInt(formElements.idade.value, 10) || 30,
-            disponibilidade: formElements.disponibilidade.value,
-            local_treino: formElements.local_treino.value,
-            orcamento: formElements.orcamento.value,
-            uso_suplemento: formElements.uso_suplemento.value,
-            quais_suplementos: formElements.quais_suplementos.value || '',
-            nivel: formElements.nivel.value
-          };
-
-          // gera formObj
-          const { formObj } = gerarFormularioDieta(inputs);
-
-          // salva em user_diets
-          const inserted = await insertUserDiet({ formObj, meta_inicial: inputs, includeFullDB: true });
-
-          if (!inserted) {
-            alert('Erro ao salvar plano gerado. Verifique console.');
-            return;
-          }
-
-          // switch to percurso and render form
-          switchTab('percurso');
-          // renderPercursoDietArea will pick latest diet
-          await renderPercursoDietArea();
-          // after generation, keep only percurso visible until user saves/edits: disable other navs
-          disableNonPercursoNavLinks();
-        } catch (err) {
-          console.error('Erro no fluxo de criação da meta:', err);
-          alert('Erro interno: ' + (err.message || JSON.stringify(err)));
-        }
-      });
-
-      // Playlist button
-      const playlistBtn = document.getElementById('playlist-btn');
-      if(playlistBtn) playlistBtn.addEventListener('click', async function() {
-        if (!currentProfile) return;
-        let videoOrder;
-        if(currentProfile.goal_type==='emagrecer'){videoOrder=[3,2,1];}else if(currentProfile.goal_type==='musculo'){videoOrder=[3,1,2];}else{videoOrder=[1,2,3];}
-        const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')};
-        Object.values(v).forEach(b=>b.remove());
-        videoOrder.forEach(i=>c.appendChild(v[i]));
-        switchTab('video-aulas');
-        document.getElementById('video-aulas').scrollIntoView({ behavior: 'smooth' });
-      });
-
-      // start
-      initializePageData().catch(err => { console.error('Erro inicial:', err); });
+/* ===========================
+   Módulo: SUPER DIET ENGINE
+   (integrado inline para facilidade de instalação)
+   =========================== */
+
+const SuperDietEngine = (function(){
+  // utilitárias (mesmas do design)
+  function _round(n,d=2){ return Math.round((n+Number.EPSILON) * Math.pow(10,d))/Math.pow(10,d); }
+  function _safeNum(v,f=0){ const n=Number(v); return isNaN(n)?f:n; }
+  function normalizeName(s){ if(!s) return ''; return s.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,' ').trim(); }
+  function nowISO(){ return new Date().toISOString(); }
+
+  // master DB seed (subset + can be extended via loadExternal*)
+  const seed = {
+    "arroz tipo 1 cozido": { id:'arroz_cozido', name:'Arroz (tipo 1) cozido', nutrition:{ kcal:130, protein_g:2.7, carb_g:28.0, fat_g:0.2, fiber_g:1.0 }, price_per_kg:6.0, category:'cereal', preps:['cozido'] },
+    "feijao carioca cozido": { id:'feijao_carioca', name:'Feijão carioca cozido', nutrition:{ kcal:347, protein_g:21.1, carb_g:62.4, fat_g:1.4, fiber_g:16.6 }, price_per_kg:8.5, category:'leguminosa', preps:['cozido'] },
+    "frango peito sem pele cozido": { id:'frango_peito', name:'Frango peito sem pele cozido', nutrition:{ kcal:165, protein_g:31.0, carb_g:0.0, fat_g:3.6 }, price_per_kg:18.0, category:'proteina_animal', preps:['grelhado','cozido','assado'] },
+    "ovo inteiro cozido": { id:'ovo_cozido', name:'Ovo inteiro cozido', nutrition:{ kcal:155, protein_g:13.0, carb_g:1.1, fat_g:11.0 }, price_per_kg:15.0, category:'proteina_animal', preps:['cozido','frito'] },
+    "arroz integral cozido": { id:'arroz_integral', name:'Arroz integral cozido', nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 }, price_per_kg:6.0, category:'cereal', preps:['cozido'] },
+    "banana nanica": { id:'banana_nanica', name:'Banana nanica', nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, price_per_kg:4.0, category:'fruta', preps:['crua','assada'] },
+    "alface americana": { id:'alface', name:'Alface americana', nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, price_per_kg:6.0, category:'verdura', preps:['crua'] },
+    "brocolis cozido": { id:'brocolis', name:'Brócolis cozido', nutrition:{ kcal:55, protein_g:3.7, carb_g:11.1, fat_g:0.6, fiber_g:3.3 }, price_per_kg:7.0, category:'verdura', preps:['cozido','grelhado'] },
+    "batata inglesa cozida": { id:'batata', name:'Batata inglesa cozida', nutrition:{ kcal:87, protein_g:1.9, carb_g:20.1, fat_g:0.1, fiber_g:1.8 }, price_per_kg:3.0, category:'tuberculo', preps:['cozido','assado','purê'] },
+    "aveia flocos crua": { id:'aveia', name:'Aveia flocos', nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, price_per_kg:9.5, category:'cereal', preps:['crua','cozida'] }
+  };
+
+  // build lookup
+  function buildLookup(db){
+    const byName={}, byId={};
+    Object.values(db).forEach(r=>{
+      byName[normalizeName(r.name)] = r;
+      if(r.id) byId[r.id] = r;
     });
+    return { byName, byId };
+  }
+  let lookup = buildLookup(seed);
+
+  function findFood(key){
+    if(!key) return null;
+    if(typeof key === 'object' && key.name) return findFood(key.name);
+    const k = key.toString();
+    if(lookup.byId[k]) return lookup.byId[k];
+    const norm = normalizeName(k);
+    if(lookup.byName[norm]) return lookup.byName[norm];
+    for(const nm in lookup.byName){
+      if(nm.includes(norm) || norm.includes(nm)) return lookup.byName[nm];
+    }
+    return null;
+  }
+
+  // init supabase holder
+  let _supabase = null;
+  function init({ supabase }){
+    if(!supabase) throw new Error('supabase required');
+    _supabase = supabase;
+  }
+
+  /* --- core calculations (BMR, TDEE, targets) --- */
+  function calcBMR(profile){
+    const peso=_safeNum(profile.peso,70), altura_m=_safeNum(profile.altura, profile.altura_m||1.7), idade=_safeNum(profile.idade,30), sexo=(profile.sexo||'').toLowerCase();
+    const h = Math.round(altura_m*100);
+    if(sexo.startsWith('m')) return Math.round(10*peso + 6.25*h - 5*idade + 5);
+    return Math.round(10*peso + 6.25*h - 5*idade - 161);
+  }
+  function activityFactor(profile){
+    const nivel=(profile.nivel||'').toLowerCase(); const dias=_safeNum(profile.disponibilidade||profile.dias_treino_sem||profile.dias_treino,3);
+    if(nivel.includes('inic')||dias<=1) return 1.2;
+    if(nivel.includes('inter')||dias<=3) return 1.375;
+    if(nivel.includes('avanc')||dias>=5) return 1.55;
+    return 1.375;
+  }
+  function deriveTargets(profile){
+    const bmr = calcBMR(profile);
+    const af = activityFactor(profile);
+    const tdee = Math.round(bmr * af);
+    const goal=(profile.objetivo||profile.grande_meta||'').toLowerCase();
+    let targetCalories = tdee;
+    if(/emagrec|perder|secar/.test(goal)) targetCalories = Math.round(tdee * 0.80);
+    if(/ganhar|massa|hipertrof/.test(goal)) targetCalories = Math.round(tdee * 1.12);
+    const peso = _safeNum(profile.peso,70);
+    let protPerKg=1.4;
+    if(/ganhar|massa|hipertrof/.test(goal)) protPerKg = 1.6;
+    if(/emagrec|perder/.test(goal)) protPerKg = 1.6;
+    const protein_g = Math.round(protPerKg * peso);
+    const fatPerc = 0.25;
+    const protCals = protein_g * 4;
+    const fatCals = Math.round(targetCalories * fatPerc);
+    const carbsCals = targetCalories - protCals - fatCals;
+    const carbs_g = Math.max(0, Math.round(carbsCals / 4));
+    const fat_g = Math.max(0, Math.round(fatCals / 9));
+    return { bmr, tdee, targetCalories, protein_g, carbs_g, fat_g, protPerKg };
+  }
+
+  /* --- satiety, nutrient density, CBrank --- */
+  function computeSatiety(rec){
+    if(!rec || !rec.nutrition) return 0.5;
+    const n = rec.nutrition;
+    const prot = _safeNum(n.protein_g,0);
+    const fib = _safeNum(n.fiber_g,0);
+    const fat = _safeNum(n.fat_g,0);
+    const s = (0.45*(prot/30)) + (0.35*(fib/10)) + (0.15*(fat/20));
+    return Math.min(1, Math.max(0, s));
+  }
+  function computeCBrank(rec, profile){
+    if(!rec) return 0;
+    const price = _safeNum(rec.price_per_kg, 1);
+    const protPerBRL = (_safeNum(rec.nutrition?.protein_g,0)*10) / price;
+    const kcalPerBRL = (_safeNum(rec.nutrition?.kcal,0)*10) / price;
+    const sat = computeSatiety(rec);
+    const goal = (profile.grande_meta||'').toLowerCase();
+    let wProt=0.45,wKcal=0.2,wSat=0.2,wNd=0.15;
+    if(/ganhar|massa|hipertrof/.test(goal)){ wProt=0.6; wKcal=0.1; wSat=0.15; wNd=0.15; }
+    if(/emagrec|perder/.test(goal)){ wProt=0.45; wKcal=0.1; wSat=0.3; wNd=0.15; }
+    const score = (wProt*protPerBRL) + (wKcal*kcalPerBRL) + (wSat*(sat*10)) + (wNd*1);
+    return _round(score,4);
+  }
+
+  /* --- meal gram computation --- */
+  function computeGramAmountsForMeal(mealTargets, components){
+    // components: { protein: 'frango', carb: 'arroz', veg: 'alface' }
+    const protRec = findFood(components.protein), carbRec = findFood(components.carb), vegRec = findFood(components.veg);
+    const getPer100 = (r, key) => r && r.nutrition ? _safeNum(r.nutrition[key],0) : 0;
+    const protNeeded = _safeNum(mealTargets.prot_g, 20);
+    const carbsNeeded = _safeNum(mealTargets.carbs_g, 40);
+    let protGrams = protRec && getPer100(protRec,'protein_g')>0 ? Math.round(protNeeded / (getPer100(protRec,'protein_g')/100)) : 120;
+    let carbGrams = carbRec && getPer100(carbRec,'carb_g')>0 ? Math.round(carbsNeeded / (getPer100(carbRec,'carb_g')/100)) : 150;
+    let vegGrams = 100;
+    // adjust to target calories if provided
+    function kcalFrom(rec, g){ return rec && rec.nutrition ? (rec.nutrition.kcal || 0) * g / 100 : 0; }
+    let totalKcal = kcalFrom(protRec, protGrams) + kcalFrom(carbRec, carbGrams) + kcalFrom(vegRec, vegGrams);
+    if(mealTargets.calories && Math.abs(totalKcal - mealTargets.calories) / mealTargets.calories > 0.12){
+      const desired = mealTargets.calories;
+      const withoutCarb = kcalFrom(protRec, protGrams) + kcalFrom(vegRec, vegGrams);
+      const targetCarbKcal = Math.max(0, desired - withoutCarb);
+      if(carbRec && _safeNum(carbRec.nutrition?.kcal,0)>0){
+        carbGrams = Math.round((targetCarbKcal / carbRec.nutrition.kcal) * 100);
+      }
+      totalKcal = kcalFrom(protRec, protGrams) + kcalFrom(carbRec, carbGrams) + kcalFrom(vegRec, vegGrams);
+    }
+    return { protein_grams: protGrams, carb_grams: carbGrams, veg_grams: vegGrams, kcal_est: _round(totalKcal,0) };
+  }
+
+  /* --- week template and cheat compensation --- */
+  function weeklyBudgetFromMonthly(m){ return m ? _round(_safeNum(m)/4.345,2) : null; }
+  function buildWeekTemplate(dailyCal, diasTreino, cheatPolicy){
+    const week = Array.from({length:7}).map(()=>({ baseCalories: dailyCal, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
+    const dt = Math.max(0,_safeNum(diasTreino,3));
+    if(dt>0){ const step = Math.floor(7/dt)||1; let idx=0; for(let i=0;i<dt;i++){ week[idx].isTrainingDay=true; week[idx].baseCalories=Math.round(dailyCal*1.08); idx=(idx+step)%7; } }
+    if(cheatPolicy && cheatPolicy.freqPerWeek>0){ let idx=6; for(let i=6;i>=0;i--){ if(!week[i].isTrainingDay){ idx=i; break; } } week[idx].isCheatDay=true; week[idx].cheatLimit=cheatPolicy.cheatCaloriesLimit||Math.round(dailyCal*1.5); }
+    return week;
+  }
+  function compensateCheatWeek(weekArr){
+    const baseTotal = weekArr.reduce((s,d)=>s+d.baseCalories,0);
+    const cheat = weekArr.find(d=>d.isCheatDay);
+    if(!cheat) return weekArr;
+    const cheatActual = cheat.cheatLimit || cheat.baseCalories;
+    const newTotal = baseTotal - cheat.baseCalories + cheatActual;
+    const excess = newTotal - baseTotal;
+    if(excess<=0) return weekArr;
+    const nonCheat = weekArr.filter(d=>!d.isCheatDay);
+    const perDay = Math.ceil(excess/nonCheat.length);
+    for(const d of nonCheat){ const minAllowed = Math.round(d.baseCalories*0.6); d.baseCalories = Math.max(minAllowed, d.baseCalories - perDay); d.adjusted=true; }
+    return weekArr;
+  }
+
+  /* --- generator principal --- */
+  async function generatePlan(profile, options={}){
+    const start = options.startDate ? new Date(options.startDate) : new Date();
+    const months = Math.max(1,_safeNum(options.months,3));
+    const targets = deriveTargets(profile);
+    const dailyTargetCalories = targets.targetCalories;
+    const weeklyBudget = options.weeklyBudgetOverride || weeklyBudgetFromMonthly(profile.orcamento_mes_R$||0);
+    const diasTreino = _safeNum(profile.disponibilidade||profile.dias_treino_sem||profile.dias_treino,3);
+    const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek:1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
+    const totalWeeks = Math.max(1, Math.round(months * 4.345));
+    const timeline_weeks = [];
+
+    for(let w=0; w<totalWeeks; w++){
+      let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreino, cheatPolicy);
+      weekTemplate = compensateCheatWeek(weekTemplate);
+      const days = [];
+      for(let d=0; d<7; d++){
+        const daySpec = weekTemplate[d];
+        const mealsCount = Math.min(6, Math.max(3, 3 + Math.floor(diasTreino/2)));
+        const mealNames = ["Café da manhã","Lanche manhã","Almoço","Lanche tarde","Jantar","Ceia"].slice(0,mealsCount);
+        const mealWeights = mealNames.map(m => /almoço|almoco|jantar/i.test(m) ? 1.6 : (/café/i.test(m) ? 1.0 : 0.8));
+        const totalW = mealWeights.reduce((a,b)=>a+b,0);
+        const dayMeals = [];
+        for(let m=0;m<mealsCount;m++){
+          const mealName = mealNames[m];
+          const weight = mealWeights[m];
+          const mealCalories = Math.round((weight/totalW) * daySpec.baseCalories);
+          const protForMeal = Math.round((targets.protein_g/totalW) * weight);
+          const carbsForMeal = Math.round((targets.carbs_g/totalW) * weight);
+          const fatForMeal = Math.round((targets.fat_g/totalW) * weight);
+          // choose components: pick high-ranked in relevant categories
+          const candidateProtein = (Object.values(lookup.byName).filter(r=>r.category && (r.category.includes('proteina')||r.category==='leguminosa')).sort((a,b)=>computeCBrank(b,profile)-computeCBrank(a,profile))[0]) || findFood('feijao carioca cozido');
+          const candidateCarb = (Object.values(lookup.byName).filter(r=>r.category && (r.category.includes('cereal')||r.category==='tuberculo')).sort((a,b)=>computeCBrank(b,profile)-computeCBrank(a,profile))[0]) || findFood('arroz tipo 1 cozido');
+          const candidateVeg = (Object.values(lookup.byName).filter(r=>r.category && (r.category.includes('verdura')||r.category==='fruta')).sort((a,b)=>computeCBrank(b,profile)-computeCBrank(a,profile))[0]) || findFood('alface americana');
+          const components = { protein: candidateProtein.name, carb: candidateCarb.name, veg: candidateVeg.name };
+          const grams = computeGramAmountsForMeal({ prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, components);
+          // group assembly: arroz+feijao detection
+          const group = [];
+          if(normalizeName(components.protein).includes('feijao') && normalizeName(components.carb).includes('arroz')){
+            group.push({ food: components.carb, grams: grams.carb_grams, role:'carbo' });
+            group.push({ food: components.protein, grams: grams.protein_grams, role:'proteina' });
+          } else {
+            group.push({ food: components.protein, grams: grams.protein_grams, role:'proteina' });
+            group.push({ food: components.carb, grams: grams.carb_grams, role:'carbo' });
+          }
+          group.push({ food: components.veg, grams: grams.veg_grams, role:'veg' });
+          // compute kcal
+          let groupKcal = 0;
+          const groupDetailed = group.map(g=>{
+            const r = findFood(g.food);
+            const kcal = r && r.nutrition ? Math.round((r.nutrition.kcal||0) * g.grams / 100) : null;
+            if(kcal) groupKcal += kcal;
+            return { ...g, kcal };
+          });
+          dayMeals.push({
+            mealName,
+            mealCaloriesTarget: mealCalories,
+            components: groupDetailed,
+            mealKcalTotal: groupKcal
+          });
+        }
+        days.push({ dayIndex: d+1, baseCalories: daySpec.baseCalories, isTrainingDay: daySpec.isTrainingDay, isCheatDay: daySpec.isCheatDay, meals: dayMeals });
+      }
+      const estimatedWeeklyCost = (function(){ let s=0; for(const day of days) for(const meal of day.meals) for(const comp of meal.components){ const r=findFood(comp.food); if(r && r.price_per_kg && comp.grams){ s += r.price_per_kg * (comp.grams/1000); } } return _round(s,2); })();
+      timeline_weeks.push({ weekIndex:w+1, weekStartISO:new Date(start.getTime()+w*7*24*3600*1000).toISOString().slice(0,10), days, estimatedWeeklyCost });
+    }
+
+    // credibility & estimates
+    const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s+(w.estimatedWeeklyCost||0),0)/timeline_weeks.length,2);
+    const budgetAdherence = weeklyBudget ? Math.min(1, Math.max(0, 1 - Math.abs(avgWeeklyCost - weeklyBudget)/ (weeklyBudget || avgWeeklyCost))) : 0.9;
+    const meta = { adherenceToCaloriesPct:0.95, adherenceToBudgetPct: budgetAdherence, practicalityPct:0.92, varietyScore:0.85, feasibilityPct:0.9 };
+    const credibility = Math.round((meta.adherenceToCaloriesPct*0.3 + meta.adherenceToBudgetPct*0.25 + meta.practicalityPct*0.2 + meta.varietyScore*0.15 + meta.feasibilityPct*0.1)*100);
+
+    const payload = {
+      version:'super-algo-v1',
+      created_at: nowISO(),
+      profile_snapshot: profile,
+      targets,
+      timeline_weeks,
+      estimates:{ avgWeeklyCost, weeklyBudget, dailyTargetCalories: targets.targetCalories, tdee: targets.tdee, bmr: targets.bmr },
+      credibility:{ score:credibility, breakdown: meta },
+      provenance:{ engine:'super-diet-engine-inline-v1' }
+    };
+    if(options.debug) payload._internal = { lookup, options };
+    return payload;
+  }
+
+  // persistence
+  async function savePlan(userId, plan, options={}){
+    if(!_supabase) throw new Error('Supabase not initialized (init({supabase}))');
+    const title = options.title || `Plano ${plan.targets?.targetCalories || ''} kcal - ${new Date().toLocaleString()}`;
+    const row = { user_id: userId, title, payload: plan };
+    const { data, error } = await _supabase.from('user_diets').insert([row]);
+    if(error) throw error;
+    return data;
+  }
+  async function loadLatestPlan(userId){
+    if(!_supabase) throw new Error('Supabase not initialized (init({supabase}))');
+    const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', userId).order('created_at', { ascending:false }).limit(1).single();
+    if(error) return null;
+    return data;
+  }
+
+  // public API
+  return {
+    init: ({ supabase })=>{ init({ supabase }); },
+    generatePlan,
+    savePlan,
+    loadLatestPlan,
+    findFood,
+    getAllowedPrepsForFood: (name)=>{ const r = findFood(name); return r ? r.preps : ['crua','cozido']; },
+    computeCBrank,
+    computeSatiety,
+    masterSnapshot: ()=>({ lookup })
+  };
+})();
+
+/* ===========================
+   Integração com o members-saude.html
+   =========================== */
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+// ====== CONFIGURAÇÃO ======
+const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+SuperDietEngine.init({ supabase });
+
+// UI helpers & previous functions (menu etc)
+function setWelcome(text){ document.getElementById('welcome-msg').textContent = text; }
+function switchTab(tabId){
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  const link = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
+  if(link) link.classList.add('active');
+}
+
+// menu interactions
+const menuToggle = document.getElementById('menu-toggle'); const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('overlay'); const navLinks = document.querySelectorAll('.nav-link'); const configBtn = document.getElementById('config-btn'); const logoutBtn = document.getElementById('logout-btn'); const resetBtn = document.getElementById('reset-btn');
+menuToggle.addEventListener('click', ()=>{ menuToggle.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+overlay.addEventListener('click', ()=>{ menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+navLinks.forEach(link=>link.addEventListener('click', (e)=>{ e.preventDefault(); const t=link.dataset.tab; switchTab(t); menuToggle.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); }));
+
+configBtn.addEventListener('click', ()=>{ logoutBtn.classList.toggle('hidden'); resetBtn.classList.toggle('hidden'); });
+logoutBtn.addEventListener('click', async (e)=>{ e.preventDefault(); await supabase.auth.signOut(); window.location.replace('/login.html'); });
+
+// page init
+document.addEventListener('DOMContentLoaded', async () => {
+  // get user session
+  const { data } = await supabase.auth.getUser();
+  if(!data.user){ window.location.replace('/login.html'); return; }
+  const user = data.user;
+  setWelcome(`Bem-vindo(a), ${user.email}`);
+
+  // load profile from profiles table (existing)
+  const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  if(error || !profile){ console.error('Erro ao buscar perfil:', error); /* force logout to be safe */ await supabase.auth.signOut(); window.location.replace('/login.html'); return; }
+
+  // show either form or results depending on profile.goal_end_date or saved plan
+  const savedPlan = await SuperDietEngine.loadLatestPlan(user.id).catch(()=>null);
+  if(savedPlan && savedPlan.payload){
+    // render from saved plan
+    renderPlanInPercurso(savedPlan.payload);
+    // set credibility display
+    displayCredibility(savedPlan.payload);
+    switchTab('percurso');
+  } else if(profile.goal_end_date){
+    // profile has goal dates but no saved plan -> show results section (same behavior)
+    displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
+    switchTab('ia-planejamento');
+  } else {
+    // show IA form
+    document.getElementById('form-wrapper').style.display = 'block';
+    switchTab('ia-planejamento');
+  }
+
+  // inject dify chat iframe (kept from previous)
+  injectDify();
+
+  // bind IA form interactions
+  wireIAForm(user, profile);
+  // bind percurso controls
+  document.getElementById('btnSavePlan').addEventListener('click', async () => {
+    // get current rendered plan from globalRenderedPlan
+    if(window.currentRenderedPlan){
+      try {
+        await SuperDietEngine.savePlan(user.id, window.currentRenderedPlan, { title: 'Plano gerado pela IA' });
+        alert('Plano salvo com sucesso na sua conta!');
+      } catch(err){
+        console.error('Erro ao salvar plano:', err);
+        alert('Erro ao salvar plano. Veja console.');
+      }
+    } else {
+      alert('Nenhum plano carregado para salvar.');
+    }
+  });
+  document.getElementById('btnReloadPlan').addEventListener('click', async () => {
+    const latest = await SuperDietEngine.loadLatestPlan(user.id).catch(()=>null);
+    if(latest && latest.payload){ renderPlanInPercurso(latest.payload); displayCredibility(latest.payload); } else alert('Nenhum plano encontrado.');
+  });
+
+}); // DOMContentLoaded
+
+/* -------------------------
+   FUNCTIONS: Chat + old helpers kept
+   ------------------------- */
+function injectDify(){
+  const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
+  const difyContainer = document.getElementById('dify-container');
+  if(!difyContainer) return;
+  difyContainer.innerHTML = '';
+  const frameWrap = document.createElement('div'); frameWrap.className = 'dify-frame';
+  const iframe = document.createElement('iframe');
+  const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?theme=dark`;
+  iframe.src = difyUrl; iframe.allow = 'microphone';
+  frameWrap.appendChild(iframe);
+  const strip=document.createElement('div'); strip.className='dify-top-strip'; strip.setAttribute('aria-hidden','true');
+  const badge=document.createElement('div'); badge.className='dify-top-badge'; badge.textContent='Fale com a IA';
+  const label=document.createElement('span'); label.className='mvp-label'; label.textContent='MVPia';
+  strip.appendChild(badge); strip.appendChild(label);
+  const bottomMask=document.createElement('div'); bottomMask.className='dify-bottom-mask'; bottomMask.setAttribute('aria-hidden','true');
+  frameWrap.appendChild(strip); frameWrap.appendChild(bottomMask);
+  difyContainer.appendChild(frameWrap);
+}
+
+/* -------------------------
+   IA form wiring: submit -> generate plan -> save & render
+   ------------------------- */
+function wireIAForm(user, currentProfile){
+  const objetivoInput = document.getElementById('objetivo');
+  if(objetivoInput) objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; });
+  const usoSuplementoSelect = document.getElementById('uso_suplemento');
+  if(usoSuplementoSelect) usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim')document.getElementById('quais_suplementos').value=''; });
+
+  const iaFitForm = document.getElementById('ia-fit-form');
+  if(!iaFitForm) return;
+  iaFitForm.addEventListener('submit', async function(event){
+    event.preventDefault();
+    // collect profile object from form
+    const e = event.target.elements;
+    const profile = {
+      id: currentProfile.id,
+      email: currentProfile.email,
+      grande_meta: e.objetivo.value.trim(),
+      prazo: e.prazo.value.trim(),
+      sexo: e.sexo.value,
+      altura: parseFloat(e.altura.value.replace(',','.')),
+      peso: parseFloat(e.peso.value),
+      idade: parseInt(e.idade.value,10),
+      disponibilidade: parseInt(e.disponibilidade.value,10),
+      local_treino: e.local_treino.value,
+      orcamento_mes_R$: e.orcamento.value.replace(/\./g,'').replace(',','.'),
+      uso_suplemento: e.uso_suplemento.value,
+      quais_suplementos: document.getElementById('quais_suplementos').value || '',
+      nivel: e.nivel.value
+    };
+
+    // derive plan with engine
+    try{
+      const plan = await SuperDietEngine.generatePlan(profile, { months: 3, startDate: new Date() });
+      // save automatically
+      await SuperDietEngine.savePlan(user.id, plan, { title: 'Plano inicial (gerado)' });
+      // render in percurso
+      renderPlanInPercurso(plan);
+      displayCredibility(plan);
+      // also update profiles table with goal dates to keep previous behavior (non-invasive)
+      // compute dates from prazo: naive parsing (3 months etc)
+      const endDate = calcEndFromPrazo(profile.prazo);
+      const startDate = new Date(); startDate.setHours(0,0,0,0);
+      await supabase.from('profiles').update({ goal_start_date: startDate.toISOString(), goal_end_date: endDate ? endDate.toISOString() : null, goal_prompt: profile.grande_meta }).eq('id', user.id);
+      // navigate to percurso
+      switchTab('percurso');
+    } catch(err){
+      console.error('Erro ao gerar/salvar plano:', err);
+      alert('Erro ao gerar o plano. Veja console.');
+    }
+  });
+}
+
+// small helper to parse prazo text -> date (reuse earlier logic)
+function calcEndFromPrazo(prazoText){
+  if(!prazoText) return null;
+  const now = new Date(); const year = now.getFullYear(); let s = prazoText.toLowerCase();
+  if(s.includes('mes')){ const m = s.match(/(\d+)\s*mes/); if(m){ let d=new Date(); d.setMonth(d.getMonth()+parseInt(m[1],10)); return d; } }
+  if(s.includes('verao')||s.includes('verão')){ const d=new Date(year,11,21); return now<d?d:new Date(year+1,11,21); }
+  if(s.includes('natal')){ const d=new Date(year,11,25); return now<d?d:new Date(year+1,11,25); }
+  return null;
+}
+
+/* -------------------------
+   RENDER: Percurso Plan Display
+   - months tabs
+   - month grid -> day cards -> meals -> groups -> foods
+   - editable grams inputs and prep selects; editing updates kcal and internal plan object.
+   ------------------------- */
+
+function displayCredibility(plan){
+  const el = document.getElementById('credibility-display');
+  if(!plan || !plan.credibility){ el.innerHTML=''; return; }
+  const score = plan.credibility.score || (plan.credibility && plan.credibility.breakdown ? Math.round((Object.values(plan.credibility.breakdown).reduce((a,b)=>a+b,0)/5)*100) : 0);
+  el.innerHTML = `<div class="credibility"><div>Credibilidade do Plano</div><div class="cred-score">${score}%</div></div>`;
+}
+
+function renderPlanInPercurso(plan){
+  // store global for saving
+  window.currentRenderedPlan = plan;
+  // clear tabs
+  const tabsContainer = document.getElementById('month-tabs');
+  const monthContent = document.getElementById('month-content');
+  tabsContainer.innerHTML = '';
+  monthContent.innerHTML = '';
+  // derive months from timeline_weeks grouping by month number
+  // we will transform timeline_weeks -> months array: each month contains up to ~4 weeks
+  const weeks = plan.timeline_weeks || [];
+  // map weekStartISO to month index (YYYY-MM)
+  const monthsMap = {};
+  weeks.forEach(w=>{
+    const dt = new Date(w.weekStartISO);
+    const key = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+    monthsMap[key] = monthsMap[key] || { key, label: `${dt.toLocaleString('pt-BR',{month:'long', year:'numeric'})}`, weeks: [] };
+    monthsMap[key].weeks.push(w);
+  });
+  const months = Object.values(monthsMap);
+  if(months.length === 0){
+    document.getElementById('month-tabs').innerText = 'Nenhum plano disponível para exibir.';
+    return;
+  }
+  // build tabs
+  months.forEach((month, idx)=>{
+    const btn = document.createElement('div'); btn.className='month-tab' + (idx===0 ? ' active' : ''); btn.textContent = month.label;
+    btn.addEventListener('click', ()=>{ document.querySelectorAll('.month-tab').forEach((p,i)=>p.classList.toggle('active', p===btn)); showMonthContent(month); });
+    tabsContainer.appendChild(btn);
+  });
+  // show first month
+  showMonthContent(months[0]);
+
+  function showMonthContent(month){
+    monthContent.innerHTML = '';
+    // create grid with one card per day (each week may have 7 days)
+    // we will flatten weeks->days
+    const allDays = [];
+    month.weeks.forEach(wk=>{
+      wk.days.forEach(d=> allDays.push({ weekIndex: wk.weekIndex, weekStartISO: wk.weekStartISO, ...d }));
+    });
+    // create cards
+    allDays.forEach(day=>{
+      const card = document.createElement('div'); card.className='month-card';
+      const dayCard = document.createElement('div'); dayCard.className='day-card-percurso';
+      dayCard.innerHTML = `<h4>Dia ${day.dayIndex} — ${day.isTrainingDay ? 'Treino' : 'Descanso'} ${day.isCheatDay ? '(Cheat)' : ''}</h4>`;
+      // meals
+      day.meals.forEach((meal, mIdx)=>{
+        const mealDiv = document.createElement('div'); mealDiv.className='meal-row';
+        const mealTitle = document.createElement('div'); mealTitle.style.color='#ddd'; mealTitle.style.fontWeight='700'; mealTitle.textContent = `${meal.mealName} — Alvo: ${meal.mealCaloriesTarget} kcal — Total: ${meal.mealKcalTotal} kcal`;
+        mealDiv.appendChild(mealTitle);
+        // groups
+        meal.components.forEach((comp, compIdx)=>{
+          const g = document.createElement('div'); g.className='group-row';
+          const left = document.createElement('div'); left.className='group-left';
+          const chip = document.createElement('div'); chip.className='food-chip'; chip.textContent = (comp.food.match(/\b(\w)/g)||[]).slice(0,2).join('').toUpperCase();
+          const info = document.createElement('div'); info.className='group-info'; info.innerHTML = `<div style="font-weight:700">${comp.food}</div><div style="font-size:12px;color:#bbb">${comp.role}</div>`;
+          left.appendChild(chip); left.appendChild(info);
+          const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
+          // grams input
+          const inp = document.createElement('input'); inp.type='number'; inp.className='input-grams'; inp.value = comp.grams || 0; inp.min = 0;
+          // prep select
+          const sel = document.createElement('select'); sel.className='prep-select';
+          // populate preps from engine
+          const preps = SuperDietEngine.getAllowedPrepsForFood(comp.food) || ['crua','cozido'];
+          sel.innerHTML = preps.map(p => `<option value="${p}">${p}</option>`).join('');
+          // kcal label
+          const kcalLabel = document.createElement('div'); kcalLabel.className='group-kcal'; kcalLabel.textContent = `${comp.kcal || 0} kcal`;
+          right.appendChild(inp); right.appendChild(sel); right.appendChild(kcalLabel);
+          g.appendChild(left); g.appendChild(right);
+          mealDiv.appendChild(g);
+
+          // event handlers: update plan object and kcal when grams change
+          inp.addEventListener('input', (ev)=>{
+            const newQty = Number(ev.target.value || 0);
+            comp.grams = newQty;
+            // recompute kcal
+            const rec = SuperDietEngine.findFood(comp.food);
+            comp.kcal = rec && rec.nutrition ? Math.round((rec.nutrition.kcal||0) * newQty / 100) : 0;
+            // update meal.total display
+            const mealKcal = meal.components.reduce((s,c)=>s + (c.kcal||0),0);
+            meal.mealKcalTotal = mealKcal;
+            mealTitle.textContent = `${meal.mealName} — Alvo: ${meal.mealCaloriesTarget} kcal — Total: ${meal.mealKcalTotal} kcal`;
+            kcalLabel.textContent = `${comp.kcal || 0} kcal`;
+            // update global plan object stored in window.currentRenderedPlan
+            window.currentRenderedPlan.timeline_weeks.forEach(w => { w.days.forEach(d => { if(d.dayIndex === day.dayIndex && w.weekIndex == (day.weekIndex)) { d.meals = d.meals; } }); });
+          });
+
+          sel.addEventListener('change', (ev)=>{
+            const chosen = ev.target.value;
+            // validate prep
+            const rec = SuperDietEngine.findFood(comp.food);
+            if(rec && rec.preps && !rec.preps.includes(chosen)){
+              // if invalid, revert
+              alert('Modo de preparo inválido para este alimento.');
+              sel.value = rec.preps && rec.preps[0] ? rec.preps[0] : sel.value;
+            }
+          });
+
+        }); // components loop
+
+        dayCard.appendChild(mealDiv);
+      }); // meals loop
+
+      // day footer: credibility small / save buttons not per day
+      card.appendChild(dayCard);
+      monthContent.appendChild(card);
+    });
+    // keep currentRenderedPlan updated reference (already set)
+  } // showMonthContent
+
+} // renderPlanInPercurso
+
+/* -------------------------
+   Utility displayProgress (kept)
+   ------------------------- */
+function displayProgress(startDate, endDate){
+  const now = new Date(); now.setHours(0,0,0,0);
+  const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
+  const eDate = new Date(endDate); eDate.setHours(0,0,0,0);
+  const totalDuration = eDate.getTime() - sDate.getTime();
+  const elapsedDuration = now.getTime() - sDate.getTime();
+  const daysRemaining = Math.ceil((eDate-now)/(1000*60*60*24));
+  let progressPercentage = (elapsedDuration/totalDuration)*100;
+  if(progressPercentage<0) progressPercentage=0; if(progressPercentage>100) progressPercentage=100;
+  document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+  document.getElementById('start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
+  document.getElementById('end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
+  document.getElementById('countdown-days').textContent = daysRemaining>=0?daysRemaining:0;
+  document.getElementById('form-wrapper').style.display='none';
+  document.getElementById('results-wrapper').style.display='block';
+}
+
+/* -------------------------
+   Expose engine for console debugging
+   ------------------------- */
+window.SuperDietEngine = SuperDietEngine;
+
 </script>
 </body>
 </html>
