@@ -78,6 +78,7 @@
     .goal-section { background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border: 1px solid #444; padding: 30px; margin-bottom: 40px; border-radius: 10px; text-align: center; }
     .goal-title { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #007BFF, #00C6FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     button[type="submit"] { width: 100%; padding: 15px; background: linear-gradient(90deg, #007BFF, #0056b3); border: none; border-radius: 8px; color: #FFFFFF; font-size: 18px; font-weight: 600; cursor: pointer; }
+    button[type="submit"]:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
     .progress-section { margin-top: 40px; padding: 20px; background-color: #2C2C2C; border-radius: 10px; }
     .progress-bar-container { width: 100%; background-color: #444; border-radius: 10px; overflow: hidden; }
     .progress-bar { width: 0%; background-color: #007BFF; height: 20px; transition: width 0.5s ease-in-out; }
@@ -112,11 +113,11 @@
 
 
     /* --- AJUSTE CHATBOT DIFY --- */
-    .iframe-container {
-        border-radius: 12px;
-        overflow: hidden;
+    .iframe-container { 
+        border-radius: 12px; 
+        overflow: hidden; 
         position: relative;
-        height: 70vh;
+        height: 70vh; 
         min-height: 500px;
         max-height: 700px;
         background: #000;
@@ -135,10 +136,10 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 50px;
-        background-color: #000000;
+        height: 50px; 
+        background-color: #000000; 
         z-index: 2;
-        pointer-events: none;
+        pointer-events: none; 
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -166,10 +167,10 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 42px;
-        background-color: #000000;
+        height: 42px; 
+        background-color: #000000; 
         z-index: 2;
-        pointer-events: none;
+        pointer-events: none; 
     }
     /* --- FIM AJUSTE CHATBOT DIFY --- */
 
@@ -184,12 +185,12 @@
         font-weight: 600;
         color: #BBBBBB;
         cursor: pointer;
-        list-style: none;
+        list-style: none; 
         position: relative;
     }
-    .day-selector-summary::-webkit-details-marker { display: none; }
-    .day-selector-summary::marker { display: none; }
-    .day-selector-summary::after {
+    .day-selector-summary::-webkit-details-marker { display: none; } 
+    .day-selector-summary::marker { display: none; } 
+    .day-selector-summary::after { 
         content: '▼';
         font-size: 0.8em;
         position: absolute;
@@ -208,7 +209,7 @@
         justify-content: center;
     }
     .day-circle-input {
-        display: none;
+        display: none; 
     }
     .day-circle-label {
         display: flex;
@@ -241,8 +242,8 @@
       .percurso-forms { grid-template-columns:1fr; }
       .plan-days { grid-template-columns:1fr; }
       body { padding: 20px 12px; }
-
-      .day-circle-label {
+      
+      .day-circle-label { 
         width: 36px;
         height: 36px;
         font-size: 13px;
@@ -254,11 +255,11 @@
       .meal-items-preview { display: none; }
 
     }
-
+    
     /* --- AJUSTE CHATBOT DIFY (MOBILE) --- */
     @media (max-width: 768px) {
         .dify-bottom-mask {
-            height: 38px;
+            height: 38px; 
         }
         .dify-top-strip {
             height: 45px;
@@ -289,7 +290,7 @@
         </div>
 
         <h3>Informações Básicas e Realidade Atual</h3>
-        <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
+        <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo" required><option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value->Feminino</option></select></div>
         <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
         <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
         <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
@@ -383,11 +384,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // <-- INICIALIZAÇÃO GLOBAL
 const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
 // ============================================
-// INÍCIO BLOCO 1 - Colar AQUI (Funções Globais)
+// INÍCIO BLOCO 1 - Colar AQUI
 // ============================================
 /* ============================================
     Helper functions reused in UI & Engine (Globally Scoped)
@@ -498,6 +499,9 @@ function mergeAndFilterComponents(components){
   // Arredonda no final
   return Object.values(map).map(m => ({ ...m, grams: Math.round(m.grams), kcal: Math.round(m.kcal) }));
 }
+
+function normalizeName(s){ if(!s) return ''; return s.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,' ').trim(); }
+
 // ============================================
 // FIM BLOCO 1
 // ============================================
@@ -961,7 +965,7 @@ const alimentosDB = [
 "Ovo, de galinha, clara cozida/10minutos",
 "Ovo, de galinha, gema cozida/10minutos",
 "Ovo, de galinha, inteiro cozido/10minutos",
-"Ovo, de galinha, inteiro frito"
+"Ovo, de galinha, inteiro frito"  
 ];
 
 /* ============================================
