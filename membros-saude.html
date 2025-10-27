@@ -592,35 +592,59 @@ const SuperDietEngine = (function(){
     }
     return dp[al][bl];
   }
+  // --- Função para detectar tipo de meta (ganho, perda, manutenção) com tolerância a erros ---
+function detectGoalType(goalText) {
+  if (!goalText || typeof goalText !== 'string') return 'manutencao';
+  
+  const text = goalText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  
+  // Palavras relacionadas a perda de peso
+  const lossWords = ['emagrecer', 'perder', 'deficit', 'diminuir', 'secar', 'reduzir', 'baixar peso', 'cutting'];
+  
+  // Palavras relacionadas a ganho de peso/massa
+  const gainWords = ['ganhar', 'aumentar', 'bulking', 'crescer', 'engordar', 'subir peso', 'superavit', 'massa'];
+  
+  // Palavras relacionadas à manutenção
+  const maintainWords = ['manter', 'estabilizar', 'manutencao', 'equilibrar', 'normal', 'saudavel'];
 
-  // detectGoalType (robusto)
-  function detectGoalType(text){
-    const s = (text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const loseKeywords = ['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer'];
-    const gainKeywords = ['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho','hipertrofia'];
-    let foundLose = false, foundGain = false;
+  // Checagem aproximada de correspondência
+  const containsAny = (arr) => arr.some(w => text.includes(w));
 
-    const words = s.split(/[\s,.;:!?()]+/).filter(Boolean);
-    const checkList = (kwList) => {
-      for(const kw of kwList){
-        if (s.includes(kw)) return true;
-        for(const w of words){
-          if (w === kw) return true;
-          if (levenshtein(w, kw) <= 1) return true;
-        }
+  if (containsAny(lossWords)) return 'perda';
+  if (containsAny(gainWords)) return 'ganho';
+  if (containsAny(maintainWords)) return 'manutencao';
+  
+  // Heurística extra (caso a pessoa escreva algo incompleto, ex: “emagreçer”)
+  const editDistance = (a, b) => {
+    const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+    for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+    for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] = a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
       }
-      return false;
-    };
+    }
+    return dp[a.length][b.length];
+  };
 
-    foundLose = checkList(loseKeywords);
-    foundGain = checkList(gainKeywords);
+  const keywords = [...lossWords, ...gainWords, ...maintainWords];
+  let bestMatch = { word: '', distance: Infinity };
 
-    if(foundLose && !foundGain) return 'emagrecer';
-    if(foundGain && !foundLose) return 'musculo';
-    if(foundLose && foundGain) return 'ambos';
-    return 'ambos';
+  for (const word of keywords) {
+    const distance = editDistance(text, word);
+    if (distance < bestMatch.distance) bestMatch = { word, distance };
   }
 
+  if (bestMatch.distance <= 3) {
+    if (lossWords.includes(bestMatch.word)) return 'perda';
+    if (gainWords.includes(bestMatch.word)) return 'ganho';
+    if (maintainWords.includes(bestMatch.word)) return 'manutencao';
+  }
+
+  return 'manutencao';
+}
   // extrai kg do texto
   function extractKgFromGoalText(text){
     if(!text) return null;
