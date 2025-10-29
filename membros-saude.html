@@ -288,7 +288,7 @@
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
   /* ===========================================
-     SuperDietEngine v5.0 - FOOD DATABASE (user-provided)
+     SuperDietEngine v5/6 - FOOD DATABASE (user-provided)
      =========================================== */
   const v5_FoodDatabase = {
   // --- 1. PROTEÍNAS (ALMOÇO/JANTAR) ---
@@ -637,7 +637,7 @@
   }
   }; // Fim da v5_FoodDatabase (user-provided)
 
-  // Add creatine entry (user requested creatina) and a friendly alias for whey
+  // Add creatine entry and whey alias
   v5_FoodDatabase['creatina_monohidratada'] = {
     name: 'Creatina monohidratada',
     nutrition: { kcal:0, protein_g:0, carb_g:0, fat_g:0, fiber_g:0 },
@@ -645,7 +645,6 @@
     category: 'suplemento',
     ig: 0
   };
-  // alias: create a copy with a clean key 'whey_concentrado' that points to same object (keeps original key too)
   if(v5_FoodDatabase['whey_protein_concentrado']){
     v5_FoodDatabase['whey_concentrado'] = { ...v5_FoodDatabase['whey_protein_concentrado'], name: 'Whey concentrado' };
   }
@@ -673,7 +672,6 @@
       const norm = normalizeName(stripParenthesis(rec.name));
       byName[norm] = rec;
       byId[rec.id] = rec;
-      // also add normalized id as possible name
       byName[normalizeName(rec.id)] = rec;
     });
     return { byName, byId };
@@ -685,7 +683,6 @@
     if(_lookup.byId[key]) return _lookup.byId[key];
     const norm = normalizeName(stripParenthesis(String(key)));
     if(_lookup.byName[norm]) return _lookup.byName[norm];
-    // fuzzy contains
     for(const nm in _lookup.byName){
       if(nm.includes(norm) || norm.includes(nm)) return _lookup.byName[nm];
     }
@@ -868,7 +865,7 @@
     return 1 - Math.min(1, (cost - 5) / 50);
   }
 
-  /* Modified: deterministic computeCBrank (removed randomness) */
+  /* Deterministic computeCBrank (no randomness) */
   function computeCBrank(rec, profile){
     if(!rec) return 0.5;
     const sat = computeSatietyScore(rec);
@@ -888,12 +885,39 @@
     }
 
     const base = (sat * satW) + (giScore * giW) + (costS * costW);
-
-    // Deterministic: return base only (no random variety)
     return Math.max(0, Math.min(1, base));
   }
 
-  /* Utilities for weekly template, rotation */
+  /* =======================
+     UPDATED: _rankFoodsByCategory with short and long term memory (penalties)
+     ======================= */
+  function _rankFoodsByCategory(categories, profile, shortTermAvoidList = [], longTermPenalizeList = []){
+    const recs = [];
+    for(const id in v5_FoodDatabase){
+      const rec = v5_FoodDatabase[id];
+      if(!rec) continue;
+      if(categories.includes(rec.category)){
+        const copy = { id, name: rec.name, nutrition: rec.nutrition || {}, price_per_kg: rec.price_per_kg || 0, ig: rec.ig, category: rec.category };
+        let rank = computeCBrank(copy, profile);
+
+        // 1. Short-term avoid list (high penalty)
+        if(Array.isArray(shortTermAvoidList) && shortTermAvoidList.includes(id)){
+          rank = rank * 0.25;
+        }
+
+        // 2. Long-term penalize list (medium penalty)
+        if(Array.isArray(longTermPenalizeList) && longTermPenalizeList.includes(id)){
+          rank = rank * 0.65;
+        }
+
+        recs.push({ ...copy, rank });
+      }
+    }
+    recs.sort((a,b) => (b.rank || 0) - (a.rank || 0) || a.name.localeCompare(b.name));
+    return recs.map(r => r.id);
+  }
+
+  /* Utilities for weekly template, rotation (rotateAlternativesForMonth removed — handled proactively by rankings) */
   function weeklyBudgetFromMonthly(monthly){ return _safeNum(monthly,0) / 4.345; }
 
   function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){
@@ -932,27 +956,6 @@
     const perDayReduction = Math.ceil(excess / nonCheat.length);
     for(const d of nonCheat){ const minAllowed = Math.round(d.baseCalories * 0.6); d.baseCalories = Math.max(minAllowed, d.baseCalories - perDayReduction); d.adjustedForCheat = true; }
     return weekArr;
-  }
-
-  function rotateAlternativesForMonth(itemsList, monthIndex, alternatesByCategory){
-    if(!itemsList || !alternatesByCategory) return itemsList;
-    return itemsList.map(it => {
-      const rec = findFood(it.food);
-      if(!rec) return it;
-      const cat = rec.category;
-      if(cat && alternatesByCategory[cat] && alternatesByCategory[cat].length > 1){
-        const arr = alternatesByCategory[cat];
-        let pick = it.food;
-        for(let a=0;a<arr.length;a++){
-          const idx = (monthIndex + a) % arr.length;
-          const candidateId = arr[idx];
-          const candidateName = (_lookup.byId[candidateId] && _lookup.byId[candidateId].name) || candidateId;
-          if(candidateName !== it.food){ pick = candidateName; break; }
-        }
-        if(pick !== it.food) return {...it, food: pick};
-      }
-      return it;
-    });
   }
 
   function computeGramAmountsForMeal(foodDBFindFn, mealMacroTargets, components){
@@ -1025,7 +1028,9 @@
     return q.includes(keyword);
   }
 
-  /* planLongTerm - atualizado com blueprints e rotação inteligente (get atualizado e memória maior) */
+  /* =====================
+     UPDATED planLongTerm v6.1 - monthly-aware ranking + short/long memory
+     ===================== */
   async function planLongTerm(profile, options = {}){
     const start = options.startDate ? new Date(options.startDate) : new Date();
     const months = Math.max(1, _safeNum(options.months, 3));
@@ -1039,10 +1044,16 @@
     const totalWeeks = Math.max(1, Math.round(months * 4.345));
     const timeline_weeks = [];
 
-    // baseline alternatesByCategory (used para rotação mensal)
-    const alternatesByCategory = {};
-    const cats = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
-    cats.forEach(cat => { alternatesByCategory[cat] = _rankFoodsByCategory([cat], profileWithTargets).slice(0, 40); });
+    // <-- MUDANÇA: Geramos rotações completas UMA VEZ (baseline ranking sem penalidades)
+    const fullProteinRotation = _rankFoodsByCategory(['proteina_main'], profileWithTargets);
+    const fullFishRotation = _rankFoodsByCategory(['peixe'], profileWithTargets);
+    const fullMainCarbRotation = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets);
+    const fullSnackProtRotation = _rankFoodsByCategory(['proteina_snack','laticinio_snack'], profileWithTargets);
+    const fullSnackCarbRotation = _rankFoodsByCategory(['cereal_snack','pao_snack'], profileWithTargets);
+    const fullLegumeRotation = _rankFoodsByCategory(['leguminosa'], profileWithTargets);
+    const fullFruitRotation = _rankFoodsByCategory(['fruta'], profileWithTargets);
+    const fullVegRotation = _rankFoodsByCategory(['verdura'], profileWithTargets);
+    const fullFatRotation = _rankFoodsByCategory(['gordura_boa'], profileWithTargets);
 
     const fallbackProtein = 'frango_peito';
     const fallbackCarb = 'arroz_branco_cozido';
@@ -1053,7 +1064,25 @@
     const fallbackFruit = 'banana_nanica_crua';
 
     for(let w=0; w<totalWeeks; w++){
-      // short-term memory lists (reiniciam por semana)
+      // <-- MUDANÇA: monthIndex and long-term penalize lists
+      const monthIndex = Math.floor(w / 4.345);
+
+      // Decide how many top items to penalize based on monthIndex (grow penalty scope as months progress)
+      const nProteinPenalize = Math.min(fullProteinRotation.length, monthIndex); // 0,1,2,...
+      const nFishPenalize = Math.min(fullFishRotation.length, monthIndex);
+      const nMainCarbPenalize = Math.min(fullMainCarbRotation.length, monthIndex);
+      const nSnackProtPenalize = Math.min(fullSnackProtRotation.length, monthIndex);
+      const nSnackCarbPenalize = Math.min(fullSnackCarbRotation.length, monthIndex);
+      const nLegumePenalize = Math.min(fullLegumeRotation.length, monthIndex);
+
+      const longTermProteinPenalize = fullProteinRotation.slice(0, nProteinPenalize);
+      const longTermFishPenalize = fullFishRotation.slice(0, nFishPenalize);
+      const longTermMainCarbPenalize = fullMainCarbRotation.slice(0, nMainCarbPenalize);
+      const longTermSnackProtPenalize = fullSnackProtRotation.slice(0, nSnackProtPenalize);
+      const longTermSnackCarbPenalize = fullSnackCarbRotation.slice(0, nSnackCarbPenalize);
+      const longTermLegumePenalize = fullLegumeRotation.slice(0, nLegumePenalize);
+
+      // short-term lists (reset per week)
       let recentProteinPicks = [];
       let recentCarbPicks = [];
 
@@ -1068,48 +1097,50 @@
         const mealsCount = Math.min(6, Math.max(3, 3 + Math.floor(diasTreinoCount / 2)));
         const mealNames = ["Café da manhã","Lanche manhã","Almoço","Lanche tarde","Jantar","Ceia"].slice(0, mealsCount);
 
-        // meal weights & nutrient timing
         let mealWeights = mealNames.map(m => /almoço|jantar/i.test(m) ? 1.8 : (/café/i.test(m) ? 1.2 : 0.6));
         if(isTraining){
           mealWeights = mealWeights.map((wgt,idx) => {
             const name = mealNames[idx].toLowerCase();
-            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6; // more carbs around training
+            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6;
             return wgt;
           });
         } else {
           mealWeights = mealWeights.map((wgt,idx) => {
             const name = mealNames[idx].toLowerCase();
-            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8; // less carbs rest days
+            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8;
             return wgt;
           });
         }
         const totalW = mealWeights.reduce((a,b)=>a+b,0);
         const meals = [];
 
-        // daily pick lists to add to recent memory at end of day
         const dayProteinPicks = [];
         const dayCarbPicks = [];
 
-        // Create dynamic candidate lists for this day using avoidList = recent picks
-        const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks);
-        const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks);
-        const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks);
-        const mainLegumesCandidates = _rankFoodsByCategory(['leguminosa'], profileWithTargets, recentProteinPicks);
-        const snackProteinsCandidates = _rankFoodsByCategory(['proteina_snack'], profileWithTargets, recentProteinPicks).concat(_rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks));
-        const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack'], profileWithTargets, recentCarbPicks).concat(_rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks));
+        // <-- MUDANÇA: use both short-term and long-term penalties when generating candidate lists
+        const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks, longTermProteinPenalize);
+        const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks, longTermFishPenalize);
+        const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks, longTermMainCarbPenalize);
+        const mainLegumesCandidates = _rankFoodsByCategory(['leguminosa'], profileWithTargets, recentCarbPicks, longTermLegumePenalize);
+        const snackProteinsCandidates = _rankFoodsByCategory(['proteina_snack','laticinio_snack'], profileWithTargets, recentProteinPicks, longTermSnackProtPenalize);
+        const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack','pao_snack'], profileWithTargets, recentCarbPicks, longTermSnackCarbPenalize);
+        // fruits, vegs, fats (no long-term penalize — keep varied)
         const commonVegCandidates = _rankFoodsByCategory(['verdura'], profileWithTargets, []);
         const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, []);
         const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, []);
 
-        // NEW get: prefer the best (index 0) or second best (index 1) based on pickIdx parity
+        // get() prefers top item (0) or second (1) based on parity, allowing rotation
         const get = (list, idx) => {
           if (!list || list.length === 0) return null;
-          const pickIndex = (idx % 2); // 0 or 1
+          const pickIndex = (idx % 2);
           if (pickIndex < list.length) return list[pickIndex];
           return list[0];
         };
 
         for(let m=0; m<mealsCount; m++){
+          // NEW pickIdx calculation per v6.1 — month influences selection strongly
+          const pickIdx = (monthIndex * 300) + (d * 10) + m;
+
           const mealName = mealNames[m];
           const weight = mealWeights[m];
           const mealCalories = Math.round((weight/totalW) * daySpec.baseCalories);
@@ -1130,14 +1161,11 @@
           const carbsForMeal = Math.max(0, Math.round(baseCarbsForMeal * carbMultiplier));
           const fatForMeal = Math.round(baseFatForMeal * fatMultiplier);
 
-          const pickIdx = (w*100)+(d*10)+m; // used by new get
-
-          // Blueprints / templates
+          // Blueprints
           let componentsToCalc = { protein: null, carb: null, veg: null };
           const extraComponents = [];
 
           if (lname.includes('café')) {
-            // Café: [pão/aveia] + [ovo/queijo] + [fruta]
             const carbPick = get(snackCarbsCandidates, pickIdx) || get(['pao_integral_forma'], pickIdx) || 'pao_integral_forma';
             const protPick = get(snackProteinsCandidates, pickIdx) || get(['ovo_cozido'], pickIdx) || 'ovo_cozido';
             const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
@@ -1145,7 +1173,6 @@
             if(protPick) dayProteinPicks.push(protPick);
             if(carbPick) dayCarbPicks.push(carbPick);
           } else if (lname.includes('almoço')) {
-            // Almoço: [proteina_main] + [cereal_main OU tuberculo] + [leguminosa] + salada extra
             const protPick = get(mainProteinsCandidates, pickIdx) || fallbackProtein;
             const carbPick = get(mainCarbsCandidates, pickIdx) || fallbackCarb;
             const legPick = get(mainLegumesCandidates, pickIdx) || fallbackLegume;
@@ -1154,45 +1181,43 @@
             if(protPick) dayProteinPicks.push(protPick);
             if(carbPick) dayCarbPicks.push(carbPick);
           } else if (lname.includes('jantar')) {
-            // Jantar: [proteina_main OU peixe] + [tuberculo OU verdura (menos carbo)]
             const protPick = get(fishProteinsCandidates, pickIdx) || get(mainProteinsCandidates, pickIdx) || 'peixe_tilapia_grelhada';
             let carbPick = get(mainCarbsCandidates, pickIdx);
             if(!carbPick) carbPick = get(mainCarbsCandidates, pickIdx+1) || fallbackCarb;
             const vegPick = get(commonVegCandidates, pickIdx) || 'brocolis_cozido';
-            if(Math.random() < 0.35) carbPick = vegPick;
+            // Probabilistic veg-swap for lower-carb dinner — kept mild
+            if(Math.random() < 0.28) carbPick = vegPick;
             componentsToCalc = { protein: protPick, carb: carbPick, veg: vegPick };
             if(protPick) dayProteinPicks.push(protPick);
             if(typeof carbPick === 'string') dayCarbPicks.push(carbPick);
           } else if (lname.includes('lanche')) {
-            // Lanche: [fruta] + [gordura_boa OU laticinio_snack]
-            const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
-            const fatPick = get(gordurasBoasCandidates, pickIdx) || get(['iogurte_nat_desnatado'], pickIdx) || 'amendoim_torrado_sem_sal';
+            // v6.1: ensure distinct picks within same day for snack comps
+            const basePickIdx = (monthIndex * 300) + (d * 10) + m;
+            const fruitPick = get(commonFruitCandidates, basePickIdx) || fallbackFruit;
+            const fatPick = get(gordurasBoasCandidates, basePickIdx + 1) || get(['iogurte_nat_desnatado'], basePickIdx + 1) || 'amendoim_torrado_sem_sal';
             componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
             if(fruitPick) dayCarbPicks.push(fruitPick);
+            // if dairy chosen for fatPick, add to protein picks to avoid repeating dairy repeatedly
+            if(fatPick && findFood(fatPick)?.category === 'laticinio_snack') dayProteinPicks.push(fatPick);
           } else if (lname.includes('ceia')) {
-            // Ceia: [laticinio_snack OU gordura_boa]
             const protPick = get(['iogurte_nat_desnatado','queijo_cottage','leite_desnatado'], pickIdx) || get(gordurasBoasCandidates, pickIdx) || 'iogurte_nat_desnatado';
             componentsToCalc = { protein: protPick, carb: null, veg: null };
             if(protPick) dayProteinPicks.push(protPick);
           } else {
-            // fallback blueprint (similar to lanche)
             const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
             const fatPick = get(gordurasBoasCandidates, pickIdx) || 'amendoim_torrado_sem_sal';
             componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
             if(fruitPick) dayCarbPicks.push(fruitPick);
           }
 
-          // supplements preference
           const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
           const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
-          // force whey post-workout (jantar/ceia) if training and user wants whey
           if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
             componentsToCalc.protein = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
             if(componentsToCalc.protein) dayProteinPicks.push(componentsToCalc.protein);
           }
 
-          // compute grams for main components
           const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: componentsToCalc.protein, carb: componentsToCalc.carb, veg: componentsToCalc.veg });
 
           const toDisplay = (idOrName) => {
@@ -1203,23 +1228,19 @@
           };
 
           const components = [];
-          // main components (from grams result)
           if(componentsToCalc.protein && grams.protein_grams >= 10) components.push({ food: toDisplay(componentsToCalc.protein), grams: grams.protein_grams, role:'proteina', source_id: componentsToCalc.protein });
           if(componentsToCalc.carb && grams.carb_grams >= 10) components.push({ food: toDisplay(componentsToCalc.carb), grams: grams.carb_grams, role:'carbo', source_id: componentsToCalc.carb });
           if(componentsToCalc.veg && grams.veg_grams >= 10) components.push({ food: toDisplay(componentsToCalc.veg), grams: grams.veg_grams, role:'legume', source_id: componentsToCalc.veg });
 
-          // extras (salada, etc.)
           for(const ex of extraComponents){
             const rec = findFood(ex.food) || { name: ex.food };
             components.push({ food: stripParenthesis(rec.name || ex.food), grams: ex.grams || 50, role: ex.role || 'extra', source_id: ex.food });
           }
 
-          // creatine: add small 3g post-workout if wanted (non-nutritive)
           if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
             components.push({ food: stripParenthesis(v5_FoodDatabase['creatina_monohidratada'].name || 'Creatina'), grams: 3, role:'suplemento', source_id:'creatina_monohidratada' });
           }
 
-          // compute kcal per component
           let groupKcal = 0;
           const finalComponents = components.map(cItem => {
             const rec = findFood(cItem.source_id || cItem.food);
@@ -1228,7 +1249,7 @@
             return { ...cItem, kcal };
           });
 
-          // add picks of the day to day lists for short-term memory
+          // register picks to today's recent lists
           finalComponents.forEach(fc=>{
             if(fc.source_id){
               const rid = fc.source_id;
@@ -1252,11 +1273,10 @@
           });
         } // end meals loop
 
-        // end of day: append day picks to recent lists and cap memory
+        // end of day: append day picks to recent lists and cap memory (longer memory)
         recentProteinPicks = [...recentProteinPicks, ...dayProteinPicks];
         recentCarbPicks = [...recentCarbPicks, ...dayCarbPicks];
 
-        // MEMORY CAP increased to ~12 (for ~1 week of meals)
         const MEMORY_CAP = 12;
         if (recentProteinPicks.length > MEMORY_CAP) recentProteinPicks = recentProteinPicks.slice(recentProteinPicks.length - MEMORY_CAP);
         if (recentCarbPicks.length > MEMORY_CAP) recentCarbPicks = recentCarbPicks.slice(recentCarbPicks.length - MEMORY_CAP);
@@ -1275,15 +1295,7 @@
       });
     } // end weeks loop
 
-    // rotate monthly alternatives
-    timeline_weeks.forEach((week,wIdx)=>{
-      const monthIndex = Math.floor(wIdx / 4.345);
-      week.days.forEach(day=>{
-        day.meals.forEach(meal=>{
-          meal.components = rotateAlternativesForMonth(meal.components, monthIndex, alternatesByCategory);
-        });
-      });
-    });
+    // No rotateAlternativesForMonth usage — rotation handled proactively by ranking & monthly penalize
 
     const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s + (w.estimatedWeeklyCost || 0),0) / timeline_weeks.length, 2);
     const budgetAdherence = 0.9;
@@ -1291,16 +1303,16 @@
     const credibilityScore = 90;
 
     const payload = {
-      version: 'super-algo-v5.0-full-db-blueprints-v2',
+      version: 'super-algo-v6.1-monthly-rotation-fix',
       created_at: nowISO(),
       profile_snapshot: profile,
       targets,
       timeline_weeks,
       estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
       credibility: { score: credibilityScore, breakdown: meta },
-      provenance: { food_db_version: 'v5_FoodDatabase_user', built_with: 'super-diet-engine-v5.0' }
+      provenance: { food_db_version: 'v5_FoodDatabase_user', built_with: 'super-diet-engine-v6.1' }
     };
-    if(options.debug) payload._internal = { alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
+    if(options.debug) payload._internal = { monthInfo: { totalWeeks, months }, baselineRotations: { proteins: fullProteinRotation.slice(0,6) } };
     return payload;
   }
 
@@ -1604,7 +1616,6 @@
       const { data } = await supabase.auth.getUser();
       if(!data.user){
         document.getElementById('welcome-msg').textContent = 'Visitante (demo)';
-        // no profile: show form so user can create meta (this aligns with "new account shows form")
         document.getElementById('form-wrapper').style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
       } else {
@@ -1615,11 +1626,9 @@
           if(!error && profile && profile.goal_end_date){
             displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
             document.getElementById('playlist-section').style.display = profile.goal_type ? 'block' : 'none';
-            // show results/chat area by default for users with an active goal
             document.getElementById('form-wrapper').style.display = 'none';
             document.getElementById('results-wrapper').style.display = 'block';
           } else {
-            // new account or no goal set: show form (user freshly created account)
             document.getElementById('form-wrapper').style.display = 'block';
             document.getElementById('results-wrapper').style.display = 'none';
           }
@@ -1638,25 +1647,20 @@
       let formHiddenByInput = false;
       const onFirstInputHide = (e) => {
         if(formHiddenByInput) return;
-        // only trigger if user is interacting (ignore programmatic)
         formHiddenByInput = true;
-        // hide form, show results/chat
         document.getElementById('form-wrapper').style.display = 'none';
         document.getElementById('results-wrapper').style.display = 'block';
-        // switch tab highlight to IA especialista
         document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
         document.getElementById('ia-planejamento').classList.add('active');
         document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
         document.querySelector('.link-ia')?.classList.add('active');
         loadFreshDifyChat();
       };
-      // attach to many inputs inside form to catch any first typing
       Array.from(iaFitForm.querySelectorAll('input, textarea, select')).forEach(el => {
         el.addEventListener('input', onFirstInputHide, { once:true });
         el.addEventListener('change', onFirstInputHide, { once:true });
       });
 
-      // existing submit handler (kept mostly as-is)
       iaFitForm.addEventListener('submit', async function(event){
         event.preventDefault();
         const submitButton = iaFitForm.querySelector('button[type="submit"]');
