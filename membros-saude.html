@@ -35,13 +35,15 @@
     .sidebar.open { left: 0; }
     .sidebar nav { padding-top: 100px; }
     .sidebar nav ul{ list-style:none; padding:0; margin:0; }
-    .sidebar nav a{ display:block; padding:15px 30px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); }
+    /* Nav link style updated to show colored rectangle at left when active */
+    .sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
+    .sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
     .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
     .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-
-    .link-ia { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,#38b6ff,#0056b3); }
-    .link-aulas { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,#c048f2,#6b21a8); }
-    .link-percurso { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); }
+    /* colored rectangle per tab */
+    .link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
+    .link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
+    .link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
 
     .sidebar-footer { padding:20px 30px; text-align:center; }
     .sidebar-config-btn { width:100%; background:transparent; border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:600; }
@@ -690,6 +692,9 @@
     return null;
   }
 
+  /* ============================
+     UTILITÁRIOS E CÁLCULOS
+     ============================ */
   function _safeNum(v, f=0){
     if(typeof v === 'number' && !Number.isNaN(v)) return v;
     if(v == null || v === '') return f;
@@ -746,6 +751,7 @@
 
   function detectGoalType(text){
     const s = (text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
     const loseKeywords = ['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer'];
     const gainKeywords = ['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho'];
     const words = s.split(/[\s,.;:!?()]+/).filter(Boolean);
@@ -885,17 +891,26 @@
     return Math.max(0, Math.min(1, base + variety));
   }
 
-  function _rankFoodsByCategory(categories, profile){
-    const arr = [];
-    for(const id in _lookup.byId){
-      const rec = _lookup.byId[id];
-      if(rec && categories.includes(rec.category)){
-        rec._rank = computeCBrank(rec, profile);
-        arr.push(rec);
+  /* NEW: _rankFoodsByCategory with avoidList (penalize recent picks)
+     Iterates v5_FoodDatabase and returns list of IDs ordered by adjusted rank */
+  function _rankFoodsByCategory(categories, profile, avoidList = []){
+    const recs = [];
+    for(const id in v5_FoodDatabase){
+      const rec = v5_FoodDatabase[id];
+      if(!rec) continue;
+      if(categories.includes(rec.category)){
+        // copy minimal info for compute
+        const copy = { id, name: rec.name, nutrition: rec.nutrition || {}, price_per_kg: rec.price_per_kg || 0, ig: rec.ig };
+        let rank = computeCBrank(copy, profile);
+        // penalize if in avoidList
+        if(Array.isArray(avoidList) && avoidList.length && avoidList.includes(id)){
+          rank = rank * 0.25; // reduce rank (penalize)
+        }
+        recs.push({ ...copy, rank });
       }
     }
-    arr.sort((a,b) => (b._rank || 0) - (a._rank || 0) || a.name.localeCompare(b.name));
-    return arr.map(r => r.id);
+    recs.sort((a,b) => (b.rank || 0) - (a.rank || 0) || a.name.localeCompare(b.name));
+    return recs.map(r => r.id);
   }
 
   /* Utilities for weekly template, rotation */
@@ -905,7 +920,7 @@
     const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
     const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 };
     if(selectedDaysArr && selectedDaysArr.length>0){
-      selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }});
+      selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }}); 
     } else {
       const dt = Math.max(0, _safeNum(diasTreinoCount,3));
       if(dt>0){
@@ -1030,7 +1045,7 @@
     return q.includes(keyword);
   }
 
-  /* planLongTerm */
+  /* planLongTerm - atualizado com blueprints e rotação inteligente */
   async function planLongTerm(profile, options = {}){
     const start = options.startDate ? new Date(options.startDate) : new Date();
     const months = Math.max(1, _safeNum(options.months, 3));
@@ -1044,30 +1059,24 @@
     const totalWeeks = Math.max(1, Math.round(months * 4.345));
     const timeline_weeks = [];
 
-    // generate alternates by category from masterDB ranking
+    // baseline alternatesByCategory (used para rotação mensal)
     const alternatesByCategory = {};
     const cats = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
     cats.forEach(cat => { alternatesByCategory[cat] = _rankFoodsByCategory([cat], profileWithTargets).slice(0, 40); });
 
-    const mainProteins = alternatesByCategory['proteina_main'] || [];
-    const fishProteins = alternatesByCategory['peixe'] || [];
-    const mainCarbs = alternatesByCategory['cereal_main'] && alternatesByCategory['cereal_main'].length ? alternatesByCategory['cereal_main'] : (alternatesByCategory['tuberculo']||[]);
-    const mainLegumes = alternatesByCategory['leguminosa'] || [];
-    const snackProteins = (alternatesByCategory['proteina_snack'] || []).concat(alternatesByCategory['laticinio_snack'] || []);
-    const snackCarbs = alternatesByCategory['cereal_snack'] || alternatesByCategory['pao_snack'] || [];
-    const commonVeg = alternatesByCategory['verdura'] || [];
-    const commonFruit = alternatesByCategory['fruta'] || [];
-
-    const get = (list, idx) => (list && list.length > 0) ? list[(idx) % list.length] : null;
     const fallbackProtein = 'frango_peito';
     const fallbackCarb = 'arroz_branco_cozido';
     const fallbackLegume = 'feijao_carioca_cozido';
     const fallbackSnackProt = 'ovo_cozido';
-    const fallbackSnackCarb = 'tapioca_goma' in v5_FoodDatabase ? 'tapioca_goma' : (Object.keys(v5_FoodDatabase)[0]);
+    const fallbackSnackCarb = ('tapioca_goma' in v5_FoodDatabase) ? 'tapioca_goma' : Object.keys(v5_FoodDatabase)[0];
     const fallbackVeg = 'alface_crespa_crua';
     const fallbackFruit = 'banana_nanica_crua';
 
     for(let w=0; w<totalWeeks; w++){
+      // short-term memory lists (reiniciam por semana)
+      let recentProteinPicks = [];
+      let recentCarbPicks = [];
+
       let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr);
       weekTemplate = compensateCheatWeek(weekTemplate);
       const daysData = [];
@@ -1097,6 +1106,23 @@
         const totalW = mealWeights.reduce((a,b)=>a+b,0);
         const meals = [];
 
+        // daily pick lists to add to recent memory at end of day
+        const dayProteinPicks = [];
+        const dayCarbPicks = [];
+
+        // Create dynamic candidate lists for this day using avoidList = recent picks
+        const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks);
+        const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks);
+        const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks);
+        const mainLegumesCandidates = _rankFoodsByCategory(['leguminosa'], profileWithTargets, recentProteinPicks);
+        const snackProteinsCandidates = _rankFoodsByCategory(['proteina_snack'], profileWithTargets, recentProteinPicks).concat(_rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks));
+        const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack'], profileWithTargets, recentCarbPicks).concat(_rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks));
+        const commonVegCandidates = _rankFoodsByCategory(['verdura'], profileWithTargets, []);
+        const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, []);
+        const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, []);
+
+        const get = (list, idx) => (list && list.length > 0) ? list[(idx) % list.length] : null;
+
         for(let m=0; m<mealsCount; m++){
           const mealName = mealNames[m];
           const weight = mealWeights[m];
@@ -1120,33 +1146,71 @@
 
           const pickIdx = (w*100)+(d*10)+m;
 
-          // diverse protein selection:
-          let protPickId = null;
-          if(/lanche|café/i.test(mealName)){
-            protPickId = get(snackProteins, pickIdx) || fallbackSnackProt;
+          // Blueprints / templates
+          let componentsToCalc = { protein: null, carb: null, veg: null };
+          const extraComponents = [];
+
+          if (lname.includes('café')) {
+            // Café: [pão/aveia] + [ovo/queijo] + [fruta]
+            const carbPick = get(snackCarbsCandidates, pickIdx) || get(['pao_integral_forma'], pickIdx) || 'pao_integral_forma';
+            const protPick = get(snackProteinsCandidates, pickIdx) || get(['ovo_cozido'], pickIdx) || 'ovo_cozido';
+            const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+            componentsToCalc = { protein: protPick, carb: carbPick, veg: fruitPick };
+            // mark snack picks
+            if(protPick) dayProteinPicks.push(protPick);
+            if(carbPick) dayCarbPicks.push(carbPick);
+          } else if (lname.includes('almoço')) {
+            // Almoço: [proteina_main] + [cereal_main OU tuberculo] + [leguminosa] + salada extra
+            const protPick = get(mainProteinsCandidates, pickIdx) || fallbackProtein;
+            const carbPick = get(mainCarbsCandidates, pickIdx) || fallbackCarb;
+            const legPick = get(mainLegumesCandidates, pickIdx) || fallbackLegume;
+            componentsToCalc = { protein: protPick, carb: carbPick, veg: legPick };
+            extraComponents.push({ food: get(commonVegCandidates, pickIdx) || fallbackVeg, grams: 75, role: 'verdura' });
+            if(protPick) dayProteinPicks.push(protPick);
+            if(carbPick) dayCarbPicks.push(carbPick);
+          } else if (lname.includes('jantar')) {
+            // Jantar: [proteina_main OU peixe] + [tuberculo OU verdura (menos carbo)]
+            const protPick = get(fishProteinsCandidates, pickIdx) || get(mainProteinsCandidates, pickIdx) || 'peixe_tilapia_grelhada';
+            // prefer tuberculo but we may prefer less carb - pick tuberculo OR verdura for variety
+            let carbPick = get(mainCarbsCandidates, pickIdx);
+            if(!carbPick) carbPick = get(mainCarbsCandidates, pickIdx+1) || fallbackCarb;
+            const vegPick = get(commonVegCandidates, pickIdx) || 'brocolis_cozido';
+            // sometimes prefer veggies not tuberculo
+            if(Math.random() < 0.35) carbPick = vegPick;
+            componentsToCalc = { protein: protPick, carb: carbPick, veg: vegPick };
+            if(protPick) dayProteinPicks.push(protPick);
+            if(typeof carbPick === 'string') dayCarbPicks.push(carbPick);
+          } else if (lname.includes('lanche')) {
+            // Lanche: [fruta] + [gordura_boa OU laticinio_snack]
+            const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+            const fatPick = get(gordurasBoasCandidates, pickIdx) || get(['iogurte_nat_desnatado'], pickIdx) || 'amendoim_torrado_sem_sal';
+            componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
+            if(fruitPick) dayCarbPicks.push(fruitPick);
+          } else if (lname.includes('ceia')) {
+            // Ceia: [laticinio_snack OU gordura_boa]
+            const protPick = get(['iogurte_nat_desnatado','queijo_cottage','leite_desnatado'], pickIdx) || get(gordurasBoasCandidates, pickIdx) || 'iogurte_nat_desnatado';
+            componentsToCalc = { protein: protPick, carb: null, veg: null };
+            if(protPick) dayProteinPicks.push(protPick);
           } else {
-            if((pickIdx % 6) === 0 && fishProteins.length > 0) protPickId = get(fishProteins, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
-            else if((pickIdx % 5) === 0 && mainLegumes.length > 0) protPickId = get(mainLegumes, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
-            else protPickId = get(mainProteins, pickIdx) || get(fishProteins, pickIdx) || fallbackProtein;
+            // fallback blueprint (similar to lanche)
+            const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+            const fatPick = get(gordurasBoasCandidates, pickIdx) || 'amendoim_torrado_sem_sal';
+            componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
+            if(fruitPick) dayCarbPicks.push(fruitPick);
           }
 
-          let carbPickId = null;
-          if(/lanche|café/i.test(mealName)) carbPickId = get(snackCarbs, pickIdx) || fallbackSnackCarb;
-          else carbPickId = get(mainCarbs, pickIdx) || get(mainCarbs, pickIdx+1) || fallbackCarb;
-
-          const vegPickId = get(commonVeg, pickIdx) || fallbackVeg;
-
-          // supplements inclusion: only if user explicitly declared use and named them
+          // supplements preference
           const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
           const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
           // force whey post-workout (jantar/ceia) if training and user wants whey
           if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
-            // prefer alias 'whey_concentrado' if exists else original key
-            protPickId = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
+            componentsToCalc.protein = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
+            if(componentsToCalc.protein) dayProteinPicks.push(componentsToCalc.protein);
           }
 
-          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: protPickId, carb: carbPickId, veg: vegPickId });
+          // compute grams for main components
+          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: componentsToCalc.protein, carb: componentsToCalc.carb, veg: componentsToCalc.veg });
 
           const toDisplay = (idOrName) => {
             if(!idOrName) return null;
@@ -1156,9 +1220,16 @@
           };
 
           const components = [];
-          if(protPickId && grams.protein_grams >= 10) components.push({ food: toDisplay(protPickId), grams: grams.protein_grams, role:'proteina', source_id: protPickId });
-          if(carbPickId && grams.carb_grams >= 10) components.push({ food: toDisplay(carbPickId), grams: grams.carb_grams, role:'carbo', source_id: carbPickId });
-          if(vegPickId && grams.veg_grams >= 10) components.push({ food: toDisplay(vegPickId), grams: grams.veg_grams, role:'legume', source_id: vegPickId });
+          // main components (from grams result)
+          if(componentsToCalc.protein && grams.protein_grams >= 10) components.push({ food: toDisplay(componentsToCalc.protein), grams: grams.protein_grams, role:'proteina', source_id: componentsToCalc.protein });
+          if(componentsToCalc.carb && grams.carb_grams >= 10) components.push({ food: toDisplay(componentsToCalc.carb), grams: grams.carb_grams, role:'carbo', source_id: componentsToCalc.carb });
+          if(componentsToCalc.veg && grams.veg_grams >= 10) components.push({ food: toDisplay(componentsToCalc.veg), grams: grams.veg_grams, role:'legume', source_id: componentsToCalc.veg });
+
+          // extras (salada, etc.)
+          for(const ex of extraComponents){
+            const rec = findFood(ex.food) || { name: ex.food };
+            components.push({ food: stripParenthesis(rec.name || ex.food), grams: ex.grams || 50, role: ex.role || 'extra', source_id: ex.food });
+          }
 
           // creatine: add small 3g post-workout if wanted (non-nutritive)
           if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
@@ -1174,17 +1245,42 @@
             return { ...cItem, kcal };
           });
 
+          // add picks of the day to day lists for short-term memory
+          // push source_id where available, else try to find by name -> id
+          finalComponents.forEach(fc=>{
+            if(fc.source_id){
+              const rid = fc.source_id;
+              if(v5_FoodDatabase[rid]){
+                if((fc.role || '').includes('proteina')) dayProteinPicks.push(rid);
+                if((fc.role || '').includes('carbo') || (fc.role || '').includes('legume')) dayCarbPicks.push(rid);
+              } else {
+                // find id by name if possible
+                const rec = findFood(fc.food);
+                if(rec && rec.id){
+                  if((fc.role || '').includes('proteina')) dayProteinPicks.push(rec.id);
+                  if((fc.role || '').includes('carbo') || (fc.role || '').includes('legume')) dayCarbPicks.push(rec.id);
+                }
+              }
+            }
+          });
+
           meals.push({
             mealIndex: m, mealName, mealCaloriesTarget: mealCalories,
             components: finalComponents, isTrainingDay: isTraining, isCheatDay: isCheat,
             gramsComputed: grams.details || {}, mealKcalTotal: groupKcal
           });
-        }
+        } // end meals loop
+
+        // end of day: append day picks to recent lists and cap memory
+        recentProteinPicks = [...recentProteinPicks, ...dayProteinPicks];
+        recentCarbPicks = [...recentCarbPicks, ...dayCarbPicks];
+        if (recentProteinPicks.length > 6) recentProteinPicks = recentProteinPicks.slice(recentProteinPicks.length - 6);
+        if (recentCarbPicks.length > 6) recentCarbPicks = recentCarbPicks.slice(recentCarbPicks.length - 6);
 
         daysData.push({
           dayIndex: d+1, dayOfWeekIndex: daySpec.dayOfWeekIndex, baseCalories: daySpec.baseCalories, isTrainingDay: isTraining, isCheatDay: isCheat, meals
         });
-      }
+      } // end days loop
 
       const estimatedWeeklyCost = 0;
       timeline_weeks.push({
@@ -1193,7 +1289,7 @@
         days: daysData,
         estimatedWeeklyCost
       });
-    }
+    } // end weeks loop
 
     // rotate monthly alternatives
     timeline_weeks.forEach((week,wIdx)=>{
@@ -1211,7 +1307,7 @@
     const credibilityScore = 90;
 
     const payload = {
-      version: 'super-algo-v5.0-full-db',
+      version: 'super-algo-v5.0-full-db-blueprints-v1',
       created_at: nowISO(),
       profile_snapshot: profile,
       targets,
@@ -1220,7 +1316,7 @@
       credibility: { score: credibilityScore, breakdown: meta },
       provenance: { food_db_version: 'v5_FoodDatabase_user', built_with: 'super-diet-engine-v5.0' }
     };
-    if(options.debug) payload._internal = { lookupSize: Object.keys(_lookup.byName).length, alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
+    if(options.debug) payload._internal = { alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
     return payload;
   }
 
@@ -1228,7 +1324,7 @@
   let _supabase = null;
   function initModule({ supabase: sup } = {}){ if(!sup) throw new Error('supabase client required'); _supabase = sup; }
 
-  async function savePlan(userId, planPayload, options = {}){
+  async function savePlan(userId, planPayload, options = {}){ 
     if(!_supabase) throw new Error('Supabase client not initialized.');
     const title = options.title || `Plano - ${planPayload.targets ? planPayload.targets.targetCalories + ' kCal' : nowISO()}`;
     const row = { user_id: userId, title, payload: planPayload };
@@ -1430,7 +1526,7 @@
         const user = await getCurrentUser();
         if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
         await savePlan(user.id, planPayload, { title: `Plano cópia - ${planPayload.targets.targetCalories} kcal` });
-        statusSpan.textContent = 'Cópia salva.';
+        statusSpan.textContent = 'Cópia salva.'; 
       } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
     };
   }
@@ -1485,6 +1581,10 @@
       document.getElementById('prazo-group').style.display = 'none';
       document.getElementById('suplementos-detalhes-group').style.display = 'none';
       document.getElementById('objetivo').focus();
+      // show the form again and hide the results/chat area
+      document.getElementById('form-wrapper').style.display = 'block';
+      document.getElementById('results-wrapper').style.display = 'none';
+      // switch tab to IA planejamento (form)
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById('ia-planejamento').classList.add('active');
       document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -1520,6 +1620,9 @@
       const { data } = await supabase.auth.getUser();
       if(!data.user){
         document.getElementById('welcome-msg').textContent = 'Visitante (demo)';
+        // no profile: show form so user can create meta (this aligns with "new account shows form")
+        document.getElementById('form-wrapper').style.display = 'block';
+        document.getElementById('results-wrapper').style.display = 'none';
       } else {
         const user = data.user;
         document.getElementById('welcome-msg').textContent = user.email || user.id;
@@ -1528,101 +1631,131 @@
           if(!error && profile && profile.goal_end_date){
             displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
             document.getElementById('playlist-section').style.display = profile.goal_type ? 'block' : 'none';
+            // show results/chat area by default for users with an active goal
+            document.getElementById('form-wrapper').style.display = 'none';
+            document.getElementById('results-wrapper').style.display = 'block';
           } else {
+            // new account or no goal set: show form (user freshly created account)
             document.getElementById('form-wrapper').style.display = 'block';
+            document.getElementById('results-wrapper').style.display = 'none';
           }
         } catch(e){
           document.getElementById('form-wrapper').style.display = 'block';
+          document.getElementById('results-wrapper').style.display = 'none';
         }
       }
       loadFreshDifyChat();
       await renderPercursoDietArea();
     })();
 
-    // form submit
+    // Form: hide form on first input and show IA/chat area
     const iaFitForm = document.getElementById('ia-fit-form');
-    if(iaFitForm) iaFitForm.addEventListener('submit', async function(event){
-      event.preventDefault();
-      const submitButton = iaFitForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true; submitButton.textContent = 'A gerar o seu plano...';
-      try{
-        const formElements = event.target.elements;
-        const prazoText = formElements.prazo.value;
-        const endDate = calculateEndDate(prazoText);
-        if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
-
-        const startDate = new Date(); startDate.setHours(0,0,0,0);
-        const objetivoText = formElements.objetivo.value;
-        const goalType = detectGoalType(objetivoText);
-
-        const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
-        const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
-        if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
-
-        const updateData = {
-          goal_start_date: startDate.toISOString(),
-          goal_end_date: endDate.toISOString(),
-          goal_prompt: objetivoText,
-          goal_type: goalType
-        };
-
-        try{
-          const current = await getCurrentUser();
-          if(current){
-            const { error } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
-            if(error) console.warn('Erro ao atualizar perfil:', error);
-          }
-        }catch(e){ console.warn('Não conectado a supabase (demo).'); }
-
-        displayProgress(startDate, endDate);
-        document.getElementById('playlist-section').style.display = 'block';
-
-        const inputs = {
-          grande_meta: objetivoText,
-          prazo: prazoText,
-          sexo: formElements.sexo.value,
-          altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
-          peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
-          idade: parseInt(formElements.idade.value,10) || 30,
-          disponibilidade: selectedDaysArray.length,
-          selected_days: selectedDaysArray,
-          local_treino: formElements.local_treino.value,
-          orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
-          orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
-          uso_suplemento: formElements.uso_suplemento.value,
-          quais_suplementos: formElements.quais_suplementos.value || '',
-          nivel: formElements.nivel.value
-        };
-
-        SuperDietEngine.init({ supabase });
-        const diffTime = Math.abs(endDate - startDate);
-        const diffDays = Math.ceil(diffTime / (1000*60*60*24));
-        const months = Math.max(1, Math.round(diffDays / 30.44));
-        const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false });
-
-        try{
-          const currentUser = await getCurrentUser();
-          if(currentUser){
-            await savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
-          }
-        } catch(saveError){
-          console.error('Erro ao salvar plano:', saveError);
-          alert('Meta atualizada, mas falha ao salvar plano: ' + (saveError.message || JSON.stringify(saveError)));
-        }
-
+    if(iaFitForm){
+      let formHiddenByInput = false;
+      const onFirstInputHide = (e) => {
+        if(formHiddenByInput) return;
+        // only trigger if user is interacting (ignore programmatic)
+        formHiddenByInput = true;
+        // hide form, show results/chat
+        document.getElementById('form-wrapper').style.display = 'none';
+        document.getElementById('results-wrapper').style.display = 'block';
+        // switch tab highlight to IA especialista
         document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-        document.getElementById('percurso').classList.add('active');
+        document.getElementById('ia-planejamento').classList.add('active');
         document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-        document.querySelector('.link-percurso')?.classList.add('active');
+        document.querySelector('.link-ia')?.classList.add('active');
+        loadFreshDifyChat();
+      };
+      // attach to many inputs inside form to catch any first typing
+      Array.from(iaFitForm.querySelectorAll('input, textarea, select')).forEach(el => {
+        el.addEventListener('input', onFirstInputHide, { once:true });
+        el.addEventListener('change', onFirstInputHide, { once:true });
+      });
 
-        await renderPercursoDietArea();
-        submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
-      } catch(err){
-        console.error('Erro no fluxo de criação da meta:', err);
-        alert('Erro interno: ' + (err.message || JSON.stringify(err)));
-        submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
-      }
-    });
+      // existing submit handler (kept mostly as-is)
+      iaFitForm.addEventListener('submit', async function(event){
+        event.preventDefault();
+        const submitButton = iaFitForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true; submitButton.textContent = 'A gerar o seu plano...';
+        try{
+          const formElements = event.target.elements;
+          const prazoText = formElements.prazo.value;
+          const endDate = calculateEndDate(prazoText);
+          if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+
+          const startDate = new Date(); startDate.setHours(0,0,0,0);
+          const objetivoText = formElements.objetivo.value;
+          const goalType = detectGoalType(objetivoText);
+
+          const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
+          const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
+          if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+
+          const updateData = {
+            goal_start_date: startDate.toISOString(),
+            goal_end_date: endDate.toISOString(),
+            goal_prompt: objetivoText,
+            goal_type: goalType
+          };
+
+          try{
+            const current = await getCurrentUser();
+            if(current){
+              const { error } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
+              if(error) console.warn('Erro ao atualizar perfil:', error);
+            }
+          }catch(e){ console.warn('Não conectado a supabase (demo).'); }
+
+          displayProgress(startDate, endDate);
+          document.getElementById('playlist-section').style.display = 'block';
+
+          const inputs = {
+            grande_meta: objetivoText,
+            prazo: prazoText,
+            sexo: formElements.sexo.value,
+            altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
+            peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
+            idade: parseInt(formElements.idade.value,10) || 30,
+            disponibilidade: selectedDaysArray.length,
+            selected_days: selectedDaysArray,
+            local_treino: formElements.local_treino.value,
+            orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
+            orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
+            uso_suplemento: formElements.uso_suplemento.value,
+            quais_suplementos: formElements.quais_suplementos.value || '',
+            nivel: formElements.nivel.value
+          };
+
+          SuperDietEngine.init({ supabase });
+          const diffTime = Math.abs(endDate - startDate);
+          const diffDays = Math.ceil(diffTime / (1000*60*60*24));
+          const months = Math.max(1, Math.round(diffDays / 30.44));
+          const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false });
+
+          try{
+            const currentUser = await getCurrentUser();
+            if(currentUser){
+              await savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+            }
+          } catch(saveError){
+            console.error('Erro ao salvar plano:', saveError);
+            alert('Meta atualizada, mas falha ao salvar plano: ' + (saveError.message || JSON.stringify(saveError)));
+          }
+
+          document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+          document.getElementById('percurso').classList.add('active');
+          document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+          document.querySelector('.link-percurso')?.classList.add('active');
+
+          await renderPercursoDietArea();
+          submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+        } catch(err){
+          console.error('Erro no fluxo de criação da meta:', err);
+          alert('Erro interno: ' + (err.message || JSON.stringify(err)));
+          submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+        }
+      });
+    }
 
   }); // DOMContentLoaded end
   </script>
