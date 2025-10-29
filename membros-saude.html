@@ -4,482 +4,735 @@
   <meta charset="utf-8" />
   <title>Plataforma de IA — Saúde & Estética</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f0f12;
-      --card:#111318;
-      --muted:#9aa0a6;
-      --accent:#007bff;
-      --accent-2:#6f42c1;
-      --danger:#ff2646;
-      --glass: rgba(255,255,255,0.02);
-      --radius:14px;
-      --soft: #1a1b1f;
-      --white: #eaeef2;
+    :root {
+      --color-ia-specialist: #007BFF;
+      --color-video-lessons: #8A2BE2;
+      --color-journey: #DC143C;
+      --journey-red-1: #ff2646;
+      --journey-red-2: #be123c;
+      --journey-dark: #2a0a12;
+      --bg: #121212;
+      --card: #1E1E1E;
+      --muted: #bbb;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-      background:linear-gradient(180deg,#070707 0%, #0f0f12 100%);
-      color:var(--white);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:28px;
-    }
-    .app {
-      max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 260px 1fr;
-      gap:22px;
-      align-items:start;
-    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
+    .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
+    h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
 
-    /* SIDEBAR */
-    .sidebar {
-      background: linear-gradient(180deg,var(--card), #0b0b0d);
-      border-radius: var(--radius);
-      padding:18px;
-      box-shadow: 0 6px 30px rgba(0,0,0,0.6);
-      height: calc(100vh - 56px);
-      position:sticky;
-      top:28px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .brand { font-weight:700; font-size:20px; color:var(--accent); margin-bottom:6px; }
-    .sidebar nav ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
-    .nav-link { display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:10px; color:var(--muted); text-decoration:none; cursor:pointer; }
-    .nav-link:hover { background: rgba(255,255,255,0.02); color:var(--white); }
-    .nav-link.active { background: linear-gradient(90deg, rgba(0,123,255,0.15), rgba(111,66,193,0.12)); color:var(--white); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02); }
-    .sidebar-footer { margin-top:auto; display:flex; flex-direction:column; gap:8px; }
-    .sidebar button { border:0; background:transparent; color:var(--muted); padding:10px; border-radius:8px; cursor:pointer; text-align:left; }
-    .sidebar button:hover { color:var(--white); background:rgba(255,255,255,0.02); }
+    /* MENU / SIDEBAR */
+    .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; padding:0; }
+    .menu-toggle .bar { width:24px; height:3px; background-color:#fff; border-radius:2px; transition: all 0.3s; }
+    .menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* MAIN */
-    .main {
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-    header.app-header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-    header .welcome { font-size:18px; color:var(--white); font-weight:600; }
-    .card { background:var(--card); border-radius:14px; padding:18px; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+    .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: var(--card); transition: left 0.28s ease; z-index:1000; border-right:1px solid #333; display:flex; flex-direction:column; justify-content:space-between; }
+    .sidebar.open { left: 0; }
+    .sidebar nav { padding-top: 100px; }
+    .sidebar nav ul{ list-style:none; padding:0; margin:0; }
+    .sidebar nav a{ display:block; padding:15px 30px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); }
+    .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
+    .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
 
-    /* form styles */
-    form .row { display:flex; gap:12px; }
-    form label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
-    input[type="text"], input[type="number"], select, textarea {
-      width:100%;
-      background:var(--soft);
-      border:1px solid rgba(255,255,255,0.02);
-      color:var(--white);
-      padding:10px 12px;
-      border-radius:10px;
-      outline:none;
-      font-size:14px;
-      resize:vertical;
-    }
-    textarea { min-height:80px; }
-    .form-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
-    .form-actions { margin-top:12px; display:flex; gap:10px; align-items:center; }
-    button.primary {
-      background:linear-gradient(90deg,var(--accent), #0056b3);
-      color:white;
-      padding:10px 14px;
-      border-radius:10px;
-      border:0;
-      cursor:pointer;
-      font-weight:600;
-    }
-    button.ghost { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:10px 14px; border-radius:10px; cursor:pointer; }
+    .link-ia { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,#38b6ff,#0056b3); }
+    .link-aulas { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,#c048f2,#6b21a8); }
+    .link-percurso { background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-image:linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); }
+
+    .sidebar-footer { padding:20px 30px; text-align:center; }
+    .sidebar-config-btn { width:100%; background:transparent; border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:600; }
+    .sidebar-config-btn:hover{ background:#333; color:#fff; }
+    .sidebar-action-btn{ width:100%; padding:10px; border-radius:8px; cursor:pointer; font-weight:600; transition: all 0.2s; margin-top:10px; }
+    .sidebar-reset-btn{ background:transparent; border:1px solid var(--color-ia-specialist); color:var(--color-ia-specialist); }
+    .sidebar-reset-btn:hover{ background:var(--color-ia-specialist); color:#fff; }
+    .sidebar-logout-btn{ background:#be123c; border:1px solid #be123c; color:#fff; }
+    .sidebar-logout-btn:hover{ background:#ff4757; border-color:#ff4757; }
+    .hidden{ display:none; }
+
+    .overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; opacity:0; visibility:hidden; transition:opacity 0.28s, visibility 0.28s; }
+    .overlay.show{ opacity:1; visibility:visible; }
+
+    .header { display:flex; justify-content:flex-end; align-items:center; margin-bottom:20px; }
+    #welcome-msg { color:#bbb; margin-right:20px; }
+
+    .tab-content{ display:none; }
+    .tab-content.active{ display:block; }
+    .form-wrapper, .results-wrapper { width:100%; max-width:900px; margin:0 auto; }
+
+    .form-container, .results-container, .percurso-container { background-color: var(--card); padding:40px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border:1px solid #333; color:#E0E0E0; }
+    .form-group{ margin-bottom:20px; }
+    label{ display:block; margin-bottom:8px; font-weight:600; color:#BBBBBB; }
+    input, select, textarea { width:100%; padding:12px; background-color:#2C2C2C; border:1px solid #444; border-radius:8px; color:#E0E0E0; font-size:16px; box-sizing:border-box; }
+    textarea{ resize:vertical; min-height:100px; }
+
+    .goal-section{ background: linear-gradient(145deg,#2a2a2a,#1a1a1a); border:1px solid #444; padding:30px; margin-bottom:24px; border-radius:10px; text-align:center; }
+    .goal-title{ font-size:28px; font-weight:700; background: linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90deg,#007BFF,#0056b3); border:none; border-radius:8px; color:#fff; font-size:18px; font-weight:600; cursor:pointer; }
+
+    .progress-section{ margin-top:24px; padding:20px; background-color:#2C2C2C; border-radius:10px; }
+    .progress-bar-container{ width:100%; background-color:#444; border-radius:10px; overflow:hidden; }
+    .progress-bar{ width:0%; background-color:#007BFF; height:20px; transition: width 0.5s ease-in-out; }
+    .progress-labels{ display:flex; justify-content:space-between; font-size:12px; color:#aaa; margin-top:5px; }
+    .countdown-container{text-align:center; margin-top:20px; }
+    .countdown-days{ font-size:4rem; font-weight:700; color:#fff; line-height:1; }
+    .countdown-label{ font-size:1rem; color:#aaa; }
+
+    .playlist-section{ text-align:center; margin:24px 0; }
+    .playlist-btn{ background:#007BFF; color:white; border:none; padding:12px 24px; font-size:1.1em; cursor:pointer; border-radius:8px; }
+
+    .percurso-forms{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
+    .percurso-card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border:1px solid rgba(190,18,60,0.06); padding:20px; border-radius:12px; }
+    .generated-diet-card{ border:2px solid rgba(190,18,60,0.14); box-shadow:0 8px 24px rgba(190,18,60,0.06); padding:18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.16)); color:#ddd; }
+
+    /* Plan UI */
+    .plan-tabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .plan-tab{ padding:8px 12px; border-radius:999px; background:#2b2b2b; color:#fff; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,0.03); }
+    .plan-tab.active{ background: linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); color:white; }
+    .plan-days{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .plan-day{ background: linear-gradient(180deg,#141414,#0f0f0f); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
+    .meal-row{ margin-bottom:10px; padding:8px; border-radius:8px; background:#0d0d0d; display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid rgba(255,255,255,0.02); }
+    .meal-left{ display:flex; gap:10px; align-items:center; }
+    .meal-name{ font-weight:700; color:#fff; }
+    .meal-kcal{ font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; }
+
+    /* dify */
+    .iframe-container{ border-radius:12px; overflow:hidden; position:relative; height:70vh; min-height:340px; max-height:720px; background:#000; }
+    .dify-top-strip{ position:absolute; top:0; left:0; width:100%; height:50px; background:#000000; z-index:2; pointer-events:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-sizing:border-box; }
+    .dify-top-badge{ font-weight:700; font-size:1.1em; color:#fff; background: linear-gradient(90deg,#007BFF,#0056b3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .mvp-label{ font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
 
     /* day selector */
-    details.day-selector-container summary { cursor:pointer; background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; color:var(--muted); }
-    .day-selector-grid { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .day-circle-input { display:none; }
-    .day-circle-label { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; background:transparent; border-radius:50%; border:1px solid rgba(255,255,255,0.03); color:var(--muted); cursor:pointer; }
-    .day-circle-input:checked + .day-circle-label { background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:0; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
+    .day-selector-container { background-color: #2C2C2C; border:1px solid #444; border-radius:8px; }
+    .day-selector-summary { padding:12px; font-weight:600; color:#BBBBBB; cursor:pointer; position:relative; }
+    .day-selector-summary::after { content:'▼'; font-size:0.8em; position:absolute; right:15px; top:14px; transition:transform 0.2s; }
+    .day-selector-container[open] .day-selector-summary::after { transform: rotate(180deg); }
+    .day-selector-grid { display:flex; flex-wrap:wrap; gap:10px; padding:0 12px 12px 12px; justify-content:center; }
+    .day-circle-input{ display:none; }
+    .day-circle-label{ display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; border:2px solid #555; background:#333; color:#E0E0E0; font-size:14px; font-weight:700; cursor:pointer; user-select:none; }
+    .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
-    /* results area */
-    .results-grid { display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start; }
-    .progress-section { background: linear-gradient(180deg,#0b0b0d, #0f0f12); padding:14px; border-radius:12px; }
-    .progress-bar-container { background: rgba(255,255,255,0.03); height:12px; border-radius:999px; overflow:hidden; margin-top:10px; }
-    #progress-bar { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width 0.6s ease; }
-    .countdown-container { display:flex; gap:12px; align-items:center; margin-top:12px; }
-    .countdown-days { font-size:22px; font-weight:700; color:var(--accent); }
-
-    /* percurso (plan) */
-    .plan-tabs { display:flex; gap:8px; margin-bottom:12px; }
-    .plan-tab { padding:8px 12px; background:transparent; border-radius:9px; color:var(--muted); cursor:pointer; border:1px solid rgba(255,255,255,0.02); }
-    .plan-tab.active { background:linear-gradient(90deg, rgba(0,123,255,0.12), rgba(111,66,193,0.08)); color:var(--white); }
-
-    .plan-days { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
-    .plan-day { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:12px; }
-    .meal-row { display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.02); }
-    .meal-row:last-child { border-bottom:0; }
-    .meal-left { display:flex; flex-direction:column; gap:6px; }
-    .meal-name { font-weight:700; color:var(--white); }
-    .meal-kcal { font-weight:700; color:var(--muted); }
-    .meal-right button { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:6px 8px; border-radius:8px; cursor:pointer; }
-
-    .dify-frame { height:320px; border-radius:12px; overflow:hidden; background:var(--glass); border:1px solid rgba(255,255,255,0.02); }
-    .dify-frame iframe { width:100%; height:100%; border:0; display:block; }
-
-    /* responsiveness */
-    @media (max-width: 1000px){
-      .app{grid-template-columns: 1fr; padding-bottom:60px}
-      .sidebar{position:static;height:auto}
-      .results-grid{grid-template-columns:1fr}
-      .plan-days{grid-template-columns:1fr}
+    @media(max-width:900px){
+      .percurso-forms{ grid-template-columns:1fr; }
+      .plan-days{ grid-template-columns:1fr; }
+      body{ padding:20px 12px; }
+      .day-circle-label{ width:36px; height:36px; font-size:13px; }
+      .iframe-container{ height:48vh; min-height:220px; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar card" aria-label="menu">
-      <div class="brand">Membros Saúde — IA</div>
-      <nav>
-        <ul>
-          <li><a class="nav-link active" data-tab="ia-planejamento">IA Especialista</a></li>
-          <li><a class="nav-link" data-tab="video-aulas">Videoaulas</a></li>
-          <li><a class="nav-link" data-tab="percurso">Percurso</a></li>
-        </ul>
-      </nav>
-      <div class="sidebar-footer">
-        <button id="config-btn">⚙️ Configurações</button>
-        <button id="reset-btn" class="hidden">🔁 Redefinir Meta</button>
-        <button id="logout-btn" class="hidden">⏻ Sair</button>
-      </div>
-    </aside>
+  <button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
 
-    <main class="main">
-      <header class="app-header">
-        <div class="welcome card" style="padding:12px 18px;">Bem-vindo(a), <span id="welcome-msg">A carregar...</span></div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <div class="card" style="padding:10px 14px;">Versão: <strong>v5.1</strong></div>
-        </div>
-      </header>
-
-      <!-- IA PLANEJAMENTO -->
-      <section id="ia-planejamento" class="card">
-        <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
-          <div style="flex:1; min-width:320px;">
-            <h2 style="margin:0 0 12px 0;">Crie sua Grande Meta</h2>
-            <form id="ia-fit-form">
-              <label for="objetivo">Qual é sua grande meta?</label>
-              <textarea id="objetivo" name="objetivo" placeholder="Ex: perder 6 kg em 3 meses ou ganhar 4 kg de massa"></textarea>
-
-              <div id="prazo-group" style="display:none; margin-top:8px;">
-                <label for="prazo">Prazo (ex: 3 meses, 1 ano, 1.5 anos)</label>
-                <input id="prazo" name="prazo" type="text" placeholder="Ex: 3 meses">
-              </div>
-
-              <div class="form-grid" style="margin-top:12px;">
-                <div>
-                  <label for="sexo">Sexo</label>
-                  <select id="sexo" name="sexo"><option value="">--</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
-                </div>
-                <div>
-                  <label for="idade">Idade</label>
-                  <input id="idade" name="idade" type="number" placeholder="30">
-                </div>
-                <div>
-                  <label for="altura">Altura (m)</label>
-                  <input id="altura" name="altura" type="text" placeholder="1.75">
-                </div>
-                <div>
-                  <label for="peso">Peso (kg)</label>
-                  <input id="peso" name="peso" type="number" placeholder="75">
-                </div>
-                <div>
-                  <label for="nivel">Nível</label>
-                  <select id="nivel" name="nivel"><option value="">--</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select>
-                </div>
-                <div>
-                  <label for="local_treino">Local de treino</label>
-                  <select id="local_treino" name="local_treino"><option value="">--</option><option value="Academia">Academia</option><option value="Casa">Casa</option></select>
-                </div>
-              </div>
-
-              <details class="day-selector-container" style="margin-top:12px;">
-                <summary>Selecione os dias de treino</summary>
-                <div class="day-selector-grid" style="margin-top:8px;">
-                  <input id="dia-seg" class="day-circle-input" type="checkbox" name="dias_treino" value="seg"><label for="dia-seg" class="day-circle-label">Seg</label>
-                  <input id="dia-ter" class="day-circle-input" type="checkbox" name="dias_treino" value="ter"><label for="dia-ter" class="day-circle-label">Ter</label>
-                  <input id="dia-qua" class="day-circle-input" type="checkbox" name="dias_treino" value="qua"><label for="dia-qua" class="day-circle-label">Qua</label>
-                  <input id="dia-qui" class="day-circle-input" type="checkbox" name="dias_treino" value="qui"><label for="dia-qui" class="day-circle-label">Qui</label>
-                  <input id="dia-sex" class="day-circle-input" type="checkbox" name="dias_treino" value="sex"><label for="dia-sex" class="day-circle-label">Sex</label>
-                  <input id="dia-sab" class="day-circle-input" type="checkbox" name="dias_treino" value="sab"><label for="dia-sab" class="day-circle-label">Sáb</label>
-                  <input id="dia-dom" class="day-circle-input" type="checkbox" name="dias_treino" value="dom"><label for="dia-dom" class="day-circle-label">Dom</label>
-                </div>
-              </details>
-
-              <div style="margin-top:12px;">
-                <label for="orcamento">Orçamento mensal (R$)</label>
-                <input id="orcamento" name="orcamento" type="text" placeholder="Ex: 600">
-              </div>
-
-              <div style="display:flex; gap:12px; margin-top:12px;">
-                <div style="flex:1;">
-                  <label for="uso_suplemento">Usa suplementos?</label>
-                  <select id="uso_suplemento" name="uso_suplemento"><option value="">--</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-                </div>
-                <div style="flex:2;">
-                  <label for="quais_suplementos">Quais suplementos? (ex: Whey, Creatina)</label>
-                  <input id="quais_suplementos" name="quais_suplementos" type="text" placeholder="Ex: Whey, Creatina" />
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button class="primary" type="submit">Crie seu próprio caminho</button>
-                <button type="button" class="ghost" id="reset-btn-quick">Limpar</button>
-                <div style="color:var(--muted); font-size:13px; margin-left:auto;">Suporte: plano dinâmico</div>
-              </div>
-            </form>
-          </div>
-
-          <div style="flex-basis:420px;">
-            <div class="card" style="padding:12px 14px;">
-              <h3 style="margin:0 0 8px 0;">Rastreamento</h3>
-              <div style="color:var(--muted); font-size:13px;">Progresso da meta</div>
-              <div class="progress-bar-container" style="margin-top:12px;"><div id="progress-bar"></div></div>
-              <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px; color:var(--muted);">
-                <div id="start-date-label">—</div>
-                <div id="end-date-label">—</div>
-              </div>
-              <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
-                <div class="countdown-days" id="countdown-days">—</div>
-                <div style="color:var(--muted); font-size:13px;">dias restantes</div>
-              </div>
-              <div style="margin-top:12px;">
-                <button id="playlist-btn" class="ghost" style="width:100%;">Abrir Roteiro de Aulas</button>
-              </div>
-            </div>
-
-            <div style="height:12px;"></div>
-
-            <div class="card" style="padding:10px;">
-              <h4 style="margin:0 0 8px 0;">Fale com a IA</h4>
-              <div id="dify-container" class="dify-frame" style="height:260px;"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- VIDEO AULAS -->
-      <section id="video-aulas" class="card" style="display:none;">
-        <h2>Aulas</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-          <div class="card"><h3>Aula 1</h3><div style="color:var(--muted)">Introdução</div></div>
-          <div class="card"><h3>Aula 2</h3><div style="color:var(--muted)">Nutrição</div></div>
-        </div>
-      </section>
-
-      <!-- PERCURSO -->
-      <section id="percurso" class="card" style="display:none;">
-        <h2>Meu Percurso</h2>
-        <div style="display:flex; gap:12px; align-items:flex-start; margin-top:12px; flex-wrap:wrap;">
-          <div style="flex:1; min-width:360px;">
-            <div class="card" id="dieta-card">
-              <h4 style="margin:0 0 8px 0;">Formulário: Dieta</h4>
-              <div id="dieta-card-content" style="color:var(--muted)">Seu formulário de dieta será exibido aqui após gerar meta.</div>
-            </div>
-          </div>
-          <div style="width:320px;">
-            <div class="card">
-              <h4>Salvos</h4>
-              <div id="saved-plans" style="color:var(--muted); margin-top:8px;">Seus planos salvos aparecerão aqui.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+  <div class="sidebar" id="sidebar">
+    <nav>
+      <ul>
+        <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
+        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
+        <li><a href="#" class="nav-link link-percurso" data-tab="percurso">Percurso</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button>
+      <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
+      <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
+    </div>
   </div>
 
+  <div class="overlay" id="overlay"></div>
+
+  <div class="container">
+    <div class="header">
+      <p id="welcome-msg">A carregar...</p>
+    </div>
+
+    <!-- IA PLANEJAMENTO -->
+    <div id="ia-planejamento" class="tab-content active">
+      <div class="form-wrapper" id="form-wrapper" style="display:block;">
+        <div class="form-container">
+          <h1>Crie a sua Meta</h1>
+          <form id="ia-fit-form">
+            <div class="goal-section">
+              <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
+              <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo... (Ex: perder 10kg, ganhar massa muscular)" required></textarea>
+
+              <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
+                <label for="prazo">Qual o prazo para esta meta?</label>
+                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required>
+              </div>
+            </div>
+
+            <h3>Informações Básicas e Realidade Atual</h3>
+
+            <div class="form-group"><label for="sexo">Sexo</label>
+              <select id="sexo" name="sexo" required>
+                <option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option>
+              </select>
+            </div>
+
+            <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
+            <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
+            <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
+
+            <div class="form-group">
+              <details class="day-selector-container">
+                <summary class="day-selector-summary">Dias de treino</summary>
+                <div class="day-selector-grid">
+                  <input type="checkbox" name="dias_treino" value="seg" id="dia-seg" class="day-circle-input"><label for="dia-seg" class="day-circle-label">Seg</label>
+                  <input type="checkbox" name="dias_treino" value="ter" id="dia-ter" class="day-circle-input"><label for="dia-ter" class="day-circle-label">Ter</label>
+                  <input type="checkbox" name="dias_treino" value="qua" id="dia-qua" class="day-circle-input"><label for="dia-qua" class="day-circle-label">Qua</label>
+                  <input type="checkbox" name="dias_treino" value="qui" id="dia-qui" class="day-circle-input"><label for="dia-qui" class="day-circle-label">Qui</label>
+                  <input type="checkbox" name="dias_treino" value="sex" id="dia-sex" class="day-circle-input"><label for="dia-sex" class="day-circle-label">Sex</label>
+                  <input type="checkbox" name="dias_treino" value="sab" id="dia-sab" class="day-circle-input"><label for="dia-sab" class="day-circle-label">Sáb</label>
+                  <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input"><label for="dia-dom" class="day-circle-label">Dom</label>
+                </div>
+              </details>
+            </div>
+
+            <div class="form-group"><label for="local_treino">Onde vai treinar?</label>
+              <select id="local_treino" name="local_treino" required>
+                <option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option>
+              </select>
+            </div>
+
+            <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
+
+            <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
+              <select id="uso_suplemento" name="uso_suplemento" required>
+                <option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
+
+            <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label>
+              <select id="nivel" name="nivel" required>
+                <option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option>
+              </select>
+            </div>
+
+            <button type="submit">Crie seu próprio caminho</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="results-wrapper" id="results-wrapper" style="display:none;">
+        <div class="results-container">
+          <h2>Fale com a IA</h2>
+          <div id="dify-container" class="iframe-container">
+            <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
+            <iframe id="dify-iframe" src="" frameborder="0" style="position:absolute; inset:0; width:100%; height:100%;"></iframe>
+            <div class="dify-bottom-mask"></div>
+          </div>
+
+          <div class="playlist-section" id="playlist-section" style="display:none;">
+            <h4>Roteiro de Aulas Sugerido</h4>
+            <p style="color:#bbb; margin-top:-10px;">Com base na sua meta, preparamos um roteiro para acelerar os seus resultados.</p>
+            <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
+          </div>
+
+          <div class="progress-section">
+            <h3>Sua Jornada</h3>
+            <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
+            <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
+            <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEO AULAS -->
+    <div id="video-aulas" class="tab-content">
+      <h2>Nossas Aulas</h2>
+      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+    </div>
+
+    <!-- PERCURSO -->
+    <div id="percurso" class="tab-content">
+      <div class="percurso-container">
+        <h2>Meu Percurso</h2>
+        <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
+        <div class="percurso-forms">
+          <div class="percurso-card" id="treino-card">
+            <h4>Formulário: Treino</h4>
+            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
+            <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
+          </div>
+
+          <div class="percurso-card generated-diet-card" id="dieta-card">
+            <h4>Formulário: Dieta</h4>
+            <div id="dieta-card-content"><p style="color:#bbb;">Seu formulário de dieta será exibido aqui após você criar sua meta.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT -->
   <script type="module">
-  /* =========================
-     Supabase client (example keys kept from prior)
-     ========================= */
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  // Supabase example (use your credentials)
   const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  /* ============================================
-    SuperDietEngine v5 Food DB (single source)
-    ============================================ */
+  /* ===========================================
+     SuperDietEngine v5.0 - FOOD DATABASE (user-provided)
+     =========================================== */
   const v5_FoodDatabase = {
-    'frango_peito': { name:'Frango, Peito sem pele cozido', nutrition:{ kcal:165, protein_g:31, carb_g:0, fat_g:3.6, fiber_g:0 }, price_per_kg: 22.0, category:'proteina_main', ig: 0 },
-    'frango_sobrecoxa': { name:'Frango, Sobrecoxa sem pele assada', nutrition:{ kcal:209, protein_g:26, carb_g:0, fat_g:11.2, fiber_g:0 }, price_per_kg: 18.0, category:'proteina_main', ig: 0 },
-    'carne_patinho_moido': { name:'Carne, Patinho moído 90/10 cozido', nutrition:{ kcal:185, protein_g:28, carb_g:0, fat_g:7.5, fiber_g:0 }, price_per_kg: 40.0, category:'proteina_main', ig: 0 },
-    'carne_alcatra_grelhada': { name:'Carne, Alcatra grelhada', nutrition:{ kcal:200, protein_g:30, carb_g:0, fat_g:8.5, fiber_g:0 }, price_per_kg: 45.0, category:'proteina_main', ig: 0 },
-    'carne_coxao_mole_cozido': { name:'Carne, Coxão mole cozido', nutrition:{ kcal:219, protein_g:32, carb_g:0, fat_g:9.5, fiber_g:0 }, price_per_kg: 42.0, category:'proteina_main', ig: 0 },
-    'porco_lombo_grelhado': { name:'Porco, Lombo grelhado', nutrition:{ kcal:176, protein_g:29, carb_g:0, fat_g:6.2, fiber_g:0 }, price_per_kg: 28.0, category:'proteina_main', ig: 0 },
+  // --- 1. PROTEÍNAS (ALMOÇO/JANTAR) ---
+  'frango_peito': { 
+    name:'Frango, Peito sem pele cozido', 
+    nutrition:{ kcal:165, protein_g:31, carb_g:0, fat_g:3.6, fiber_g:0 }, 
+    price_per_kg: 22.0, category:'proteina_main', ig: 0 
+  },
+  'frango_sobrecoxa': {
+    name:'Frango, Sobrecoxa sem pele assada',
+    nutrition:{ kcal:209, protein_g:26, carb_g:0, fat_g:11.2, fiber_g:0 },
+    price_per_kg: 18.0, category:'proteina_main', ig: 0
+  },
+  'carne_patinho_moido': { 
+    name:'Carne, Patinho moído 90/10 cozido', 
+    nutrition:{ kcal:185, protein_g:28, carb_g:0, fat_g:7.5, fiber_g:0 }, 
+    price_per_kg: 40.0, category:'proteina_main', ig: 0 
+  },
+  'carne_alcatra_grelhada': {
+    name:'Carne, Alcatra grelhada',
+    nutrition:{ kcal:200, protein_g:30, carb_g:0, fat_g:8.5, fiber_g:0 },
+    price_per_kg: 45.0, category:'proteina_main', ig: 0
+  },
+  'carne_coxao_mole_cozido': {
+    name:'Carne, Coxão mole cozido',
+    nutrition:{ kcal:219, protein_g:32, carb_g:0, fat_g:9.5, fiber_g:0 },
+    price_per_kg: 42.0, category:'proteina_main', ig: 0
+  },
+  'porco_lombo_grelhado': {
+    name:'Porco, Lombo grelhado',
+    nutrition:{ kcal:176, protein_g:29, carb_g:0, fat_g:6.2, fiber_g:0 },
+    price_per_kg: 28.0, category:'proteina_main', ig: 0
+  },
 
-    'peixe_tilapia_grelhada': { name:'Peixe, Tilápia grelhada', nutrition:{ kcal:128, protein_g:26, carb_g:0, fat_g:2.7, fiber_g:0 }, price_per_kg: 40.0, category:'peixe', ig: 0 },
-    'peixe_salmao_grelhado': { name:'Peixe, Salmão grelhado', nutrition:{ kcal:208, protein_g:20, carb_g:0, fat_g:13, fiber_g:0 }, price_per_kg: 75.0, category:'peixe', ig: 0 },
-    'atum_lata_agua': { name:'Atum, em lata (drenado)', nutrition:{ kcal:116, protein_g:26, carb_g:0, fat_g:0.9, fiber_g:0 }, price_per_kg: 55.0, category:'peixe', ig: 0 },
-    'sardinha_lata_oleo': { name:'Sardinha, em lata óleo (drenada)', nutrition:{ kcal:208, protein_g:24.6, carb_g:0, fat_g:11.5, fiber_g:0 }, price_per_kg: 30.0, category:'peixe', ig: 0 },
+  // --- 2. PEIXES ---
+  'peixe_tilapia_grelhada': { 
+    name:'Peixe, Tilápia grelhada', 
+    nutrition:{ kcal:128, protein_g:26, carb_g:0, fat_g:2.7, fiber_g:0 }, 
+    price_per_kg: 40.0, category:'peixe', ig: 0 
+  },
+  'peixe_salmao_grelhado': {
+    name:'Peixe, Salmão grelhado',
+    nutrition:{ kcal:208, protein_g:20, carb_g:0, fat_g:13, fiber_g:0 },
+    price_per_kg: 75.0, category:'peixe', ig: 0
+  },
+  'atum_lata_agua': {
+    name:'Atum, em lata (drenado)',
+    nutrition:{ kcal:116, protein_g:26, carb_g:0, fat_g:0.9, fiber_g:0 },
+    price_per_kg: 55.0, category:'peixe', ig: 0
+  },
+  'sardinha_lata_oleo': {
+    name:'Sardinha, em lata óleo (drenada)',
+    nutrition:{ kcal:208, protein_g:24.6, carb_g:0, fat_g:11.5, fiber_g:0 },
+    price_per_kg: 30.0, category:'peixe', ig: 0
+  },
 
-    'ovo_cozido': { name:'Ovo, de galinha inteiro cozido', nutrition:{ kcal:155, protein_g:13, carb_g:1.1, fat_g:11, fiber_g:0 }, price_per_kg: 16.0, category:'proteina_snack', ig: 0 },
-    'ovo_clara_cozida': { name:'Ovo, clara cozida', nutrition:{ kcal:52, protein_g:11, carb_g:0.7, fat_g:0.2, fiber_g:0 }, price_per_kg: 20.0, category:'proteina_snack', ig: 0 },
-    'queijo_cottage': { name:'Queijo, Cottage', nutrition:{ kcal:98, protein_g:11, carb_g:3.4, fat_g:4.3, fiber_g:0 }, price_per_kg: 45.0, category:'laticinio_snack', ig: 0 },
-    'queijo_minas_frescal': { name:'Queijo, Minas frescal', nutrition:{ kcal:264, protein_g:17, carb_g:3, fat_g:20, fiber_g:0 }, price_per_kg: 38.0, category:'laticinio_snack', ig: 0 },
-    'queijo_mussarela': { name:'Queijo, Mussarela', nutrition:{ kcal:300, protein_g:22, carb_g:2.2, fat_g:22, fiber_g:0 }, price_per_kg: 48.0, category:'laticinio_snack', ig: 0 },
-    'iogurte_nat_desnatado': { name:'Iogurte Natural desnatado', nutrition:{ kcal:41, protein_g:5.7, carb_g:4.2, fat_g:0.1, fiber_g:0 }, price_per_kg: 15.0, category:'laticinio_snack', ig: 35 },
-    'leite_desnatado': { name:'Leite Desnatado UHT', nutrition:{ kcal:35, protein_g:3.6, carb_g:5.1, fat_g:0.1, fiber_g:0 }, price_per_kg: 5.50, category:'laticinio_snack', ig: 32 },
-    'requeijao_light': { name:'Requeijão Light', nutrition:{ kcal:170, protein_g:10, carb_g:4.5, fat_g:12, fiber_g:0 }, price_per_kg: 35.0, category:'laticinio_snack', ig: 0 },
+  // --- 3. PROTEÍNAS & LATICÍNIOS (CAFÉ/LANCHES) ---
+  'ovo_cozido': { 
+    name:'Ovo, de galinha inteiro cozido', 
+    nutrition:{ kcal:155, protein_g:13, carb_g:1.1, fat_g:11, fiber_g:0 }, 
+    price_per_kg: 16.0, category:'proteina_snack', ig: 0 
+  },
+  'ovo_clara_cozida': {
+    name:'Ovo, clara cozida',
+    nutrition:{ kcal:52, protein_g:11, carb_g:0.7, fat_g:0.2, fiber_g:0 },
+    price_per_kg: 20.0, category:'proteina_snack', ig: 0
+  },
+  'queijo_cottage': {
+    name:'Queijo, Cottage (ex: 4% gordura)',
+    nutrition:{ kcal:98, protein_g:11, carb_g:3.4, fat_g:4.3, fiber_g:0 },
+    price_per_kg: 45.0, category:'laticinio_snack', ig: 0
+  },
+  'queijo_minas_frescal': {
+    name:'Queijo, Minas frescal',
+    nutrition:{ kcal:264, protein_g:17, carb_g:3, fat_g:20, fiber_g:0 },
+    price_per_kg: 38.0, category:'laticinio_snack', ig: 0
+  },
+  'queijo_mussarela': {
+    name:'Queijo, Mussarela',
+    nutrition:{ kcal:300, protein_g:22, carb_g:2.2, fat_g:22, fiber_g:0 },
+    price_per_kg: 48.0, category:'laticinio_snack', ig: 0
+  },
+  'iogurte_nat_desnatado': {
+    name:'Iogurte, Natural desnatado',
+    nutrition:{ kcal:41, protein_g:5.7, carb_g:4.2, fat_g:0.1, fiber_g:0 },
+    price_per_kg: 15.0, category:'laticinio_snack', ig: 35
+  },
+  'leite_desnatado': {
+    name:'Leite, Desnatado UHT',
+    nutrition:{ kcal:35, protein_g:3.6, carb_g:5.1, fat_g:0.1, fiber_g:0 },
+    price_per_kg: 5.50, category:'laticinio_snack', ig: 32
+  },
+  'requeijao_light': {
+    name:'Requeijão, Light',
+    nutrition:{ kcal:170, protein_g:10, carb_g:4.5, fat_g:12, fiber_g:0 },
+    price_per_kg: 35.0, category:'laticinio_snack', ig: 0
+  },
 
-    /* whey renamed to whey_concentrado and label "Whey concentrado" */
-    'whey_concentrado': { name:'Whey concentrado', nutrition:{ kcal:390, protein_g:80, carb_g:9, fat_g:3.5, fiber_g:1 }, price_per_kg: 110.0, category:'suplemento', ig: 15 },
+  // --- 4. SUPLEMENTOS ---
+  'whey_protein_concentrado': { 
+    name:'Whey Protein (padrão 80%)', 
+    nutrition:{ kcal:390, protein_g:80, carb_g:9, fat_g:3.5, fiber_g:1 }, 
+    price_per_kg: 110.0, category:'suplemento', ig: 15 
+  },
 
-    /* creatine small supplement */
-    'creatina_monohidratada': { name:'Creatina monohidratada', nutrition:{ kcal:0, protein_g:0, carb_g:0, fat_g:0, fiber_g:0 }, price_per_kg: 300.0, category:'suplemento', ig: 0 },
+  // --- 5. CARBOIDRATOS (ALMOÇO/JANTAR/TUBÉRCULOS) ---
+  'arroz_branco_cozido': { 
+    name:'Arroz, Branco tipo 1 cozido', 
+    nutrition:{ kcal:130, protein_g:2.7, carb_g:28, fat_g:0.2, fiber_g:0.4 }, 
+    price_per_kg: 6.0, category:'cereal_main', ig: 73 
+  },
+  'arroz_integral_cozido': {
+    name:'Arroz, Integral cozido',
+    nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 },
+    price_per_kg: 8.0, category:'cereal_main', ig: 50
+  },
+  'macarrao_comum_cozido': {
+    name:'Macarrão, comum cozido',
+    nutrition:{ kcal:158, protein_g:5.8, carb_g:31, fat_g:0.9, fiber_g:1.8 },
+    price_per_kg: 10.0, category:'cereal_main', ig: 55
+  },
+  'macarrao_integral_cozido': {
+    name:'Macarrão, integral cozido',
+    nutrition:{ kcal:141, protein_g:5.5, carb_g:27, fat_g:0.9, fiber_g:3.9 },
+    price_per_kg: 16.0, category:'cereal_main', ig: 40
+  },
+  'batata_doce_cozida': {
+    name:'Batata doce, cozida',
+    nutrition:{ kcal:90, protein_g:1.0, carb_g:21.0, fat_g:0.1, fiber_g:2.5 },
+    price_per_kg: 5.0, category:'tuberculo', ig: 63
+  },
+  'batata_inglesa_cozida': {
+    name:'Batata inglesa, cozida',
+    nutrition:{ kcal:87, protein_g:1.9, carb_g:20.1, fat_g:0.1, fiber_g:1.8 },
+    price_per_kg: 4.5, category:'tuberculo', ig: 82
+  },
+  'mandioca_cozida': {
+    name:'Mandioca (Aipim), cozida',
+    nutrition:{ kcal:160, protein_g:1.4, carb_g:38, fat_g:0.3, fiber_g:1.8 },
+    price_per_kg: 6.0, category:'tuberculo', ig: 77
+  },
+  'inhame_cozido': {
+    name:'Inhame, cozido',
+    nutrition:{ kcal:118, protein_g:1.5, carb_g:28, fat_g:0.2, fiber_g:4.1 },
+    price_per_kg: 7.0, category:'tuberculo', ig: 51
+  },
+  'cuscuz_milho_cozido': {
+    name:'Cuscuz, de milho (flocão) cozido',
+    nutrition:{ kcal:113, protein_g:2.2, carb_g:25.5, fat_g:0.3, fiber_g:1.9 },
+    price_per_kg: 9.0, category:'cereal_main', ig: 65
+  },
 
-    'arroz_branco_cozido': { name:'Arroz, Branco cozido', nutrition:{ kcal:130, protein_g:2.7, carb_g:28, fat_g:0.2, fiber_g:0.4 }, price_per_kg: 6.0, category:'cereal_main', ig: 73 },
-    'arroz_integral_cozido': { name:'Arroz, Integral cozido', nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 }, price_per_kg: 8.0, category:'cereal_main', ig: 50 },
-    'macarrao_comum_cozido': { name:'Macarrão comum cozido', nutrition:{ kcal:158, protein_g:5.8, carb_g:31, fat_g:0.9, fiber_g:1.8 }, price_per_kg: 10.0, category:'cereal_main', ig: 55 },
-    'macarrao_integral_cozido': { name:'Macarrão integral cozido', nutrition:{ kcal:141, protein_g:5.5, carb_g:27, fat_g:0.9, fiber_g:3.9 }, price_per_kg: 16.0, category:'cereal_main', ig: 40 },
-    'batata_doce_cozida': { name:'Batata doce cozida', nutrition:{ kcal:90, protein_g:1.0, carb_g:21.0, fat_g:0.1, fiber_g:2.5 }, price_per_kg: 5.0, category:'tuberculo', ig: 63 },
-    'batata_inglesa_cozida': { name:'Batata inglesa cozida', nutrition:{ kcal:87, protein_g:1.9, carb_g:20.1, fat_g:0.1, fiber_g:1.8 }, price_per_kg: 4.5, category:'tuberculo', ig: 82 },
-    'mandioca_cozida': { name:'Mandioca cozida', nutrition:{ kcal:160, protein_g:1.4, carb_g:38, fat_g:0.3, fiber_g:1.8 }, price_per_kg: 6.0, category:'tuberculo', ig: 77 },
-    'inhame_cozido': { name:'Inhame cozido', nutrition:{ kcal:118, protein_g:1.5, carb_g:28, fat_g:0.2, fiber_g:4.1 }, price_per_kg: 7.0, category:'tuberculo', ig: 51 },
-    'cuscuz_milho_cozido': { name:'Cuscuz de milho cozido', nutrition:{ kcal:113, protein_g:2.2, carb_g:25.5, fat_g:0.3, fiber_g:1.9 }, price_per_kg: 9.0, category:'cereal_main', ig: 65 },
+  // --- 6. CARBOIDRATOS (CAFÉ/LANCHES) ---
+  'aveia_flocos': { 
+    name:'Aveia, em flocos crus', 
+    nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, 
+    price_per_kg: 12.0, category:'cereal_snack', ig: 55 
+  },
+  'pao_integral_forma': {
+    name:'Pão, de forma integral (1 fatia ≈ 25g)',
+    nutrition:{ kcal:250, protein_g:9.5, carb_g:48, fat_g:2.5, fiber_g:6.0 },
+    price_per_kg: 20.0, category:'pao_snack', ig: 45
+  },
+  'pao_frances': {
+    name:'Pão, Francês (unidade ≈ 50g)',
+    nutrition:{ kcal:289, protein_g:8.0, carb_g:58.5, fat_g:2.0, fiber_g:2.3 },
+    price_per_kg: 15.0, category:'pao_snack', ig: 70
+  },
+  'tapioca_goma': {
+    name:'Tapioca (goma hidratada)',
+    nutrition:{ kcal:240, protein_g:0, carb_g:59, fat_g:0, fiber_g:0 },
+    price_per_kg: 10.0, category:'cereal_snack', ig: 80
+  },
+  'granola_tradicional': {
+    name:'Granola, tradicional (com açúcar)',
+    nutrition:{ kcal:420, protein_g:9.0, carb_g:70, fat_g:12, fiber_g:8.0 },
+    price_per_kg: 25.0, category:'cereal_snack', ig: 65
+  },
+  'milho_pipoca_estourada': {
+    name:'Pipoca (milho estourado, sem gordura)',
+    nutrition:{ kcal:387, protein_g:12.9, carb_g:78, fat_g:4.5, fiber_g:15.1 },
+    price_per_kg: 14.0, category:'cereal_snack', ig: 55
+  },
+  'rap10_comum': {
+    name:'Pão Folha (Rap10) comum',
+    nutrition:{ kcal:306, protein_g:8.2, carb_g:55, fat_g:5.7, fiber_g:2.1 },
+    price_per_kg: 28.0, category:'pao_snack', ig: 68
+  },
 
-    'aveia_flocos': { name:'Aveia em flocos', nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, price_per_kg: 12.0, category:'cereal_snack', ig: 55 },
-    'pao_integral_forma': { name:'Pão integral (fatia)', nutrition:{ kcal:250, protein_g:9.5, carb_g:48, fat_g:2.5, fiber_g:6.0 }, price_per_kg: 20.0, category:'pao_snack', ig: 45 },
-    'pao_frances': { name:'Pão Francês', nutrition:{ kcal:289, protein_g:8.0, carb_g:58.5, fat_g:2.0, fiber_g:2.3 }, price_per_kg: 15.0, category:'pao_snack', ig: 70 },
-    'tapioca_goma': { name:'Tapioca', nutrition:{ kcal:240, protein_g:0, carb_g:59, fat_g:0, fiber_g:0 }, price_per_kg: 10.0, category:'cereal_snack', ig: 80 },
-    'granola_tradicional': { name:'Granola tradicional', nutrition:{ kcal:420, protein_g:9.0, carb_g:70, fat_g:12, fiber_g:8.0 }, price_per_kg: 25.0, category:'cereal_snack', ig: 65 },
-    'milho_pipoca_estourada': { name:'Pipoca', nutrition:{ kcal:387, protein_g:12.9, carb_g:78, fat_g:4.5, fiber_g:15.1 }, price_per_kg: 14.0, category:'cereal_snack', ig: 55 },
-    'rap10_comum': { name:'Pão Rap10', nutrition:{ kcal:306, protein_g:8.2, carb_g:55, fat_g:5.7, fiber_g:2.1 }, price_per_kg: 28.0, category:'pao_snack', ig: 68 },
+  // --- 7. LEGUMINOSAS (FEIJÕES) ---
+  'feijao_carioca_cozido': { 
+    name:'Feijão, Carioca cozido (com caldo)', 
+    nutrition:{ kcal:76, protein_g:4.8, carb_g:13.6, fat_g:0.5, fiber_g:5.5 }, 
+    price_per_kg: 8.5, category:'leguminosa', ig: 29 
+  },
+  'feijao_preto_cozido': {
+    name:'Feijão, Preto cozido (com caldo)',
+    nutrition:{ kcal:77, protein_g:4.5, carb_g:14, fat_g:0.5, fiber_g:5.8 },
+    price_per_kg: 9.0, category:'leguminosa', ig: 30
+  },
+  'lentilha_cozida': {
+    name:'Lentilha, cozida',
+    nutrition:{ kcal:116, protein_g:9.0, carb_g:20.1, fat_g:0.4, fiber_g:7.9 },
+    price_per_kg: 14.0, category:'leguminosa', ig: 32
+  },
+  'grao_de_bico_cozido': {
+    name:'Grão-de-bico, cozido',
+    nutrition:{ kcal:139, protein_g:7.2, carb_g:25.5, fat_g:1.1, fiber_g:6.4 },
+    price_per_kg: 15.0, category:'leguminosa', ig: 28
+  },
 
-    'feijao_carioca_cozido': { name:'Feijão Carioca cozido', nutrition:{ kcal:76, protein_g:4.8, carb_g:13.6, fat_g:0.5, fiber_g:5.5 }, price_per_kg: 8.5, category:'leguminosa', ig: 29 },
-    'feijao_preto_cozido': { name:'Feijão Preto cozido', nutrition:{ kcal:77, protein_g:4.5, carb_g:14, fat_g:0.5, fiber_g:5.8 }, price_per_kg: 9.0, category:'leguminosa', ig: 30 },
-    'lentilha_cozida': { name:'Lentilha cozida', nutrition:{ kcal:116, protein_g:9.0, carb_g:20.1, fat_g:0.4, fiber_g:7.9 }, price_per_kg: 14.0, category:'leguminosa', ig: 32 },
-    'grao_de_bico_cozido': { name:'Grão-de-bico cozido', nutrition:{ kcal:139, protein_g:7.2, carb_g:25.5, fat_g:1.1, fiber_g:6.4 }, price_per_kg: 15.0, category:'leguminosa', ig: 28 },
+  // --- 8. GORDURAS BOAS (ÓLEOS, NUTS, FRUTAS) ---
+  'azeite_oliva_extravirgem': { 
+    name:'Azeite, de Oliva Extra Virgem', 
+    nutrition:{ kcal:884, protein_g:0, carb_g:0, fat_g:100, fiber_g:0 }, 
+    price_per_kg: 45.0, category:'gordura_boa', ig: 0 
+  },
+  'abacate': {
+    name:'Abacate, cru',
+    nutrition:{ kcal:160, protein_g:2, carb_g:8.5, fat_g:14.7, fiber_g:6.7 },
+    price_per_kg: 12.0, category:'gordura_boa', ig: 15
+  },
+  'castanha_de_caju_torrada': {
+    name:'Castanha de Caju, torrada',
+    nutrition:{ kcal:580, protein_g:17, carb_g:30, fat_g:46, fiber_g:3.3 },
+    price_per_kg: 80.0, category:'gordura_boa', ig: 22
+  },
+  'amendoim_torrado_sem_sal': {
+    name:'Amendoim, torrado sem sal',
+    nutrition:{ kcal:567, protein_g:25.8, carb_g:16.1, fat_g:49.2, fiber_g:8.5 },
+    price_per_kg: 25.0, category:'gordura_boa', ig: 14
+  },
+  'pasta_amendoim_integral': {
+    name:'Pasta de Amendoim, integral',
+    nutrition:{ kcal:588, protein_g:25, carb_g:20, fat_g:50, fiber_g:8 },
+    price_per_kg: 40.0, category:'gordura_boa', ig: 14
+  },
+  'acai_puro_congelado': {
+    name:'Açaí, polpa pura congelada (sem açúcar)',
+    nutrition:{ kcal:58, protein_g:0.8, carb_g:6.2, fat_g:3.9, fiber_g:2.9 },
+    price_per_kg: 20.0, category:'gordura_boa', ig: 10
+  },
 
-    'azeite_oliva_extravirgem': { name:'Azeite de Oliva Extra Virgem', nutrition:{ kcal:884, protein_g:0, carb_g:0, fat_g:100, fiber_g:0 }, price_per_kg: 45.0, category:'gordura_boa', ig: 0 },
-    'abacate': { name:'Abacate', nutrition:{ kcal:160, protein_g:2, carb_g:8.5, fat_g:14.7, fiber_g:6.7 }, price_per_kg: 12.0, category:'gordura_boa', ig: 15 },
-    'castanha_de_caju_torrada': { name:'Castanha de Caju', nutrition:{ kcal:580, protein_g:17, carb_g:30, fat_g:46, fiber_g:3.3 }, price_per_kg: 80.0, category:'gordura_boa', ig: 22 },
-    'amendoim_torrado_sem_sal': { name:'Amendoim torrado sem sal', nutrition:{ kcal:567, protein_g:25.8, carb_g:16.1, fat_g:49.2, fiber_g:8.5 }, price_per_kg: 25.0, category:'gordura_boa', ig: 14 },
-    'pasta_amendoim_integral': { name:'Pasta de Amendoim integral', nutrition:{ kcal:588, protein_g:25, carb_g:20, fat_g:50, fiber_g:8 }, price_per_kg: 40.0, category:'gordura_boa', ig: 14 },
-    'acai_puro_congelado': { name:'Açaí (polpa pura)', nutrition:{ kcal:58, protein_g:0.8, carb_g:6.2, fat_g:3.9, fiber_g:2.9 }, price_per_kg: 20.0, category:'gordura_boa', ig: 10 },
+  // --- 9. FRUTAS ---
+  'banana_nanica_crua': { 
+    name:'Banana, nanica crua', 
+    nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, 
+    price_per_kg: 4.5, category:'fruta', ig: 51 
+  },
+  'maca_fuji_crua': {
+    name:'Maçã, Fuji com casca crua',
+    nutrition:{ kcal:56, protein_g:0.3, carb_g:15.2, fat_g:0, fiber_g:2.0 },
+    price_per_kg: 8.0, category:'fruta', ig: 38
+  },
+  'mamao_papaia_cru': {
+    name:'Mamão, Papaia cru',
+    nutrition:{ kcal:43, protein_g:0.5, carb_g:11, fat_g:0.3, fiber_g:1.7 },
+    price_per_kg: 7.0, category:'fruta', ig: 60
+  },
+  'laranja_pera_crua': {
+    name:'Laranja, Pêra crua',
+    nutrition:{ kcal:47, protein_g:0.9, carb_g:12, fat_g:0.1, fiber_g:2.4 },
+    price_per_kg: 4.0, category:'fruta', ig: 43
+  },
+  'uva_thompson_crua': {
+    name:'Uva, Thompson (verde) crua',
+    nutrition:{ kcal:69, protein_g:0.7, carb_g:18, fat_g:0.2, fiber_g:0.9 },
+    price_per_kg: 15.0, category:'fruta', ig: 53
+  },
+  'morango_cru': {
+    name:'Morango, cru',
+    nutrition:{ kcal:32, protein_g:0.7, carb_g:7.7, fat_g:0.3, fiber_g:2.0 },
+    price_per_kg: 25.0, category:'fruta', ig: 40
+  },
+  'melao_amarelo_cru': {
+    name:'Melão, Amarelo cru',
+    nutrition:{ kcal:29, protein_g:0.9, carb_g:7.5, fat_g:0, fiber_g:0.5 },
+    price_per_kg: 6.0, category:'fruta', ig: 65
+  },
+  'melancia_crua': {
+    name:'Melancia, crua',
+    nutrition:{ kcal:30, protein_g:0.6, carb_g:8, fat_g:0.2, fiber_g:0.4 },
+    price_per_kg: 3.5, category:'fruta', ig: 72
+  },
+  'manga_tommy_crua': {
+    name:'Manga, Tommy crua',
+    nutrition:{ kcal:60, protein_g:0.8, carb_g:15, fat_g:0.4, fiber_g:1.6 },
+    price_per_kg: 7.5, category:'fruta', ig: 51
+  },
+  'abacaxi_cru': {
+    name:'Abacaxi, cru',
+    nutrition:{ kcal:50, protein_g:0.5, carb_g:13, fat_g:0.1, fiber_g:1.4 },
+    price_per_kg: 7.0, category:'fruta', ig: 59
+  },
 
-    'banana_nanica_crua': { name:'Banana nanica', nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, price_per_kg: 4.5, category:'fruta', ig: 51 },
-    'maca_fuji_crua': { name:'Maçã Fuji', nutrition:{ kcal:56, protein_g:0.3, carb_g:15.2, fat_g:0, fiber_g:2.0 }, price_per_kg: 8.0, category:'fruta', ig: 38 },
-    'mamao_papaia_cru': { name:'Mamão Papaia', nutrition:{ kcal:43, protein_g:0.5, carb_g:11, fat_g:0.3, fiber_g:1.7 }, price_per_kg: 7.0, category:'fruta', ig: 60 },
-    'laranja_pera_crua': { name:'Laranja Pêra', nutrition:{ kcal:47, protein_g:0.9, carb_g:12, fat_g:0.1, fiber_g:2.4 }, price_per_kg: 4.0, category:'fruta', ig: 43 },
-    'uva_thompson_crua': { name:'Uva Thompson', nutrition:{ kcal:69, protein_g:0.7, carb_g:18, fat_g:0.2, fiber_g:0.9 }, price_per_kg: 15.0, category:'fruta', ig: 53 },
-    'morango_cru': { name:'Morango', nutrition:{ kcal:32, protein_g:0.7, carb_g:7.7, fat_g:0.3, fiber_g:2.0 }, price_per_kg: 25.0, category:'fruta', ig: 40 },
-    'melao_amarelo_cru': { name:'Melão', nutrition:{ kcal:29, protein_g:0.9, carb_g:7.5, fat_g:0, fiber_g:0.5 }, price_per_kg: 6.0, category:'fruta', ig: 65 },
-    'melancia_crua': { name:'Melancia', nutrition:{ kcal:30, protein_g:0.6, carb_g:8, fat_g:0.2, fiber_g:0.4 }, price_per_kg: 3.5, category:'fruta', ig: 72 },
-    'manga_tommy_crua': { name:'Manga Tommy', nutrition:{ kcal:60, protein_g:0.8, carb_g:15, fat_g:0.4, fiber_g:1.6 }, price_per_kg: 7.5, category:'fruta', ig: 51 },
-    'abacaxi_cru': { name:'Abacaxi', nutrition:{ kcal:50, protein_g:0.5, carb_g:13, fat_g:0.1, fiber_g:1.4 }, price_per_kg: 7.0, category:'fruta', ig: 59 },
+  // --- 10. VERDURAS & LEGUMES (HORTALIÇAS) ---
+  'alface_crespa_crua': { 
+    name:'Alface, Crespa crua', 
+    nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, 
+    price_per_kg: 8.0, category:'verdura', ig: 15 
+  },
+  'tomate_salada_cru': {
+    name:'Tomate, Salada cru',
+    nutrition:{ kcal:18, protein_g:0.9, carb_g:3.9, fat_g:0.2, fiber_g:1.2 },
+    price_per_kg: 9.0, category:'verdura', ig: 15
+  },
+  'cenoura_crua': {
+    name:'Cenoura, crua',
+    nutrition:{ kcal:41, protein_g:0.9, carb_g:9.6, fat_g:0.2, fiber_g:2.8 },
+    price_per_kg: 5.0, category:'verdura', ig: 39
+  },
+  'brocolis_cozido': {
+    name:'Brócolis, cozido',
+    nutrition:{ kcal:35, protein_g:2.4, carb_g:7.2, fat_g:0.4, fiber_g:3.4 },
+    price_per_kg: 12.0, category:'verdura', ig: 15
+  },
+  'cebola_crua': {
+    name:'Cebola, crua',
+    nutrition:{ kcal:40, protein_g:1.1, carb_g:9.3, fat_g:0.1, fiber_g:1.7 },
+    price_per_kg: 6.0, category:'verdura', ig: 15
+  },
+  'abobrinha_refogada': {
+    name:'Abobrinha, refogada',
+    nutrition:{ kcal:20, protein_g:1.1, carb_g:4.0, fat_g:0.3, fiber_g:1.2 },
+    price_per_kg: 7.0, category:'verdura', ig: 15
+  },
+  'beterraba_cozida': {
+    name:'Beterraba, cozida',
+    nutrition:{ kcal:44, protein_g:1.7, carb_g:10, fat_g:0.2, fiber_g:2 },
+    price_per_kg: 6.5, category:'verdura', ig: 64
+  },
+  'couve_manteiga_refogada': {
+    name:'Couve, Manteiga refogada',
+    nutrition:{ kcal:38, protein_g:1.7, carb_g:7.9, fat_g:0.5, fiber_g:2.3 },
+    price_per_kg: 9.0, category:'verdura', ig: 15
+  },
+  'espinafre_cozido': {
+    name:'Espinafre, cozido',
+    nutrition:{ kcal:23, protein_g:3, carb_g:3.6, fat_g:0.3, fiber_g:2.2 },
+    price_per_kg: 15.0, category:'verdura', ig: 15
+  },
+  'pepino_cru': {
+    name:'Pepino, comum cru',
+    nutrition:{ kcal:15, protein_g:0.7, carb_g:3.6, fat_g:0.1, fiber_g:0.5 },
+    price_per_kg: 6.0, category:'verdura', ig: 15
+  }
+  }; // Fim da v5_FoodDatabase (user-provided)
 
-    'alface_crespa_crua': { name:'Alface crespa', nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, price_per_kg: 8.0, category:'verdura', ig: 15 },
-    'tomate_salada_cru': { name:'Tomate salada', nutrition:{ kcal:18, protein_g:0.9, carb_g:3.9, fat_g:0.2, fiber_g:1.2 }, price_per_kg: 9.0, category:'verdura', ig: 15 },
-    'cenoura_crua': { name:'Cenoura', nutrition:{ kcal:41, protein_g:0.9, carb_g:9.6, fat_g:0.2, fiber_g:2.8 }, price_per_kg: 5.0, category:'verdura', ig: 39 },
-    'brocolis_cozido': { name:'Brócolis cozido', nutrition:{ kcal:35, protein_g:2.4, carb_g:7.2, fat_g:0.4, fiber_g:3.4 }, price_per_kg: 12.0, category:'verdura', ig: 15 },
-    'cebola_crua': { name:'Cebola', nutrition:{ kcal:40, protein_g:1.1, carb_g:9.3, fat_g:0.1, fiber_g:1.7 }, price_per_kg: 6.0, category:'verdura', ig: 15 },
-    'abobrinha_refogada': { name:'Abobrinha refogada', nutrition:{ kcal:20, protein_g:1.1, carb_g:4.0, fat_g:0.3, fiber_g:1.2 }, price_per_kg: 7.0, category:'verdura', ig: 15 },
-    'beterraba_cozida': { name:'Beterraba cozida', nutrition:{ kcal:44, protein_g:1.7, carb_g:10, fat_g:0.2, fiber_g:2 }, price_per_kg: 6.5, category:'verdura', ig: 64 },
-    'couve_manteiga_refogada': { name:'Couve manteiga refogada', nutrition:{ kcal:38, protein_g:1.7, carb_g:7.9, fat_g:0.5, fiber_g:2.3 }, price_per_kg: 9.0, category:'verdura', ig: 15 },
-    'espinafre_cozido': { name:'Espinafre cozido', nutrition:{ kcal:23, protein_g:3, carb_g:3.6, fat_g:0.3, fiber_g:2.2 }, price_per_kg: 15.0, category:'verdura', ig: 15 },
-    'pepino_cru': { name:'Pepino', nutrition:{ kcal:15, protein_g:0.7, carb_g:3.6, fat_g:0.1, fiber_g:0.5 }, price_per_kg: 6.0, category:'verdura', ig: 15 }
+  // Add creatine entry (user requested creatina) and a friendly alias for whey
+  v5_FoodDatabase['creatina_monohidratada'] = {
+    name: 'Creatina monohidratada',
+    nutrition: { kcal:0, protein_g:0, carb_g:0, fat_g:0, fiber_g:0 },
+    price_per_kg: 300.0,
+    category: 'suplemento',
+    ig: 0
   };
+  // alias: create a copy with a clean key 'whey_concentrado' that points to same object (keeps original key too)
+  if(v5_FoodDatabase['whey_protein_concentrado']){
+    v5_FoodDatabase['whey_concentrado'] = { ...v5_FoodDatabase['whey_protein_concentrado'], name: 'Whey concentrado' };
+  }
 
-  /* build masterDB + lookup */
+  /* Build master lookup and helper utilities */
   const masterDB = {};
-  Object.keys(v5_FoodDatabase).forEach(key => {
-    const src = v5_FoodDatabase[key];
-    masterDB[key] = {
-      id: key,
-      name: src.name,
-      nutrition: src.nutrition || {},
-      price_per_kg: src.price_per_kg || 0,
-      category: src.category || 'other',
-      preps: src.preps || ['cozida','assada','grelhada','crua'],
-      ig: (typeof src.ig !== 'undefined') ? src.ig : null
+  Object.keys(v5_FoodDatabase).forEach(k => {
+    const s = v5_FoodDatabase[k];
+    masterDB[k] = {
+      id: k,
+      name: s.name,
+      nutrition: s.nutrition || {},
+      price_per_kg: s.price_per_kg || 0,
+      category: s.category || 'other',
+      ig: (typeof s.ig !== 'undefined') ? s.ig : null
     };
   });
 
   function normalizeName(n){ return (n||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
-  function _buildLookup(db){
+  function stripParenthesis(name){ if(!name) return name; return name.replace(/\s*\(.*?\)\s*/g,'').trim(); }
+
+  function buildLookup(db){
     const byName = {}, byId = {};
     Object.values(db).forEach(rec => {
-      const normalized = normalizeName(rec.name);
-      if(!byName[normalized]) byName[normalized] = rec;
-      if(rec.id) byId[rec.id] = rec;
+      const norm = normalizeName(stripParenthesis(rec.name));
+      byName[norm] = rec;
+      byId[rec.id] = rec;
+      // also add normalized id as possible name
+      byName[normalizeName(rec.id)] = rec;
     });
     return { byName, byId };
   }
-  let _lookup = _buildLookup(masterDB);
+  let _lookup = buildLookup(masterDB);
 
-  function _safeNum(v, fallback=0){
-    if(typeof v === 'number' && !Number.isNaN(v)) return v;
-    if(v == null || v === '') return fallback;
-    const n = parseFloat(String(v).replace(',','.'));
-    return isNaN(n) ? fallback : n;
-  }
-  function _round(n,p=0){ const pow=10**(p||0); return Math.round((n||0)*pow)/pow; }
-  function nowISO(){ return (new Date()).toISOString(); }
-
-  /* glycemic info */
-  function _getGlycemicInfo(foodKey){
-    if(!foodKey) return { ig:50, gl_100g:10 };
-    if(_lookup.byId[foodKey]) {
-      const rec = _lookup.byId[foodKey];
-      const ig = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? rec.ig : 50;
-      const carbs = _safeNum(rec.nutrition?.carb_g,0);
-      return { ig, gl_100g: Math.round((ig * carbs) / 100) };
-    }
-    const norm = normalizeName(foodKey);
-    if(_lookup.byName[norm]) {
-      const rec = _lookup.byName[norm];
-      const ig = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? rec.ig : 50;
-      const carbs = _safeNum(rec.nutrition?.carb_g,0);
-      return { ig, gl_100g: Math.round((ig * carbs) / 100) };
-    }
-    for(const nm in _lookup.byName){
-      if(nm.includes(norm) || norm.includes(nm)){
-        const rec = _lookup.byName[nm];
-        const ig = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? rec.ig : 50;
-        const carbs = _safeNum(rec.nutrition?.carb_g,0);
-        return { ig, gl_100g: Math.round((ig * carbs) / 100) };
-      }
-    }
-    return { ig:50, gl_100g:10 };
-  }
-
-  function findFood(foodKey){
-    if(!foodKey) return null;
-    const k = foodKey.toString();
-    if(_lookup.byId[k]) return _lookup.byId[k];
-    const norm = normalizeName(k);
+  function findFood(key){
+    if(!key) return null;
+    if(_lookup.byId[key]) return _lookup.byId[key];
+    const norm = normalizeName(stripParenthesis(String(key)));
     if(_lookup.byName[norm]) return _lookup.byName[norm];
+    // fuzzy contains
     for(const nm in _lookup.byName){
       if(nm.includes(norm) || norm.includes(nm)) return _lookup.byName[nm];
     }
     return null;
   }
 
-  /* BMR & activity */
-  function calcBMR(profile){ const peso=_safeNum(profile.peso,70); const altura_m=_safeNum(profile.altura,1.7); const idade=_safeNum(profile.idade,30); const sexo=(profile.sexo||'').toLowerCase(); const hcm=Math.round(altura_m*100); if(sexo.startsWith('m')) return Math.round(88.362 + (13.397 * peso) + (4.799 * hcm) - (5.677 * idade)); return Math.round(447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade)); }
-  function activityFactor(profile){ const nivel=(profile.nivel||'').toLowerCase(); const dias=_safeNum(profile.disponibilidade,3); if(nivel.includes('inic')||dias<=2) return 1.3; if(nivel.includes('inter')||dias<=4) return 1.55; if(nivel.includes('avanc')||dias>=5) return 1.75; return 1.55; }
+  function _safeNum(v, f=0){
+    if(typeof v === 'number' && !Number.isNaN(v)) return v;
+    if(v == null || v === '') return f;
+    const n = parseFloat(String(v).replace(',','.'));
+    return isNaN(n) ? f : n;
+  }
+  function _round(n,p=0){ const pow = 10**(p||0); return Math.round((n||0)*pow)/pow; }
+  function nowISO(){ return (new Date()).toISOString(); }
 
-  /* helpers goal detection */
-  function levenshtein(a, b) {
+  function _getGlycemicInfo(foodKey){
+    if(!foodKey) return { ig:50, gl_100g:10 };
+    const rec = findFood(foodKey);
+    if(!rec) return { ig:50, gl_100g:10 };
+    const ig = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? rec.ig : 50;
+    const carbs = _safeNum(rec.nutrition?.carb_g, 0);
+    return { ig, gl_100g: Math.round((ig * carbs) / 100) };
+  }
+
+  /* BMR / activity */
+  function calcBMR(profile){
+    const peso = _safeNum(profile.peso,70);
+    const altura_m = _safeNum(profile.altura,1.7);
+    const idade = _safeNum(profile.idade,30);
+    const sexo = (profile.sexo||'').toLowerCase();
+    const hcm = Math.round(altura_m*100);
+    if(sexo.startsWith('m')) return Math.round(88.362 + (13.397 * peso) + (4.799 * hcm) - (5.677 * idade));
+    return Math.round(447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade));
+  }
+  function activityFactor(profile){
+    const nivel = (profile.nivel||'').toLowerCase();
+    const dias = _safeNum(profile.disponibilidade,3);
+    if(nivel.includes('inic') || dias<=2) return 1.3;
+    if(nivel.includes('inter') || dias<=4) return 1.55;
+    if(nivel.includes('avanc') || dias>=5) return 1.75;
+    return 1.55;
+  }
+
+  /* Levenshtein & helpers */
+  function levenshtein(a,b){
     if(!a||!b) return (a||'') === (b||'') ? 0 : Infinity;
     a = a.toString(); b = b.toString();
-    const al = a.length, bl = b.length;
-    const dp = Array.from({length: al+1}, () => new Array(bl+1).fill(0));
+    const al=a.length, bl=b.length;
+    const dp = Array.from({length:al+1},()=>new Array(bl+1).fill(0));
     for(let i=0;i<=al;i++) dp[i][0]=i;
     for(let j=0;j<=bl;j++) dp[0][j]=j;
     for(let i=1;i<=al;i++){
@@ -490,37 +743,39 @@
     }
     return dp[al][bl];
   }
+
   function detectGoalType(text){
-    const s=(text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const loseKeywords=['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer'];
-    const gainKeywords=['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho'];
-    let foundLose=false, foundGain=false;
-    const words=s.split(/[\s,.;:!?()]+/).filter(Boolean);
-    const checkList=(kwList)=>{
-      for(const kw of kwList){
+    const s = (text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const loseKeywords = ['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer'];
+    const gainKeywords = ['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho'];
+    const words = s.split(/[\s,.;:!?()]+/).filter(Boolean);
+    const checkList = (arr) => {
+      for(const kw of arr){
         if(s.includes(kw)) return true;
         for(const w of words){
           if(w===kw) return true;
-          if(levenshtein(w,kw)<=1) return true;
+          if(levenshtein(w,kw) <= 1) return true;
         }
       }
       return false;
     };
-    foundLose=checkList(loseKeywords);
-    foundGain=checkList(gainKeywords);
+    const foundLose = checkList(loseKeywords);
+    const foundGain = checkList(gainKeywords);
     if(foundLose && !foundGain) return 'emagrecer';
     if(foundGain && !foundLose) return 'musculo';
     if(foundLose && foundGain) return 'ambos';
     return 'ambos';
   }
+
   function extractKgFromGoalText(text){
-    const s=(text||'').toLowerCase().replace(',', '.');
-    let match=s.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|kilos|quilos|quilo|kilos?)/);
-    if(match) return parseFloat(match[1].replace(',', '.'));
-    match=s.match(/(perder|ganhar)\s+(-?\d+(?:[.,]\d+)?)/);
-    if(match) return parseFloat(match[2].replace(',', '.')) * (match[1].startsWith('perder') ? -1 : 1);
+    const s = (text||'').toLowerCase().replace(',', '.');
+    let match = s.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|kilos|quilos|quilo|kilos?)/);
+    if(match) return parseFloat(match[1].replace(',','.'));
+    match = s.match(/(perder|ganhar)\s+(-?\d+(?:[.,]\d+)?)/);
+    if(match) return parseFloat(match[2].replace(',','.')) * (match[1].startsWith('perder') ? -1 : 1);
     return null;
   }
+
   function computeAggressiveness(kgChange, months, goalType){
     if(kgChange === null || typeof kgChange === 'undefined') return 'moderado';
     const absKg = Math.abs(kgChange);
@@ -539,31 +794,24 @@
 
   /* deriveTargets */
   function deriveTargets(profile){
-    const ABS_MAX_CALORIES = 4500;
-    const ABS_MIN_CALORIES = 1200;
-    const peso=_safeNum(profile.peso,70);
-    const altura_m=_safeNum(profile.altura,1.7);
-    const idade=_safeNum(profile.idade,30);
-    const sexo=(profile.sexo||'').toLowerCase();
+    const ABS_MAX_CALORIES = 4500, ABS_MIN_CALORIES = 1200;
+    const peso = _safeNum(profile.peso,70);
     const bmr = calcBMR(profile);
     const af = activityFactor(profile);
     let tdee = Math.round(bmr * af);
     if(tdee > 6000) tdee = 3500;
     const goalText = (profile.grande_meta || profile.goal_prompt || '').toString().toLowerCase();
-    const goalType = (typeof detectGoalType === 'function') ? detectGoalType(goalText) : ( /emagrec|perder/.test(goalText) ? 'emagrecer' : (/ganhar|massa|hipertrof/.test(goalText)?'musculo':'ambos') );
-    const kgWanted = (typeof extractKgFromGoalText === 'function') ? extractKgFromGoalText(goalText) : null;
+    const goalType = detectGoalType(goalText);
+    const kgWanted = extractKgFromGoalText(goalText);
     let months = 3;
     try{
       if(profile.prazo){
-        const ed = (typeof calculateEndDate === 'function') ? calculateEndDate(profile.prazo) : null;
-        if(ed){
-          const diffMonths = Math.max(1, Math.round((ed.getTime() - (new Date()).getTime()) / (1000*60*60*24*30)));
-          months = diffMonths;
-        }
+        const ed = calculateEndDate(profile.prazo);
+        if(ed){ months = Math.max(1, Math.round((ed.getTime() - Date.now())/(1000*60*60*24*30))); }
       }
-    } catch(e){ months = 3; }
+    } catch(e){}
     if(profile.selected_months) months = Math.max(1, _safeNum(profile.selected_months, months));
-    const aggressiveness = (typeof computeAggressiveness === 'function') ? computeAggressiveness(kgWanted, months, goalType) : 'moderado';
+    const aggressiveness = computeAggressiveness(kgWanted, months, goalType);
     let deficitPercent=0, surplusPercent=0;
     if(goalType === 'emagrecer'){
       if(aggressiveness === 'baixo') deficitPercent = 0.08;
@@ -574,36 +822,20 @@
       if(aggressiveness === 'baixo') surplusPercent = 0.08;
       else if(aggressiveness === 'moderado') surplusPercent = 0.13;
       else surplusPercent = 0.20;
-      if(idade < 20) surplusPercent = Math.min(0.25, surplusPercent + 0.03);
-    } else {
-      surplusPercent = 0; deficitPercent = 0;
     }
     let targetCalories = tdee;
     if(goalType === 'emagrecer'){
       const delta = Math.round(tdee * deficitPercent);
-      const maxAllowedDelta = Math.min(1000, Math.round(tdee * 0.30));
-      const finalDelta = Math.min(delta, maxAllowedDelta);
-      targetCalories = Math.round(tdee - finalDelta);
+      targetCalories = Math.max(ABS_MIN_CALORIES, tdee - delta);
     } else if(goalType === 'musculo'){
       const delta = Math.round(tdee * surplusPercent);
-      const maxAllowedDelta = Math.round(tdee * 0.30);
-      const finalDelta = Math.min(delta, maxAllowedDelta);
-      targetCalories = Math.round(tdee + finalDelta);
-    } else {
-      targetCalories = tdee;
+      targetCalories = Math.min(ABS_MAX_CALORIES, tdee + delta);
     }
-    if(targetCalories < ABS_MIN_CALORIES) targetCalories = ABS_MIN_CALORIES;
-    if(targetCalories > ABS_MAX_CALORIES) targetCalories = ABS_MAX_CALORIES;
+
     let protPerKg = 1.4;
-    if(goalType === 'musculo'){
-      if(aggressiveness === 'baixo') protPerKg = 1.6;
-      else if(aggressiveness === 'moderado') protPerKg = 1.8;
-      else protPerKg = 2.0;
-    } else if(goalType === 'emagrecer'){
-      protPerKg = 1.8;
-    } else { protPerKg = 1.4; }
-    if(idade < 20) protPerKg = Math.max(protPerKg,1.8);
-    const protein_g = Math.round(protPerKg * peso);
+    if(goalType === 'musculo'){ protPerKg = (aggressiveness === 'agressivo' ? 2.0 : (aggressiveness === 'moderado' ? 1.8 : 1.6)); }
+    else if(goalType === 'emagrecer') protPerKg = 1.8;
+    const protein_g = Math.round(protPerKg * _safeNum(profile.peso,70));
     const fatPerc = 0.25;
     const fatCals = Math.round(targetCalories * fatPerc);
     const fat_g = Math.max(0, Math.round(fatCals / 9));
@@ -613,69 +845,85 @@
     return { bmr, tdee, targetCalories, protein_g, carbs_g, fat_g, protPerKg, aggressiveness, goalType, parsedGoalKg: kgWanted, monthsTarget: months };
   }
 
-  /* ranking helpers */
+  /* Ranking helpers */
   function computeSatietyScore(rec){
     if(!rec?.nutrition) return 0.3;
-    const prot_g=_safeNum(rec.nutrition.protein_g,0);
-    const fiber_g=_safeNum(rec.nutrition.fiber_g,2);
-    const kcal=_safeNum(rec.nutrition.kcal,150);
-    const protScore = Math.min(1, prot_g / 30);
-    const fiberScore = Math.min(1, fiber_g / 10);
+    const prot = _safeNum(rec.nutrition.protein_g,0);
+    const fiber = _safeNum(rec.nutrition.fiber_g,0);
+    const kcal = _safeNum(rec.nutrition.kcal,150);
+    const protScore = Math.min(1, prot / 30);
+    const fiberScore = Math.min(1, fiber / 10);
     const densityScore = 1 - Math.min(1, kcal / 400);
     const score = (protScore*0.5) + (fiberScore*0.3) + (densityScore*0.2);
     return Math.max(0.1, Math.min(1, score));
   }
-  function computeCostMetrics(rec){ if(!rec) return null; return { costPerKg: _safeNum(rec.price_per_kg, 0) }; }
-
-  /* computeCBrank (considers budget and goal) */
-  function computeCBrank(rec, profile){
-    if(!rec || !profile) return 0.5;
-    const satietyScore = computeSatietyScore(rec);
-    const cost = _safeNum(rec.price_per_kg, 15.0);
-    const costScore = 1 - Math.min(1, (cost - 5) / 50);
-    const igInfo = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? { ig: rec.ig } : _getGlycemicInfo(rec.name);
-    const giScore = 1 - (_safeNum(igInfo.ig, 50) / 100);
-    const monthlyBudget = _safeNum(profile.orcamento_mes_R$ || profile.orcamento || profile.orcamento_mes || profile.budget || 0, 0);
-    let satietyWeight=0, giWeight=0, costWeight=0.2;
-    const goal = profile.targets?.goalType || profile.goal_type || 'ambos';
-    if(monthlyBudget > 0 && monthlyBudget <= 400){
-      costWeight = 0.6; satietyWeight = 0.3; giWeight = 0.1;
-    } else if(monthlyBudget > 400 && monthlyBudget <= 1000){
-      costWeight = 0.4; satietyWeight = 0.4; giWeight = 0.2;
-    } else {
-      if(goal === 'emagrecer'){ satietyWeight = 0.5; giWeight = 0.3; costWeight = 0.2; }
-      else if(goal === 'musculo'){ satietyWeight = 0.3; giWeight = 0.0; costWeight = 0.5; }
-      else { satietyWeight = 0.4; giWeight = 0.1; costWeight = 0.3; }
-    }
-    let totalWeight = satietyWeight + giWeight + costWeight;
-    if(totalWeight <= 0) totalWeight = 1;
-    satietyWeight /= totalWeight; giWeight /= totalWeight; costWeight /= totalWeight;
-    let finalRank = (satietyScore * satietyWeight) + (giScore * giWeight) + (costScore * costWeight);
-    const varietyFactor = (Math.random() - 0.5) * 0.12;
-    return Math.max(0, Math.min(1, finalRank + varietyFactor));
+  function computeCostScore(rec){
+    const cost = _safeNum(rec.price_per_kg, 20);
+    return 1 - Math.min(1, (cost - 5) / 50);
   }
 
-  /* selection helpers */
-  function weeklyBudgetFromMonthly(monthly){ return _safeNum(monthly, 0) / 4.345; }
+  function computeCBrank(rec, profile){
+    if(!rec) return 0.5;
+    const sat = computeSatietyScore(rec);
+    const costS = computeCostScore(rec);
+    const giInfo = (typeof rec.ig !== 'undefined' && rec.ig !== null) ? { ig: rec.ig } : _getGlycemicInfo(rec.name);
+    const giScore = 1 - (_safeNum(giInfo.ig,50) / 100);
+    const monthlyBudget = _safeNum(profile.orcamento_mes_R$ || profile.orcamento || profile.budget || 0, 0);
+
+    let satW=0.4, giW=0.2, costW=0.4;
+    if(monthlyBudget > 0 && monthlyBudget <= 400){ costW = 0.6; satW = 0.3; giW = 0.1; }
+    else if(monthlyBudget > 400 && monthlyBudget <= 1000){ costW = 0.4; satW = 0.4; giW = 0.2; }
+    else {
+      const goal = profile.targets?.goalType || profile.goal_type || 'ambos';
+      if(goal === 'emagrecer'){ satW = 0.5; giW = 0.3; costW = 0.2; }
+      else if(goal === 'musculo'){ satW = 0.4; giW = 0.1; costW = 0.5; }
+      else { satW = 0.45; giW = 0.15; costW = 0.4; }
+    }
+
+    const base = (sat * satW) + (giScore * giW) + (costS * costW);
+    const variety = (Math.random() - 0.5) * 0.12;
+    return Math.max(0, Math.min(1, base + variety));
+  }
+
+  function _rankFoodsByCategory(categories, profile){
+    const arr = [];
+    for(const id in _lookup.byId){
+      const rec = _lookup.byId[id];
+      if(rec && categories.includes(rec.category)){
+        rec._rank = computeCBrank(rec, profile);
+        arr.push(rec);
+      }
+    }
+    arr.sort((a,b) => (b._rank || 0) - (a._rank || 0) || a.name.localeCompare(b.name));
+    return arr.map(r => r.id);
+  }
+
+  /* Utilities for weekly template, rotation */
+  function weeklyBudgetFromMonthly(monthly){ return _safeNum(monthly,0) / 4.345; }
+
   function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){
-    const week = Array.from({length:7}).map((_, index) => ({ dayOfWeekIndex:index, baseCalories:dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
+    const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
     const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 };
-    if(selectedDaysArr.length>0){
-      selectedDaysArr.forEach(dayKey=>{ const idx=dayMap[dayKey]; if(idx!==undefined && week[idx]){ week[idx].isTrainingDay=true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); } });
+    if(selectedDaysArr && selectedDaysArr.length>0){
+      selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }});
     } else {
       const dt = Math.max(0, _safeNum(diasTreinoCount,3));
       if(dt>0){
-        const step = Math.floor(7 / dt) || 1; let currentDayIndex = 1;
-        for(let i=0;i<dt;i++){ if(week[currentDayIndex]){ week[currentDayIndex].isTrainingDay=true; week[currentDayIndex].baseCalories = Math.round(dailyTargetCalories * 1.08); } currentDayIndex = (currentDayIndex + step) % 7; }
+        const step = Math.floor(7 / dt) || 1;
+        let cur = 1;
+        for(let i=0;i<dt;i++){
+          if(week[cur]) { week[cur].isTrainingDay = true; week[cur].baseCalories = Math.round(dailyTargetCalories * 1.08); }
+          cur = (cur + step) % 7;
+        }
       }
     }
     if(cheatPolicy?.freqPerWeek > 0){
-      let cheatDayIndex = 6;
-      if(week[cheatDayIndex]?.isTrainingDay){ cheatDayIndex = 0; if(week[cheatDayIndex]?.isTrainingDay){ const restDayIndex = week.findIndex(d=>!d.isTrainingDay); cheatDayIndex = restDayIndex !== -1 ? restDayIndex : 6; } }
-      if(week[cheatDayIndex]){ week[cheatDayIndex].isCheatDay = true; week[cheatDayIndex].cheatLimit = cheatPolicy.cheatCaloriesLimit || Math.round(dailyTargetCalories * 1.5); }
+      const candidate = week.find(d => !d.isTrainingDay) || week[6];
+      candidate.isCheatDay = true; candidate.cheatLimit = cheatPolicy.cheatCaloriesLimit || Math.round(dailyTargetCalories * 1.5);
     }
     return week;
   }
+
   function compensateCheatWeek(weekArr){
     const baseTotal = weekArr.reduce((s,d)=>s + d.baseCalories,0);
     const cheatDay = weekArr.find(d=>d.isCheatDay);
@@ -691,84 +939,61 @@
     return weekArr;
   }
 
-  /* rotateAlternativesForMonth - expects alternatesByCategory arrays of display names */
   function rotateAlternativesForMonth(itemsList, monthIndex, alternatesByCategory){
     if(!itemsList || !alternatesByCategory) return itemsList;
     return itemsList.map(it => {
       const rec = findFood(it.food);
       if(!rec) return it;
-      const cat = rec.category || null;
+      const cat = rec.category;
       if(cat && alternatesByCategory[cat] && alternatesByCategory[cat].length > 1){
         const arr = alternatesByCategory[cat];
-        let attempts = 0; let pickName = it.food;
-        while(attempts < arr.length){
-          const pickIndex = (monthIndex + attempts) % arr.length;
-          const potentialPick = arr[pickIndex];
-          if(potentialPick !== it.food){ pickName = potentialPick; break; }
-          attempts++;
+        let pick = it.food;
+        for(let a=0;a<arr.length;a++){
+          const idx = (monthIndex + a) % arr.length;
+          const candidateId = arr[idx];
+          const candidateName = (_lookup.byId[candidateId] && _lookup.byId[candidateId].name) || candidateId;
+          if(candidateName !== it.food){ pick = candidateName; break; }
         }
-        if(pickName !== it.food) return { ...it, food: pickName };
+        if(pick !== it.food) return {...it, food: pick};
       }
       return it;
     });
   }
 
-  function _rankFoodsByCategory(categories, profile){
-    const recs = [];
-    for(const nm in _lookup.byName){
-      const rec = _lookup.byName[nm];
-      if(rec && categories.includes(rec.category)){
-        rec.rank = computeCBrank(rec, profile);
-        recs.push(rec);
-      }
-    }
-    recs.sort((a,b) => (b.rank || 0) - (a.rank || 0) || a.name.localeCompare(b.name));
-    return recs.map(r => r.name);
-  }
-
-  function _estimateWeeklyCostFromPlan(weekDays){ return 150.00; }
-  function computeCredibility(c){ return 90.0; }
-  function parseGoal(profile){ const text=(profile.grande_meta||'').toLowerCase(); const isLose=/emagrec|perder|secar/.test(text); const isGain=/ganhar|massa|hipertrof/.test(text); return { type: isLose ? 'lose' : (isGain ? 'gain' : 'maintain') }; }
-
-  /* userHasSupplement - tolerant search */
-  function normalizeForSearch(s){ if(!s) return ''; return s.toString().toLowerCase().replace(/[_\-]+/g,' ').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-  function userHasSupplement(profile, keyword){
-    if(!profile) return false;
-    if((profile.uso_suplemento||'').toString().toLowerCase() !== 'sim') return false;
-    const q = normalizeForSearch(profile.quais_suplementos || '');
-    if(!q) return false;
-    return q.includes(keyword);
-  }
-
-  /* computeGramAmountsForMeal */
   function computeGramAmountsForMeal(foodDBFindFn, mealMacroTargets, components){
-    const protFood = components.protein, carbFood = components.carb, vegFood = components.veg;
-    const protNut = findFood(protFood)?.nutrition;
-    const carbNut = findFood(carbFood)?.nutrition;
-    const vegNut = findFood(vegFood)?.nutrition;
+    const protName = components.protein;
+    const carbName = components.carb;
+    const vegName = components.veg;
+    const protRec = findFood(protName);
+    const carbRec = findFood(carbName);
+    const vegRec = findFood(vegName);
     const out = { protein_grams:0, carb_grams:0, veg_grams:0, details:{} };
-    out.protein_grams = (protNut && _safeNum(protNut.protein_g,0) > 0) ? Math.max(10, Math.round( mealMacroTargets.prot_g / (protNut.protein_g / 100) )) : Math.max(10, Math.round(mealMacroTargets.prot_g / 0.25));
-    out.carb_grams = (carbNut && _safeNum(carbNut.carb_g,0) > 0) ? Math.max(10, Math.round( mealMacroTargets.carbs_g / (carbNut.carb_g / 100) )) : Math.max(10, Math.round(mealMacroTargets.carbs_g / 0.25));
-    out.veg_grams = vegFood ? 100 : 0;
-    function kcalFrom(foodName, grams){ const rec = findFood(foodName); return (rec?.nutrition?.kcal || 0) * (grams || 0) / 100; }
-    let totalKcal = kcalFrom(protFood, out.protein_grams) + kcalFrom(carbFood, out.carb_grams) + kcalFrom(vegFood, out.veg_grams);
-    if(mealMacroTargets.calories && Math.abs(totalKcal - mealMacroTargets.calories) > 50 ){
-      const diff = mealMacroTargets.calories - totalKcal;
-      if(carbNut && _safeNum(carbNut.kcal,0) > 0){
-        const carbKcalPerGram = carbNut.kcal / 100;
-        if(carbKcalPerGram > 0){
-          const carbGramsToAdd = Math.round(diff / carbKcalPerGram);
-          out.carb_grams = Math.max(10, out.carb_grams + carbGramsToAdd);
-        }
-      }
-      totalKcal = kcalFrom(protFood, out.protein_grams) + kcalFrom(carbFood, out.carb_grams) + kcalFrom(vegFood, out.veg_grams);
+    const protPer100 = _safeNum(protRec?.nutrition?.protein_g, 25);
+    const carbPer100 = _safeNum(carbRec?.nutrition?.carb_g, 25);
+    out.protein_grams = protPer100 > 0 ? Math.max(10, Math.round(mealMacroTargets.prot_g / (protPer100/100))) : Math.max(10, Math.round(mealMacroTargets.prot_g / 0.25));
+    out.carb_grams = carbPer100 > 0 ? Math.max(10, Math.round(mealMacroTargets.carbs_g / (carbPer100/100))) : Math.max(10, Math.round(mealMacroTargets.carbs_g / 0.25));
+    out.veg_grams = vegName ? 100 : 0;
+
+    function kcalFrom(name, grams){
+      const r = findFood(name);
+      return (r?.nutrition?.kcal || 0) * (grams || 0) / 100;
     }
-    out.details = { kcal_est: _round(totalKcal,0), kcalProt:_round(kcalFrom(protFood, out.protein_grams),0), kcalCarb:_round(kcalFrom(carbFood, out.carb_grams),0), kcalVeg:_round(kcalFrom(vegFood, out.veg_grams),0) };
+    let total = kcalFrom(protName, out.protein_grams) + kcalFrom(carbName, out.carb_grams) + kcalFrom(vegName, out.veg_grams);
+    if(mealMacroTargets.calories && Math.abs(total - mealMacroTargets.calories) > 50){
+      const diff = mealMacroTargets.calories - total;
+      const carbKcalPerGram = (carbRec?.nutrition?.kcal || 0) / 100;
+      if(carbKcalPerGram > 0){
+        const carbAdd = Math.round(diff / carbKcalPerGram);
+        out.carb_grams = Math.max(0, out.carb_grams + carbAdd);
+      }
+      total = kcalFrom(protName, out.protein_grams) + kcalFrom(carbName, out.carb_grams) + kcalFrom(vegName, out.veg_grams);
+    }
+    out.details = { kcal_est: _round(total,0), kcalProt:_round(kcalFrom(protName, out.protein_grams),0), kcalCarb:_round(kcalFrom(carbName, out.carb_grams),0) };
     return out;
   }
 
-  /* calculateEndDate (robust) */
   function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
+
   function calculateEndDate(prazoText){
     if(!prazoText) return null;
     const now = new Date();
@@ -776,20 +1001,16 @@
     const clean = text.replace(/[,]/g,'.').replace(/\s+/g,' ');
     let match;
     match = clean.match(/(\d+(?:[.,]\d+)?)\s*(anos|ano)/);
-    if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const monthsToAdd = Math.round(value * 12); const d = new Date(); d.setMonth(d.getMonth() + monthsToAdd); return d; } }
+    if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const monthsToAdd = Math.round(value*12); const d=new Date(); d.setMonth(d.getMonth() + monthsToAdd); return d; } }
     match = clean.match(/(\d+)\s*ano(?:s)?\s*e\s*meio/);
-    if(match){ const d = new Date(); d.setMonth(d.getMonth() + (parseInt(match[1],10) * 12) + 6); return d; }
+    if(match){ const d=new Date(); d.setMonth(d.getMonth() + (parseInt(match[1],10)*12) + 6); return d; }
     match = clean.match(/(\d+(?:[.,]\d+)?)\s*(meses|m[eê]s|mes)/);
-    if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const d = new Date(); d.setMonth(d.getMonth() + Math.round(value)); return d; } }
+    if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const d=new Date(); d.setMonth(d.getMonth() + Math.round(value)); return d; } }
     match = clean.match(/(\d+(?:[.,]\d+)?)\s*(year|years)/);
-    if(match){ const value = parseFloat(match[1].replace(',', '.')); const d = new Date(); d.setMonth(d.getMonth() + Math.round(value * 12)); return d; }
-    match = clean.match(/(\d+(?:[.,]\d+)?)\s*(month|months)/);
-    if(match){ const value = parseFloat(match[1].replace(',', '.')); const d = new Date(); d.setMonth(d.getMonth() + Math.round(value)); return d; }
-    match = clean.match(/(até|em|para|dentro de)\s+(\d+)\s*(anos|ano|meses|mes)/);
-    if(match){ const n=parseInt(match[2],10); if(match[3].includes('ano')){ const d=new Date(); d.setMonth(d.getMonth() + (n*12)); return d; } else { const d=new Date(); d.setMonth(d.getMonth()+n); return d; } }
+    if(match){ const value = parseFloat(match[1].replace(',', '.')); const d=new Date(); d.setMonth(d.getMonth() + Math.round(value * 12)); return d; }
     match = clean.match(/^(\d{1,3})$/);
-    if(match){ const n=parseInt(match[1],10); if(n<=36){ const d=new Date(); d.setMonth(d.getMonth()+n); return d; } }
-    if(clean.includes('meio ano') || clean.includes('1/2 ano')){ const d=new Date(); d.setMonth(d.getMonth()+6); return d; }
+    if(match){ const n = parseInt(match[1],10); if(n <= 36){ const d=new Date(); d.setMonth(d.getMonth() + n); return d; } }
+    if(clean.includes('meio ano') || clean.includes('1/2 ano')) { const d=new Date(); d.setMonth(d.getMonth()+6); return d; }
     const year = now.getFullYear();
     if(clean.includes('final do ano') || clean.includes('fim de ano')) return new Date(year,11,31);
     if(clean.includes('verao')||clean.includes('verão')){ const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); }
@@ -799,55 +1020,60 @@
     return null;
   }
 
-  /* planLongTerm (timing, supplements, protein diversity) */
+  /* userHasSupplement: checks profile.uso_suplemento === 'Sim' and quais_suplementos includes keyword */
+  function normalizeForSearch(s){ if(!s) return ''; return s.toString().toLowerCase().replace(/[_\-]+/g,' ').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+  function userHasSupplement(profile, keyword){
+    if(!profile) return false;
+    if((profile.uso_suplemento||'').toString().toLowerCase() !== 'sim') return false;
+    const q = normalizeForSearch(profile.quais_suplementos || '');
+    if(!q) return false;
+    return q.includes(keyword);
+  }
+
+  /* planLongTerm */
   async function planLongTerm(profile, options = {}){
     const start = options.startDate ? new Date(options.startDate) : new Date();
     const months = Math.max(1, _safeNum(options.months, 3));
-    const profileTargets = deriveTargets(profile);
-    const profileWithTargets = { ...profile, targets: profileTargets };
-
-    const dailyTargetCalories = profileTargets.targetCalories;
+    const targets = deriveTargets(profile);
+    const profileWithTargets = {...profile, targets};
+    const dailyTargetCalories = targets.targetCalories;
     const weeklyBudget = options.weeklyBudgetOverride || weeklyBudgetFromMonthly(profile.orcamento_mes_R$ || profile.orcamento || 0);
     const diasTreinoCount = _safeNum(profile.disponibilidade, 3);
     const selectedDaysArr = profile.selected_days || [];
-    const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek: 1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
+    const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek:1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
     const totalWeeks = Math.max(1, Math.round(months * 4.345));
     const timeline_weeks = [];
 
-    // build alternates
-    const alternatesByCategory = options.alternatesByCategory || {};
-    if(!options.alternatesByCategory){
-      const categoriesForRotation = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
-      categoriesForRotation.forEach(cat => {
-        alternatesByCategory[cat] = _rankFoodsByCategory([cat], profileWithTargets).slice(0, 30);
-      });
-    }
+    // generate alternates by category from masterDB ranking
+    const alternatesByCategory = {};
+    const cats = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
+    cats.forEach(cat => { alternatesByCategory[cat] = _rankFoodsByCategory([cat], profileWithTargets).slice(0, 40); });
 
     const mainProteins = alternatesByCategory['proteina_main'] || [];
     const fishProteins = alternatesByCategory['peixe'] || [];
-    const mainCarbs = alternatesByCategory['cereal_main'] || alternatesByCategory['tuberculo'] || [];
+    const mainCarbs = alternatesByCategory['cereal_main'] && alternatesByCategory['cereal_main'].length ? alternatesByCategory['cereal_main'] : (alternatesByCategory['tuberculo']||[]);
     const mainLegumes = alternatesByCategory['leguminosa'] || [];
-    const snackProteins = alternatesByCategory['proteina_snack'] || alternatesByCategory['laticinio_snack'] || [];
+    const snackProteins = (alternatesByCategory['proteina_snack'] || []).concat(alternatesByCategory['laticinio_snack'] || []);
     const snackCarbs = alternatesByCategory['cereal_snack'] || alternatesByCategory['pao_snack'] || [];
     const commonVeg = alternatesByCategory['verdura'] || [];
     const commonFruit = alternatesByCategory['fruta'] || [];
 
     const get = (list, idx) => (list && list.length > 0) ? list[(idx) % list.length] : null;
-    const fallbackProtein = 'Frango, Peito sem pele cozido';
-    const fallbackCarb = 'Arroz, Branco cozido';
-    const fallbackLegume = 'Feijão Carioca cozido';
-    const fallbackSnackProt = 'Ovo, de galinha inteiro cozido';
-    const fallbackSnackCarb = 'Aveia em flocos';
-    const fallbackVeg = 'Alface crespa';
-    const fallbackFruit = 'Banana nanica';
+    const fallbackProtein = 'frango_peito';
+    const fallbackCarb = 'arroz_branco_cozido';
+    const fallbackLegume = 'feijao_carioca_cozido';
+    const fallbackSnackProt = 'ovo_cozido';
+    const fallbackSnackCarb = 'tapioca_goma' in v5_FoodDatabase ? 'tapioca_goma' : (Object.keys(v5_FoodDatabase)[0]);
+    const fallbackVeg = 'alface_crespa_crua';
+    const fallbackFruit = 'banana_nanica_crua';
 
     for(let w=0; w<totalWeeks; w++){
       let weekTemplate = buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr);
       weekTemplate = compensateCheatWeek(weekTemplate);
       const daysData = [];
 
-      for(let dIdx=0; dIdx<7; dIdx++){
-        const daySpec = weekTemplate[dIdx];
+      for(let d=0; d<7; d++){
+        const daySpec = weekTemplate[d];
         const isTraining = daySpec.isTrainingDay;
         const isCheat = daySpec.isCheatDay;
         const mealsCount = Math.min(6, Math.max(3, 3 + Math.floor(diasTreinoCount / 2)));
@@ -858,27 +1084,27 @@
         if(isTraining){
           mealWeights = mealWeights.map((wgt,idx) => {
             const name = mealNames[idx].toLowerCase();
-            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6;
+            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6; // more carbs around training
             return wgt;
           });
         } else {
           mealWeights = mealWeights.map((wgt,idx) => {
             const name = mealNames[idx].toLowerCase();
-            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8;
+            if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8; // less carbs rest days
             return wgt;
           });
         }
         const totalW = mealWeights.reduce((a,b)=>a+b,0);
-        const dayMeals = [];
+        const meals = [];
 
         for(let m=0; m<mealsCount; m++){
           const mealName = mealNames[m];
           const weight = mealWeights[m];
           const mealCalories = Math.round((weight/totalW) * daySpec.baseCalories);
 
-          const baseProtForMeal = Math.round((profileTargets.protein_g / totalW) * weight);
-          const baseCarbsForMeal = Math.round((profileTargets.carbs_g / totalW) * weight);
-          const baseFatForMeal = Math.round((profileTargets.fat_g / totalW) * weight);
+          const baseProtForMeal = Math.round((targets.protein_g / totalW) * weight);
+          const baseCarbsForMeal = Math.round((targets.carbs_g / totalW) * weight);
+          const baseFatForMeal = Math.round((targets.fat_g / totalW) * weight);
 
           let carbMultiplier=1.0, protMultiplier=1.0, fatMultiplier=1.0;
           const lname = mealName.toLowerCase();
@@ -892,54 +1118,51 @@
           const carbsForMeal = Math.max(0, Math.round(baseCarbsForMeal * carbMultiplier));
           const fatForMeal = Math.round(baseFatForMeal * fatMultiplier);
 
-          // pick proteins: diversify (frango, carne, peixe, porco, leguminosa)
-          const pickIdx = (w * 100) + (dIdx * 10) + m;
-          let protPickName = null;
-          if(mealName.toLowerCase().includes('lanche') || mealName.toLowerCase().includes('café')){
-            protPickName = get(snackProteins, pickIdx) || fallbackSnackProt;
+          const pickIdx = (w*100)+(d*10)+m;
+
+          // diverse protein selection:
+          let protPickId = null;
+          if(/lanche|café/i.test(mealName)){
+            protPickId = get(snackProteins, pickIdx) || fallbackSnackProt;
           } else {
-            if((pickIdx % 5) === 0 && fishProteins.length > 0){
-              protPickName = get(fishProteins, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
-            } else if((pickIdx % 7) === 0 && mainLegumes.length > 0){
-              protPickName = get(mainLegumes, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
-            } else {
-              protPickName = get(mainProteins, pickIdx) || get(fishProteins, pickIdx) || fallbackProtein;
-            }
+            if((pickIdx % 6) === 0 && fishProteins.length > 0) protPickId = get(fishProteins, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
+            else if((pickIdx % 5) === 0 && mainLegumes.length > 0) protPickId = get(mainLegumes, pickIdx) || get(mainProteins, pickIdx) || fallbackProtein;
+            else protPickId = get(mainProteins, pickIdx) || get(fishProteins, pickIdx) || fallbackProtein;
           }
 
-          let carbPickName = null;
-          if(mealName.toLowerCase().includes('lanche') || mealName.toLowerCase().includes('café')) carbPickName = get(snackCarbs, pickIdx) || fallbackSnackCarb;
-          else carbPickName = get(mainCarbs, pickIdx) || get(mainCarbs, pickIdx+1) || fallbackCarb;
+          let carbPickId = null;
+          if(/lanche|café/i.test(mealName)) carbPickId = get(snackCarbs, pickIdx) || fallbackSnackCarb;
+          else carbPickId = get(mainCarbs, pickIdx) || get(mainCarbs, pickIdx+1) || fallbackCarb;
 
-          const vegPickName = get(commonVeg, pickIdx) || fallbackVeg;
+          const vegPickId = get(commonVeg, pickIdx) || fallbackVeg;
 
-          // supplements: only if user uses supplements AND listed them
-          const wantsWhey = userHasSupplement(profile, 'whey');
+          // supplements inclusion: only if user explicitly declared use and named them
+          const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
           const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
-          // force whey at post-workout: dinner/ceia when training and user wants whey
+          // force whey post-workout (jantar/ceia) if training and user wants whey
           if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
-            protPickName = 'whey_concentrado';
+            // prefer alias 'whey_concentrado' if exists else original key
+            protPickId = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
           }
 
-          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: protPickName, carb: carbPickName, veg: vegPickName });
+          const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: protPickId, carb: carbPickId, veg: vegPickId });
 
-          const toDisplay = (foodKeyOrName) => {
-            if(!foodKeyOrName) return null;
-            if(_lookup.byId[foodKeyOrName]) return _lookup.byId[foodKeyOrName].name;
-            const rec = findFood(foodKeyOrName);
-            return rec?.name || String(foodKeyOrName);
+          const toDisplay = (idOrName) => {
+            if(!idOrName) return null;
+            const rec = findFood(idOrName);
+            const raw = rec?.name || idOrName;
+            return stripParenthesis(raw);
           };
 
           const components = [];
-          if(protPickName && grams.protein_grams >= 10) components.push({ food: toDisplay(protPickName), grams: grams.protein_grams, role:'proteina', source_id: (_lookup.byId[protPickName]?.id || null) });
-          if(carbPickName && grams.carb_grams >= 10) components.push({ food: toDisplay(carbPickName), grams: grams.carb_grams, role:'carbo', source_id: (_lookup.byId[carbPickName]?.id || null) });
-          if(vegPickName && grams.veg_grams >= 10) components.push({ food: toDisplay(vegPickName), grams: grams.veg_grams, role:'legume', source_id: (_lookup.byId[vegPickName]?.id || null) });
+          if(protPickId && grams.protein_grams >= 10) components.push({ food: toDisplay(protPickId), grams: grams.protein_grams, role:'proteina', source_id: protPickId });
+          if(carbPickId && grams.carb_grams >= 10) components.push({ food: toDisplay(carbPickId), grams: grams.carb_grams, role:'carbo', source_id: carbPickId });
+          if(vegPickId && grams.veg_grams >= 10) components.push({ food: toDisplay(vegPickId), grams: grams.veg_grams, role:'legume', source_id: vegPickId });
 
-          // creatine as small 3g post-workout item if user wants creatine
+          // creatine: add small 3g post-workout if wanted (non-nutritive)
           if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
-            const creatDisplay = toDisplay('creatina_monohidratada') || 'Creatina monohidratada';
-            components.push({ food: creatDisplay, grams: 3, role:'suplemento', source_id: 'creatina_monohidratada' });
+            components.push({ food: stripParenthesis(v5_FoodDatabase['creatina_monohidratada'].name || 'Creatina'), grams: 3, role:'suplemento', source_id:'creatina_monohidratada' });
           }
 
           // compute kcal per component
@@ -951,19 +1174,19 @@
             return { ...cItem, kcal };
           });
 
-          dayMeals.push({
+          meals.push({
             mealIndex: m, mealName, mealCaloriesTarget: mealCalories,
             components: finalComponents, isTrainingDay: isTraining, isCheatDay: isCheat,
-            gramsComputed: grams.details || {}, sanity: { protForMeal, carbsForMeal, fatForMeal }, mealKcalTotal: groupKcal
+            gramsComputed: grams.details || {}, mealKcalTotal: groupKcal
           });
         }
 
         daysData.push({
-          dayIndex: dIdx + 1, dayOfWeekIndex: daySpec.dayOfWeekIndex, baseCalories: daySpec.baseCalories, isTrainingDay: isTraining, isCheatDay: isCheat, meals: dayMeals
+          dayIndex: d+1, dayOfWeekIndex: daySpec.dayOfWeekIndex, baseCalories: daySpec.baseCalories, isTrainingDay: isTraining, isCheatDay: isCheat, meals
         });
       }
 
-      const estimatedWeeklyCost = _estimateWeeklyCostFromPlan(daysData);
+      const estimatedWeeklyCost = 0;
       timeline_weeks.push({
         weekIndex: w+1,
         weekStartISO: new Date(start.getTime() + (w*7*24*3600*1000)).toISOString().slice(0,10),
@@ -972,7 +1195,7 @@
       });
     }
 
-    // rotate monthly alternatives (now food names)
+    // rotate monthly alternatives
     timeline_weeks.forEach((week,wIdx)=>{
       const monthIndex = Math.floor(wIdx / 4.345);
       week.days.forEach(day=>{
@@ -984,26 +1207,27 @@
 
     const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s + (w.estimatedWeeklyCost || 0),0) / timeline_weeks.length, 2);
     const budgetAdherence = 0.9;
-    const meta = { adherenceToCaloriesPct: 0.95, adherenceToBudgetPct: budgetAdherence, practicalityPct: 0.92, varietyScore: 0.9, feasibilityPct: 0.9 };
-    const credibilityScore = computeCredibility(meta);
+    const meta = { adherenceToCaloriesPct: 0.95, adherenceToBudgetPct: budgetAdherence, practicalityPct: 0.92, varietyScore: 0.9, feasibilityPct:0.9 };
+    const credibilityScore = 90;
 
     const payload = {
-      version: 'super-algo-v5.1-ig-satiety-timing-supp',
+      version: 'super-algo-v5.0-full-db',
       created_at: nowISO(),
       profile_snapshot: profile,
-      targets: profileTargets,
+      targets,
       timeline_weeks,
-      estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: profileTargets.tdee, bmr: profileTargets.bmr },
+      estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
       credibility: { score: credibilityScore, breakdown: meta },
-      provenance: { food_db_version: 'v5_FoodDatabase', built_with: 'super-diet-engine-v5.1' }
+      provenance: { food_db_version: 'v5_FoodDatabase_user', built_with: 'super-diet-engine-v5.0' }
     };
-    if(options.debug) payload._internal = { lookupSize: Object.keys(_lookup.byName).length, alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d => ({ dow: d.dayOfWeekIndex, train: d.isTrainingDay, cheat: d.isCheatDay })) };
+    if(options.debug) payload._internal = { lookupSize: Object.keys(_lookup.byName).length, alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
     return payload;
   }
 
-  /* persistence */
+  /* Persistence helpers (supabase) */
   let _supabase = null;
-  function init({ supabase } = {}){ if(!supabase) throw new Error('supabase client required'); _supabase = supabase; }
+  function initModule({ supabase: sup } = {}){ if(!sup) throw new Error('supabase client required'); _supabase = sup; }
+
   async function savePlan(userId, planPayload, options = {}){
     if(!_supabase) throw new Error('Supabase client not initialized.');
     const title = options.title || `Plano - ${planPayload.targets ? planPayload.targets.targetCalories + ' kCal' : nowISO()}`;
@@ -1012,21 +1236,27 @@
     if(error) { console.error('Erro ao salvar plano:', error); throw error; }
     return data;
   }
+
   async function loadPlans(userId){
     if(!_supabase) throw new Error('Supabase client not initialized.');
-    const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending:false });
     if(error) { console.error('Erro ao carregar planos:', error); throw error; }
     return data;
   }
+
   async function loadLatestPlan(userId){
     const plans = await loadPlans(userId);
     return plans && plans.length ? plans[0] : null;
   }
 
-  /* module object */
-  const SuperDietEngine = { init, loadExternalPrices: ()=>{}, loadExternalNutrition: ()=>{}, generatePlan: planLongTerm, savePlan, loadPlans, loadLatestPlan, findFood };
+  const SuperDietEngine = {
+    init: ({ supabase } = {}) => { if(!supabase) initModule({ supabase }); else initModule({ supabase }); },
+    generatePlan: planLongTerm,
+    savePlan, loadPlans, loadLatestPlan, findFood
+  };
 
-  /* UI render helpers (renderPlanToContainer, renderMonth, openMealEditModal, renderGeneratedPlanEditor, renderPercursoDietArea) */
+  /* ========== UI functions ========== */
+
   function displayProgress(startDate, endDate){
     const now = new Date(); now.setHours(0,0,0,0);
     const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
@@ -1034,25 +1264,27 @@
     const totalDuration = eDate.getTime() - sDate.getTime();
     const elapsedDuration = now.getTime() - sDate.getTime();
     const daysRemaining = Math.ceil((eDate - now) / (1000*60*60*24));
-    let progressPercentage = (elapsedDuration/totalDuration)*100;
+    let progressPercentage = (elapsedDuration / totalDuration) * 100;
     if(progressPercentage < 0) progressPercentage = 0;
     if(progressPercentage > 100) progressPercentage = 100;
     document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
     document.getElementById('start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
     document.getElementById('end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
     document.getElementById('countdown-days').textContent = daysRemaining >= 0 ? daysRemaining : 0;
-    document.getElementById('ia-planejamento').style.display = 'none';
-    document.getElementById('percurso').style.display = 'block';
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('percurso').classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector('.link-percurso')?.classList.add('active');
   }
 
-  function renderPlanToContainer(container, planPayload, options = {}){
+  function renderPlanToContainer(container, planPayload){
     container.innerHTML = '';
     const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
     const title = document.createElement('h4'); title.textContent = 'Plano de Dieta — visão geral';
-    const meta = document.createElement('div'); meta.style.color = 'var(--muted)';
+    const meta = document.createElement('div'); meta.style.color = '#bbb';
     const targetCals = planPayload.targets.targetCalories || planPayload.estimates.dailyTargetCalories || '...';
     const tdee = planPayload.targets.tdee || planPayload.estimates.tdee || '...';
-    meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <div style="font-size:12px;color:var(--muted)">TDEE: ${tdee} kcal</div>`;
+    meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <div style="font-size:12px;color:#bbb">TDEE: ${tdee} kcal</div>`;
     header.appendChild(title); header.appendChild(meta); container.appendChild(header);
 
     const months = {};
@@ -1064,7 +1296,7 @@
     });
 
     const monthKeys = Object.keys(months).sort();
-    const tabsBar = document.createElement('div'); tabsBar.className='plan-tabs'; container.appendChild(tabsBar);
+    const tabsBar = document.createElement('div'); tabsBar.className = 'plan-tabs'; container.appendChild(tabsBar);
     const contentArea = document.createElement('div'); container.appendChild(contentArea);
 
     monthKeys.forEach((mk, idx) => {
@@ -1072,42 +1304,44 @@
       pill.onclick = () => { document.querySelectorAll('.plan-tab.active').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); renderMonth(months[mk], contentArea); };
       tabsBar.appendChild(pill);
     });
-
     if(monthKeys.length) renderMonth(months[monthKeys[0]], contentArea);
   }
 
   function renderMonth(monthObj, contentArea){
     contentArea.innerHTML = '';
-    const wrapper = document.createElement('div'); wrapper.style.marginTop='12px';
+    const wrapper = document.createElement('div'); wrapper.style.marginTop = '12px';
     const days = [];
     monthObj.weeks.forEach(w => { w.days.forEach(d => { const copy = { ...d }; copy.weekIndex = w.weekIndex; days.push(copy); }); });
+
     const daysWrap = document.createElement('div'); daysWrap.className = 'plan-days';
-    const dayNameMap = { 0: 'Dom', 1: 'Seg', 2:'Ter', 3:'Qua', 4:'Qui', 5:'Sex', 6:'Sab' };
-    days.forEach(d=>{
+    const dayNameMap = { 0:'Dom',1:'Seg',2:'Ter',3:'Qua',4:'Qui',5:'Sex',6:'Sab' };
+
+    days.forEach(d => {
       const dayOfWeekIndex = d.dayOfWeekIndex;
       const dayName = dayNameMap[dayOfWeekIndex] !== undefined ? dayNameMap[dayOfWeekIndex] : 'Dia';
-      const dayCard = document.createElement('div'); dayCard.className='plan-day';
+      const dayCard = document.createElement('div'); dayCard.className = 'plan-day';
       const dayTitle = document.createElement('div'); dayTitle.style.display='flex'; dayTitle.style.justifyContent='space-between'; dayTitle.style.alignItems='center';
       const left = document.createElement('div');
       const statusText = d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso';
       const cheatText = d.isCheatDay ? ' • Cheat' : '';
-      left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--danger)' : 'var(--muted)'};font-size:12px;font-weight:700;">${statusText} ${cheatText}</div>`;
+      left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#bbb'};font-size:12px;font-weight:700;">${statusText} ${cheatText}</div>`;
       const right = document.createElement('div'); right.style.textAlign='right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
-      dayTitle.appendChild(left); dayTitle.appendChild(right);
-      dayCard.appendChild(dayTitle);
+      dayTitle.appendChild(left); dayTitle.appendChild(right); dayCard.appendChild(dayTitle);
 
-      d.meals.forEach(m=>{
-        const mealRow = document.createElement('div'); mealRow.className='meal-row';
-        const mealLeft = document.createElement('div'); mealLeft.className='meal-left';
-        const name = document.createElement('div'); name.className='meal-name'; name.textContent = m.mealName;
-        const listPreview = document.createElement('div'); listPreview.style.color='var(--muted)'; listPreview.style.fontSize='13px';
+      d.meals.forEach(m => {
+        const mealRow = document.createElement('div'); mealRow.className = 'meal-row';
+        const mealLeft = document.createElement('div'); mealLeft.className = 'meal-left';
+        const name = document.createElement('div'); name.className = 'meal-name'; name.textContent = m.mealName;
+        const listPreview = document.createElement('div'); listPreview.style.color = '#bbb'; listPreview.style.fontSize = '13px';
         const items = m.components.map(c => `${c.food} (${c.grams}g)`).join(' • ');
         listPreview.textContent = items;
         mealLeft.appendChild(name); mealLeft.appendChild(listPreview);
-        const mealRight = document.createElement('div'); mealRight.style.display='flex'; mealRight.style.flexDirection='column'; mealRight.style.alignItems='flex-end';
-        const kcal = document.createElement('div'); kcal.className='meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
-        const editBtn = document.createElement('button'); editBtn.textContent = 'Editar'; editBtn.onclick = ()=> openMealEditModal(m);
+
+        const mealRight = document.createElement('div'); mealRight.style.display = 'flex'; mealRight.style.flexDirection = 'column'; mealRight.style.alignItems = 'flex-end';
+        const kcal = document.createElement('div'); kcal.className = 'meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
+        const editBtn = document.createElement('button'); editBtn.textContent = 'Editar'; editBtn.style.marginTop = '8px'; editBtn.onclick = () => openMealEditModal(m);
         mealRight.appendChild(kcal); mealRight.appendChild(editBtn);
+
         mealRow.appendChild(mealLeft); mealRow.appendChild(mealRight);
         dayCard.appendChild(mealRow);
       });
@@ -1120,130 +1354,192 @@
   }
 
   function openMealEditModal(meal){
-    meal.components.forEach((c,i)=>{
+    meal.components.forEach((c,i) => {
       const newG = prompt(`Editar ${c.food} (g) — atual: ${c.grams}`, c.grams);
-      if(newG !== null){ const val = parseInt(newG,10); if(!isNaN(val)) meal.components[i].grams = Math.max(0,val); }
+      if(newG !== null){ const val = parseInt(newG,10); if(!isNaN(val)) meal.components[i].grams = Math.max(0, val); }
     });
     const dietaContent = document.getElementById('dieta-card-content');
-    if(dietaContent && dietaContent._lastPlan) renderPlanToContainer(dietaContent, dietaContent._lastPlan);
+    const latest = dietaContent?._lastPlan;
+    if(dietaContent && latest) renderPlanToContainer(dietaContent, latest);
   }
 
   async function getCurrentUser(){ const { data } = await supabase.auth.getUser(); return data?.user; }
   async function fetchLatestUserDiet(){
-    const user = await getCurrentUser(); if(!user) return null;
-    const { data, error } = await supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single();
+    const user = await getCurrentUser();
+    if(!user) return null;
+    const { data, error } = await supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending:false }).limit(1).single();
     if(error && error.code !== 'PGRST116') console.error('Erro fetchLatestUserDiet:', error.message);
     return data;
   }
 
-  function clearDietaCardContent(){ const el = document.getElementById('dieta-card-content'); if(el) el.remove(); }
-  function renderGeneratedPlanEditor(container, planPayload, existingId=null){
+  async function renderPercursoDietArea(){
+    const dietaCard = document.getElementById('dieta-card');
+    const targetContainer = document.createElement('div'); targetContainer.id = 'dieta-card-content';
+    dietaCard.innerHTML = '<h4>Formulário: Dieta</h4>';
+    dietaCard.appendChild(targetContainer);
+
+    const latest = await fetchLatestUserDiet();
+    if(latest && latest.payload){
+      renderGeneratedPlanEditor(targetContainer, latest.payload, latest.id);
+    } else {
+      const p = document.createElement('p'); p.style.color='#bbb'; p.textContent = 'Gere sua meta para criar um plano.'; targetContainer.appendChild(p);
+    }
+  }
+
+  function renderGeneratedPlanEditor(container, planPayload, existingId = null){
     container.innerHTML = '';
     const title = document.createElement('h4'); title.textContent = 'Formulário: Dieta — Plano gerado';
-    const meta = document.createElement('p'); meta.style.color='var(--muted)';
+    const meta = document.createElement('p'); meta.style.color='#bbb';
     const targetCals = planPayload.targets.targetCalories || '...';
     const tdee = planPayload.targets.tdee || '...';
-    meta.innerHTML = `Meta: ${planPayload.profile_snapshot.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size: 11px; color: var(--muted);"> (TDEE: ${tdee} kcal)</span>`;
+    meta.innerHTML = `Meta: ${planPayload.profile_snapshot.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size:11px;color:#bbb">(TDEE: ${tdee} kcal)</span>`;
     container.appendChild(title); container.appendChild(meta);
-    const planView = document.createElement('div'); planView.style.marginTop='12px'; planView.id = 'plan-view';
-    container._lastPlan = planPayload; renderPlanToContainer(planView, planPayload); container.appendChild(planView);
-    const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.gap='10px'; btnWrap.style.marginTop='12px';
-    const saveBtn = document.createElement('button'); saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário'; saveBtn.className='primary';
-    const saveNewBtn = document.createElement('button'); saveNewBtn.textContent = 'Salvar como novo'; saveNewBtn.className='ghost';
-    const statusSpan = document.createElement('span'); statusSpan.style.color='var(--muted)'; statusSpan.style.marginLeft='8px';
-    btnWrap.appendChild(saveBtn); btnWrap.appendChild(saveNewBtn); btnWrap.appendChild(statusSpan); container.appendChild(btnWrap);
+    const planView = document.createElement('div'); planView.style.marginTop='12px'; planView.id='plan-view';
+    container._lastPlan = planPayload;
+    renderPlanToContainer(planView, planPayload);
+    container.appendChild(planView);
 
-    saveBtn.onclick = async ()=>{
+    const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.gap='8px'; btnWrap.style.marginTop='12px';
+    const saveBtn = document.createElement('button'); saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário'; saveBtn.className = 'playlist-btn';
+    const saveNewBtn = document.createElement('button'); saveNewBtn.textContent = 'Salvar como novo'; saveNewBtn.style.background = '#444'; saveNewBtn.style.color = '#fff'; saveNewBtn.style.border = 'none'; saveNewBtn.style.padding = '10px 14px'; saveNewBtn.style.borderRadius='8px';
+    const statusSpan = document.createElement('span'); statusSpan.style.color = '#bbb'; statusSpan.style.marginLeft = '8px';
+    btnWrap.appendChild(saveBtn); btnWrap.appendChild(saveNewBtn); btnWrap.appendChild(statusSpan);
+    container.appendChild(btnWrap);
+
+    saveBtn.onclick = async () => {
       statusSpan.textContent = 'Salvando...';
       try{
-        const user = await getCurrentUser(); if(!user){ statusSpan.textContent='Usuário não autenticado.'; return; }
+        const user = await getCurrentUser();
+        if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
         planPayload.modified_at = new Date().toISOString();
         if(existingId){
           const { error } = await supabase.from('user_diets').update({ payload: planPayload }).eq('id', existingId);
-          if(error){ console.error(error); statusSpan.textContent='Erro ao atualizar.'; return; }
+          if(error){ console.error(error); statusSpan.textContent = 'Erro ao atualizar.'; return; }
           statusSpan.textContent = 'Salvo (atualizado).';
         } else {
-          SuperDietEngine.init({ supabase }); await SuperDietEngine.savePlan(user.id, planPayload, { title: `Plano - ${planPayload.targets.targetCalories} kcal` });
+          await savePlan(user.id, planPayload, { title: `Plano - ${planPayload.targets.targetCalories} kcal` });
           statusSpan.textContent = 'Salvo com sucesso.';
           await renderPercursoDietArea();
         }
       } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
     };
 
-    saveNewBtn.onclick = async ()=>{
+    saveNewBtn.onclick = async () => {
       statusSpan.textContent = 'Salvando cópia...';
       try{
-        const user = await getCurrentUser(); if(!user){ statusSpan.textContent='Usuário não autenticado.'; return; }
-        SuperDietEngine.init({ supabase }); await SuperDietEngine.savePlan(user.id, planPayload, { title: `Plano cópia - ${planPayload.targets.targetCalories} kcal` });
+        const user = await getCurrentUser();
+        if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
+        await savePlan(user.id, planPayload, { title: `Plano cópia - ${planPayload.targets.targetCalories} kcal` });
         statusSpan.textContent = 'Cópia salva.';
       } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
     };
   }
 
-  async function renderPercursoDietArea(){
-    const dietaCard = document.getElementById('dieta-card'); const targetContainer = document.createElement('div'); targetContainer.id = 'dieta-card-content';
-    dietaCard.appendChild(targetContainer);
-    const latest = await fetchLatestUserDiet();
-    if(latest && latest.payload){
-      if(latest.payload.version && (latest.payload.version.startsWith('super-algo-v') || latest.payload.targets)){
-        renderGeneratedPlanEditor(targetContainer, latest.payload, latest.id);
-      } else {
-        const p = document.createElement('p'); p.style.color='var(--muted)'; p.textContent='Formato de plano antigo ou inválido.'; targetContainer.appendChild(p);
-      }
-    } else {
-      const p = document.createElement('p'); p.style.color='var(--muted)'; p.textContent='Gere sua meta para criar um plano.'; targetContainer.appendChild(p);
-    }
-  }
-
   function loadFreshDifyChat(){
-    const difyContainer = document.getElementById('dify-container'); if(!difyContainer) return;
-    difyContainer.innerHTML = ''; const iframe = document.createElement('iframe'); const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-    const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&_=${Date.now()}`;
-    iframe.src = difyUrl; iframe.allow='microphone'; difyContainer.appendChild(iframe);
+    const iframe = document.getElementById('dify-iframe');
+    if(!iframe) return;
+    const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
+    iframe.src = difyUrl;
   }
 
-  /* initialization & events */
-  document.addEventListener('DOMContentLoaded', ()=>{
+  /* UI initialization */
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const configBtn = document.getElementById('config-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    function openSidebar(){ sidebar.classList.add('open'); menuToggle.classList.add('open'); overlay.classList.add('show'); }
+    function closeSidebar(){ sidebar.classList.remove('open'); menuToggle.classList.remove('open'); overlay.classList.remove('show'); }
+
+    menuToggle.addEventListener('click', () => {
+      if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    // nav links
     document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', (e)=>{
+      link.addEventListener('click', (e) => {
         e.preventDefault();
-        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-        link.classList.add('active');
         const tab = link.dataset.tab;
-        document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-        document.getElementById(tab).style.display = 'block';
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+        closeSidebar();
       });
     });
 
-    document.getElementById('reset-btn-quick').addEventListener('click', ()=>{
-      document.getElementById('ia-fit-form').reset();
-      document.getElementById('prazo-group').style.display = 'none';
+    // config button toggles reset/logout visibility
+    configBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logoutBtn.classList.toggle('hidden');
+      resetBtn.classList.toggle('hidden');
     });
 
+    resetBtn.addEventListener('click', () => {
+      document.getElementById('ia-fit-form').reset();
+      document.getElementById('prazo-group').style.display = 'none';
+      document.getElementById('suplementos-detalhes-group').style.display = 'none';
+      document.getElementById('objetivo').focus();
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('ia-planejamento').classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelector('.link-ia')?.classList.add('active');
+      closeSidebar();
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      try{
+        await supabase.auth.signOut();
+        window.location.reload();
+      } catch(err){
+        console.warn('logout falhou (demo):', err);
+        alert('Logout falhou: ' + (err.message || err));
+      }
+    });
+
+    // show/hide prazo and suplementos detail
     const objetivoInput = document.getElementById('objetivo');
-    if(objetivoInput) objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display = this.value.trim() !== '' ? 'block' : 'none'; });
+    objetivoInput && objetivoInput.addEventListener('input', function(){ document.getElementById('prazo-group').style.display = this.value.trim() !== '' ? 'block' : 'none'; });
 
-    const usoSuplementoSelect = document.getElementById('uso_suplemento');
-    if(usoSuplementoSelect) usoSuplementoSelect.addEventListener('change', function(){ document.getElementById('quais_suplementos').style.display = this.value === 'Sim' ? 'block' : 'block'; });
+    const usoSupp = document.getElementById('uso_suplemento');
+    usoSupp && usoSupp.addEventListener('change', function(){ document.getElementById('suplementos-detalhes-group').style.display = this.value === 'Sim' ? 'block' : 'none'; if(this.value !== 'Sim') document.getElementById('quais_suplementos').value = ''; });
 
-    async function initializePageData(){
+    // playlist open
+    document.getElementById('playlist-btn')?.addEventListener('click', () => {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('video-aulas').classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    });
+
+    (async function initializePageData(){
       const { data } = await supabase.auth.getUser();
       if(!data.user){
-        // Not logged: for demo, we'll still allow form to work
         document.getElementById('welcome-msg').textContent = 'Visitante (demo)';
       } else {
-        const user = data.user; document.getElementById('welcome-msg').textContent = user.email || user.id;
-        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if(!error && profile){
-          if(profile.goal_end_date){
+        const user = data.user;
+        document.getElementById('welcome-msg').textContent = user.email || user.id;
+        try{
+          const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+          if(!error && profile && profile.goal_end_date){
             displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
+            document.getElementById('playlist-section').style.display = profile.goal_type ? 'block' : 'none';
+          } else {
+            document.getElementById('form-wrapper').style.display = 'block';
           }
+        } catch(e){
+          document.getElementById('form-wrapper').style.display = 'block';
         }
       }
       loadFreshDifyChat();
       await renderPercursoDietArea();
-    }
+    })();
 
+    // form submit
     const iaFitForm = document.getElementById('ia-fit-form');
     if(iaFitForm) iaFitForm.addEventListener('submit', async function(event){
       event.preventDefault();
@@ -1254,9 +1550,11 @@
         const prazoText = formElements.prazo.value;
         const endDate = calculateEndDate(prazoText);
         if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+
         const startDate = new Date(); startDate.setHours(0,0,0,0);
         const objetivoText = formElements.objetivo.value;
         const goalType = detectGoalType(objetivoText);
+
         const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
         if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
@@ -1268,17 +1566,16 @@
           goal_type: goalType
         };
 
-        // attempt to save to Supabase profile if logged in
         try{
           const current = await getCurrentUser();
           if(current){
-            const { error: updateError } = await supabase.from('profiles').update(updateData).eq('id', current.id);
-            if(updateError){ console.warn('Erro ao atualizar perfil:', updateError); }
+            const { error } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
+            if(error) console.warn('Erro ao atualizar perfil:', error);
           }
-        } catch(e){ console.warn('Não conectado a supabase (demo).'); }
+        }catch(e){ console.warn('Não conectado a supabase (demo).'); }
 
         displayProgress(startDate, endDate);
-        if(goalType) { document.getElementById('playlist-btn').style.display = 'inline-block'; }
+        document.getElementById('playlist-section').style.display = 'block';
 
         const inputs = {
           grande_meta: objetivoText,
@@ -1286,7 +1583,7 @@
           sexo: formElements.sexo.value,
           altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
           peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
-          idade: parseInt(formElements.idade.value, 10) || 30,
+          idade: parseInt(formElements.idade.value,10) || 30,
           disponibilidade: selectedDaysArray.length,
           selected_days: selectedDaysArray,
           local_treino: formElements.local_treino.value,
@@ -1299,23 +1596,25 @@
 
         SuperDietEngine.init({ supabase });
         const diffTime = Math.abs(endDate - startDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.ceil(diffTime / (1000*60*60*24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false });
 
-        // try save plan if user logged
         try{
           const currentUser = await getCurrentUser();
           if(currentUser){
-            await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+            await savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
           }
         } catch(saveError){
-          console.error("Erro ao salvar plano:", saveError);
+          console.error('Erro ao salvar plano:', saveError);
           alert('Meta atualizada, mas falha ao salvar plano: ' + (saveError.message || JSON.stringify(saveError)));
         }
 
-        // update UI
-        document.getElementById('percurso').style.display = 'block';
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.getElementById('percurso').classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+        document.querySelector('.link-percurso')?.classList.add('active');
+
         await renderPercursoDietArea();
         submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
       } catch(err){
@@ -1325,14 +1624,7 @@
       }
     });
 
-    document.getElementById('playlist-btn').addEventListener('click', async ()=>{
-      document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-      document.getElementById('video-aulas').style.display = 'block';
-      document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-    });
-
-    initializePageData().catch(err => console.error('Erro inicial:', err));
-  });
+  }); // DOMContentLoaded end
   </script>
 </body>
 </html>
