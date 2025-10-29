@@ -868,6 +868,7 @@
     return 1 - Math.min(1, (cost - 5) / 50);
   }
 
+  /* Modified: deterministic computeCBrank (removed randomness) */
   function computeCBrank(rec, profile){
     if(!rec) return 0.5;
     const sat = computeSatietyScore(rec);
@@ -887,30 +888,9 @@
     }
 
     const base = (sat * satW) + (giScore * giW) + (costS * costW);
-    const variety = (Math.random() - 0.5) * 0.12;
-    return Math.max(0, Math.min(1, base + variety));
-  }
 
-  /* NEW: _rankFoodsByCategory with avoidList (penalize recent picks)
-     Iterates v5_FoodDatabase and returns list of IDs ordered by adjusted rank */
-  function _rankFoodsByCategory(categories, profile, avoidList = []){
-    const recs = [];
-    for(const id in v5_FoodDatabase){
-      const rec = v5_FoodDatabase[id];
-      if(!rec) continue;
-      if(categories.includes(rec.category)){
-        // copy minimal info for compute
-        const copy = { id, name: rec.name, nutrition: rec.nutrition || {}, price_per_kg: rec.price_per_kg || 0, ig: rec.ig };
-        let rank = computeCBrank(copy, profile);
-        // penalize if in avoidList
-        if(Array.isArray(avoidList) && avoidList.length && avoidList.includes(id)){
-          rank = rank * 0.25; // reduce rank (penalize)
-        }
-        recs.push({ ...copy, rank });
-      }
-    }
-    recs.sort((a,b) => (b.rank || 0) - (a.rank || 0) || a.name.localeCompare(b.name));
-    return recs.map(r => r.id);
+    // Deterministic: return base only (no random variety)
+    return Math.max(0, Math.min(1, base));
   }
 
   /* Utilities for weekly template, rotation */
@@ -1045,7 +1025,7 @@
     return q.includes(keyword);
   }
 
-  /* planLongTerm - atualizado com blueprints e rotação inteligente */
+  /* planLongTerm - atualizado com blueprints e rotação inteligente (get atualizado e memória maior) */
   async function planLongTerm(profile, options = {}){
     const start = options.startDate ? new Date(options.startDate) : new Date();
     const months = Math.max(1, _safeNum(options.months, 3));
@@ -1121,7 +1101,13 @@
         const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, []);
         const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, []);
 
-        const get = (list, idx) => (list && list.length > 0) ? list[(idx) % list.length] : null;
+        // NEW get: prefer the best (index 0) or second best (index 1) based on pickIdx parity
+        const get = (list, idx) => {
+          if (!list || list.length === 0) return null;
+          const pickIndex = (idx % 2); // 0 or 1
+          if (pickIndex < list.length) return list[pickIndex];
+          return list[0];
+        };
 
         for(let m=0; m<mealsCount; m++){
           const mealName = mealNames[m];
@@ -1144,7 +1130,7 @@
           const carbsForMeal = Math.max(0, Math.round(baseCarbsForMeal * carbMultiplier));
           const fatForMeal = Math.round(baseFatForMeal * fatMultiplier);
 
-          const pickIdx = (w*100)+(d*10)+m;
+          const pickIdx = (w*100)+(d*10)+m; // used by new get
 
           // Blueprints / templates
           let componentsToCalc = { protein: null, carb: null, veg: null };
@@ -1156,7 +1142,6 @@
             const protPick = get(snackProteinsCandidates, pickIdx) || get(['ovo_cozido'], pickIdx) || 'ovo_cozido';
             const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
             componentsToCalc = { protein: protPick, carb: carbPick, veg: fruitPick };
-            // mark snack picks
             if(protPick) dayProteinPicks.push(protPick);
             if(carbPick) dayCarbPicks.push(carbPick);
           } else if (lname.includes('almoço')) {
@@ -1171,11 +1156,9 @@
           } else if (lname.includes('jantar')) {
             // Jantar: [proteina_main OU peixe] + [tuberculo OU verdura (menos carbo)]
             const protPick = get(fishProteinsCandidates, pickIdx) || get(mainProteinsCandidates, pickIdx) || 'peixe_tilapia_grelhada';
-            // prefer tuberculo but we may prefer less carb - pick tuberculo OR verdura for variety
             let carbPick = get(mainCarbsCandidates, pickIdx);
             if(!carbPick) carbPick = get(mainCarbsCandidates, pickIdx+1) || fallbackCarb;
             const vegPick = get(commonVegCandidates, pickIdx) || 'brocolis_cozido';
-            // sometimes prefer veggies not tuberculo
             if(Math.random() < 0.35) carbPick = vegPick;
             componentsToCalc = { protein: protPick, carb: carbPick, veg: vegPick };
             if(protPick) dayProteinPicks.push(protPick);
@@ -1246,7 +1229,6 @@
           });
 
           // add picks of the day to day lists for short-term memory
-          // push source_id where available, else try to find by name -> id
           finalComponents.forEach(fc=>{
             if(fc.source_id){
               const rid = fc.source_id;
@@ -1254,7 +1236,6 @@
                 if((fc.role || '').includes('proteina')) dayProteinPicks.push(rid);
                 if((fc.role || '').includes('carbo') || (fc.role || '').includes('legume')) dayCarbPicks.push(rid);
               } else {
-                // find id by name if possible
                 const rec = findFood(fc.food);
                 if(rec && rec.id){
                   if((fc.role || '').includes('proteina')) dayProteinPicks.push(rec.id);
@@ -1274,8 +1255,11 @@
         // end of day: append day picks to recent lists and cap memory
         recentProteinPicks = [...recentProteinPicks, ...dayProteinPicks];
         recentCarbPicks = [...recentCarbPicks, ...dayCarbPicks];
-        if (recentProteinPicks.length > 6) recentProteinPicks = recentProteinPicks.slice(recentProteinPicks.length - 6);
-        if (recentCarbPicks.length > 6) recentCarbPicks = recentCarbPicks.slice(recentCarbPicks.length - 6);
+
+        // MEMORY CAP increased to ~12 (for ~1 week of meals)
+        const MEMORY_CAP = 12;
+        if (recentProteinPicks.length > MEMORY_CAP) recentProteinPicks = recentProteinPicks.slice(recentProteinPicks.length - MEMORY_CAP);
+        if (recentCarbPicks.length > MEMORY_CAP) recentCarbPicks = recentCarbPicks.slice(recentCarbPicks.length - MEMORY_CAP);
 
         daysData.push({
           dayIndex: d+1, dayOfWeekIndex: daySpec.dayOfWeekIndex, baseCalories: daySpec.baseCalories, isTrainingDay: isTraining, isCheatDay: isCheat, meals
@@ -1307,7 +1291,7 @@
     const credibilityScore = 90;
 
     const payload = {
-      version: 'super-algo-v5.0-full-db-blueprints-v1',
+      version: 'super-algo-v5.0-full-db-blueprints-v2',
       created_at: nowISO(),
       profile_snapshot: profile,
       targets,
