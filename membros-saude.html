@@ -877,7 +877,7 @@ const SuperDietEngine = (function(){
   const masterDB = { ...masterDBSeed };
 
   // ============================================
-  // INÍCIO: NOVO MÓDULO (Banco de Dados Glicêmico v1.0)
+  // INÍCIO: NOVO MÓDUTO (Banco de Dados Glicêmico v1.0)
   // ============================================
   const giDatabase = {
     // Chave é o NOME NORMALIZADO (como em masterDB)
@@ -1888,7 +1888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const objetivoInput = document.getElementById('objetivo'); if(objetivoInput) objetivoInput.oninput = function(){ document.getElementById('prazo-group').style.display=this.value.trim()!==''?'block':'none'; }; const usoSuplementoSelect = document.getElementById('uso_suplemento'); if(usoSuplementoSelect) usoSuplementoSelect.onchange = function(){ document.getElementById('suplementos-detalhes-group').style.display=this.value==='Sim'?'block':'none'; if(this.value!=='Sim') document.getElementById('quais_suplementos').value=''; };
 
   // ============================================
-  // INÍCIO: FUNÇÃO de SUBMIT (MODIFICADA)
+  // INÍCIO: FUNÇÃO de SUBMIT (COM AMBAS AS CORREÇÕES)
   // ============================================
   const iaFitForm = document.getElementById('ia-fit-form');
   if(iaFitForm) iaFitForm.addEventListener('submit', async function(event){
@@ -1901,17 +1901,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const formElements = event.target.elements;
       const prazoText = formElements.prazo.value;
       
-      // *** MODIFICAÇÃO APLICADA AQUI ***
-      // Chama a nova função global 'calculateEndDate'
       const endDate = calculateEndDate(prazoText);
-      // Mensagem de erro melhorada
       if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
       
       const startDate = new Date(); startDate.setHours(0,0,0,0);
       const objetivoText = formElements.objetivo.value;
-      
-      // *** MODIFICAÇÃO APLICADA AQUI ***
-      // Chama a nova função global 'detectGoalType'
       const goalType = detectGoalType(objetivoText);
 
       const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
@@ -1924,27 +1918,46 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
       }
 
-      const { error: updateError } = await supabase.from('profiles').update({
-        goal_start_date: startDate.toISOString(), goal_end_date: endDate.toISOString(),
-        goal_prompt: objetivoText, goal_type: goalType,
-        prazo: prazoText // Salva o prazo original também
-      }).eq('id', (await getCurrentUser()).id);
-      if(updateError){ console.error("Erro ao salvar meta:", updateError); alert('Erro ao salvar meta.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+      // --- Objeto de dados para o UPDATE ---
+      // ================================================================
+      // ✨ CORREÇÃO APLICADA: A linha "prazo: prazoText" foi removida
+      // para evitar o erro de "coluna não existe" no Supabase.
+      // ================================================================
+      const updateData = {
+        goal_start_date: startDate.toISOString(), 
+        goal_end_date: endDate.toISOString(),
+        goal_prompt: objetivoText, 
+        goal_type: goalType
+        // A linha "prazo: prazoText" foi removida.
+      };
+
+      const { error: updateError } = await supabase.from('profiles')
+          .update(updateData)
+          .eq('id', (await getCurrentUser()).id);
+
+      if(updateError){ 
+        console.error("Erro detalhado do Supabase:", updateError); 
+        // Erro de código corrigido: mostra a mensagem de erro real
+        alert('Erro ao salvar meta. Detalhes: ' + updateError.message); 
+        submitButton.disabled = false; 
+        submitButton.textContent = 'Crie seu próprio caminho'; 
+        return; 
+      }
 
       displayProgress(startDate, endDate);
       if(goalType) document.getElementById('playlist-section').style.display = 'block';
 
-      // O objeto 'inputs' agora contém o 'prazo', que será lido pelo 'deriveTargets'
+      // O objeto 'inputs' ainda contém o 'prazo' e as correções
+      // do parseFloat, pois o SuperDietEngine (que roda localmente) precisa deles.
       const inputs = {
-        grande_meta: objetivoText, prazo: prazoText,
+        grande_meta: objetivoText, 
+        prazo: prazoText, // O SuperDietEngine usa isto
         sexo: formElements.sexo.value,
         // ============================================
-        // INÍCIO: CORREÇÃO DO BUG (VÍRGULA VS PONTO)
+        // ✨ CORREÇÃO APLICADA (VÍRGULA VS PONTO)
         // ============================================
         altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
         peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
-        // ============================================
-        // FIM: CORREÇÃO DO BUG
         // ============================================
         idade: parseInt(formElements.idade.value, 10) || 30,
         disponibilidade: selectedDaysArray.length, 
@@ -1959,7 +1972,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       SuperDietEngine.init({ supabase });
       
-      // Lógica de 'months' (mantida)
       const diffTime = Math.abs(endDate - startDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       const months = Math.max(1, Math.round(diffDays / 30.44));
@@ -1968,7 +1980,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const currentUser = await getCurrentUser();
       if(!currentUser) { alert('Usuário não autenticado.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
-      await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+      
+      // Adicionado try/catch para o segundo salvamento
+      try {
+        await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+      } catch (saveError) {
+        console.error("Erro ao SALVAR o plano na 'user_diets':", saveError);
+        alert('Meta atualizada, mas falha ao salvar plano: ' + saveError.message);
+      }
 
       switchTab('percurso');
       await renderPercursoDietArea();
@@ -1976,13 +1995,14 @@ document.addEventListener('DOMContentLoaded', () => {
       submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
 
     } catch(err){
+      // Este é o 'catch' geral para erros de código
       console.error('Erro no fluxo de criação da meta:', err);
-      alert('Erro interno: ' + (err.message || JSON.stringify(err)));
+      alert('Erro interno de código: ' + (err.message || JSON.stringify(err)));
       submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
     }
   });
   // ============================================
-  // FIM: FUNÇÃO de SUBMIT (MODIFICADA)
+  // FIM: FUNÇÃO de SUBMIT (CORRIGIDA)
   // ============================================
 
   // Handler do botão da playlist (mantido)
