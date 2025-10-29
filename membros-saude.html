@@ -1937,8 +1937,16 @@ document.addEventListener('DOMContentLoaded', () => {
       // O objeto 'inputs' agora contém o 'prazo', que será lido pelo 'deriveTargets'
       const inputs = {
         grande_meta: objetivoText, prazo: prazoText,
-        sexo: formElements.sexo.value, altura: parseFloat(formElements.altura.value) || 1.7,
-        peso: parseFloat(formElements.peso.value) || 70, idade: parseInt(formElements.idade.value, 10) || 30,
+        sexo: formElements.sexo.value,
+        // ============================================
+        // INÍCIO: CORREÇÃO DO BUG (VÍRGULA VS PONTO)
+        // ============================================
+        altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
+        peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
+        // ============================================
+        // FIM: CORREÇÃO DO BUG
+        // ============================================
+        idade: parseInt(formElements.idade.value, 10) || 30,
         disponibilidade: selectedDaysArray.length, 
         selected_days: selectedDaysArray, 
         local_treino: formElements.local_treino.value,
