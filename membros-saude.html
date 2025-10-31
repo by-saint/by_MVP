@@ -226,7 +226,7 @@
           <h2>Fale com a IA</h2>
           <div id="dify-container" class="iframe-container">
             <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
-            <iframe id="dify-iframe" src="" frameborder="0" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+            <iframe id="dify-iframe" src="" frameborder="0" style="position:absolute; inset:0; width:100%; height:100%;"></iframe>
             <div class="dify-bottom-mask"></div>
           </div>
 
@@ -250,7 +250,7 @@
     <div id="video-aulas" class="tab-content">
       <h2>Nossas Aulas</h2>
       <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1I" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
       <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
     </div>
 
@@ -288,419 +288,355 @@
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
   /* ============================
-     SuperDietEngine v6.1 -> v7.0 (porções + blueprints)
+     SuperDietEngine v6.1 - IIFE (encapsulado)
+     Todas as funções do algorítmo e DB estão aqui dentro.
      ============================ */
   const SuperDietEngine = (function(){
-    /* ========== FOOD DB (v5) with 'portion' added for each item ========== */
+    /* ========== FOOD DB ========== */
     const v5_FoodDatabase = {
-      // Proteínas (principais)
+      // --- proteins, fishes, snacks, carbs, etc (same entries as provided) ---
       'frango_peito': { 
         name:'Frango, Peito sem pele cozido', 
         nutrition:{ kcal:165, protein_g:31, carb_g:0, fat_g:3.6, fiber_g:0 }, 
-        price_per_kg: 22.0, category:'proteina_main', ig: 0,
-        portion: { name: 'filé(s)', grams: 125 }
+        price_per_kg: 22.0, category:'proteina_main', ig: 0 
       },
       'frango_sobrecoxa': {
         name:'Frango, Sobrecoxa sem pele assada',
         nutrition:{ kcal:209, protein_g:26, carb_g:0, fat_g:11.2, fiber_g:0 },
-        price_per_kg: 18.0, category:'proteina_main', ig: 0,
-        portion: { name: 'porção(ões)', grams: 120 }
+        price_per_kg: 18.0, category:'proteina_main', ig: 0
       },
       'carne_patinho_moido': { 
         name:'Carne, Patinho moído 90/10 cozido', 
         nutrition:{ kcal:185, protein_g:28, carb_g:0, fat_g:7.5, fiber_g:0 }, 
-        price_per_kg: 40.0, category:'proteina_main', ig: 0,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 40.0, category:'proteina_main', ig: 0 
       },
       'carne_alcatra_grelhada': {
         name:'Carne, Alcatra grelhada',
         nutrition:{ kcal:200, protein_g:30, carb_g:0, fat_g:8.5, fiber_g:0 },
-        price_per_kg: 45.0, category:'proteina_main', ig: 0,
-        portion: { name: 'bife(s)', grams: 120 }
+        price_per_kg: 45.0, category:'proteina_main', ig: 0
       },
       'carne_coxao_mole_cozido': {
         name:'Carne, Coxão mole cozido',
         nutrition:{ kcal:219, protein_g:32, carb_g:0, fat_g:9.5, fiber_g:0 },
-        price_per_kg: 42.0, category:'proteina_main', ig: 0,
-        portion: { name: 'porção(ões)', grams: 120 }
+        price_per_kg: 42.0, category:'proteina_main', ig: 0
       },
       'porco_lombo_grelhado': {
         name:'Porco, Lombo grelhado',
         nutrition:{ kcal:176, protein_g:29, carb_g:0, fat_g:6.2, fiber_g:0 },
-        price_per_kg: 28.0, category:'proteina_main', ig: 0,
-        portion: { name: 'porção(ões)', grams: 120 }
+        price_per_kg: 28.0, category:'proteina_main', ig: 0
       },
 
       // peixes
       'peixe_tilapia_grelhada': { 
         name:'Peixe, Tilápia grelhada', 
         nutrition:{ kcal:128, protein_g:26, carb_g:0, fat_g:2.7, fiber_g:0 }, 
-        price_per_kg: 40.0, category:'peixe', ig: 0,
-        portion: { name: 'filé(s)', grams: 120 }
+        price_per_kg: 40.0, category:'peixe', ig: 0 
       },
       'peixe_salmao_grelhado': {
         name:'Peixe, Salmão grelhado',
         nutrition:{ kcal:208, protein_g:20, carb_g:0, fat_g:13, fiber_g:0 },
-        price_per_kg: 75.0, category:'peixe', ig: 0,
-        portion: { name: 'filé(s)', grams: 120 }
+        price_per_kg: 75.0, category:'peixe', ig: 0
       },
       'atum_lata_agua': {
         name:'Atum, em lata (drenado)',
         nutrition:{ kcal:116, protein_g:26, carb_g:0, fat_g:0.9, fiber_g:0 },
-        price_per_kg: 55.0, category:'peixe', ig: 0,
-        portion: { name: 'lata(s)', grams: 120 }
+        price_per_kg: 55.0, category:'peixe', ig: 0
       },
       'sardinha_lata_oleo': {
         name:'Sardinha, em lata óleo (drenada)',
         nutrition:{ kcal:208, protein_g:24.6, carb_g:0, fat_g:11.5, fiber_g:0 },
-        price_per_kg: 30.0, category:'peixe', ig: 0,
-        portion: { name: 'lata(s)', grams: 120 }
+        price_per_kg: 30.0, category:'peixe', ig: 0
       },
 
       // snacks / laticinios
       'ovo_cozido': { 
         name:'Ovo, de galinha inteiro cozido', 
         nutrition:{ kcal:155, protein_g:13, carb_g:1.1, fat_g:11, fiber_g:0 }, 
-        price_per_kg: 16.0, category:'proteina_snack', ig: 0,
-        portion: { name: 'unidade(s)', grams: 50 }
+        price_per_kg: 16.0, category:'proteina_snack', ig: 0 
       },
       'ovo_clara_cozida': {
         name:'Ovo, clara cozida',
         nutrition:{ kcal:52, protein_g:11, carb_g:0.7, fat_g:0.2, fiber_g:0 },
-        price_per_kg: 20.0, category:'proteina_snack', ig: 0,
-        portion: { name: 'unidade(s)', grams: 30 }
+        price_per_kg: 20.0, category:'proteina_snack', ig: 0
       },
       'queijo_cottage': {
         name:'Queijo, Cottage (ex: 4% gordura)',
         nutrition:{ kcal:98, protein_g:11, carb_g:3.4, fat_g:4.3, fiber_g:0 },
-        price_per_kg: 45.0, category:'laticinio_snack', ig: 0,
-        portion: { name: 'colher(es)', grams: 80 }
+        price_per_kg: 45.0, category:'laticinio_snack', ig: 0
       },
       'queijo_minas_frescal': {
         name:'Queijo, Minas frescal',
         nutrition:{ kcal:264, protein_g:17, carb_g:3, fat_g:20, fiber_g:0 },
-        price_per_kg: 38.0, category:'laticinio_snack', ig: 0,
-        portion: { name: 'fatia(s)', grams: 50 }
+        price_per_kg: 38.0, category:'laticinio_snack', ig: 0
       },
       'queijo_mussarela': {
         name:'Queijo, Mussarela',
         nutrition:{ kcal:300, protein_g:22, carb_g:2.2, fat_g:22, fiber_g:0 },
-        price_per_kg: 48.0, category:'laticinio_snack', ig: 0,
-        portion: { name: 'fatia(s)', grams: 30 }
+        price_per_kg: 48.0, category:'laticinio_snack', ig: 0
       },
       'iogurte_nat_desnatado': {
         name:'Iogurte, Natural desnatado',
         nutrition:{ kcal:41, protein_g:5.7, carb_g:4.2, fat_g:0.1, fiber_g:0 },
-        price_per_kg: 15.0, category:'laticinio_snack', ig: 35,
-        portion: { name: 'potinho(s)', grams: 170 }
+        price_per_kg: 15.0, category:'laticinio_snack', ig: 35
       },
       'leite_desnatado': {
         name:'Leite, Desnatado UHT',
         nutrition:{ kcal:35, protein_g:3.6, carb_g:5.1, fat_g:0.1, fiber_g:0 },
-        price_per_kg: 5.50, category:'laticinio_snack', ig: 32,
-        portion: { name: 'copo(s)', grams: 200 }
+        price_per_kg: 5.50, category:'laticinio_snack', ig: 32
       },
       'requeijao_light': {
         name:'Requeijão, Light',
         nutrition:{ kcal:170, protein_g:10, carb_g:4.5, fat_g:12, fiber_g:0 },
-        price_per_kg: 35.0, category:'laticinio_snack', ig: 0,
-        portion: { name: 'colher(es)', grams: 20 }
+        price_per_kg: 35.0, category:'laticinio_snack', ig: 0
       },
 
       // suplementos
       'whey_protein_concentrado': { 
         name:'Whey Protein (padrão 80%)', 
         nutrition:{ kcal:390, protein_g:80, carb_g:9, fat_g:3.5, fiber_g:1 }, 
-        price_per_kg: 110.0, category:'suplemento', ig: 15,
-        portion: { name: 'scoop(s)', grams: 30 }
+        price_per_kg: 110.0, category:'suplemento', ig: 15 
       },
 
       // carbo principais
       'arroz_branco_cozido': { 
         name:'Arroz, Branco tipo 1 cozido', 
         nutrition:{ kcal:130, protein_g:2.7, carb_g:28, fat_g:0.2, fiber_g:0.4 }, 
-        price_per_kg: 6.0, category:'cereal_main', ig: 73,
-        portion: { name: 'colher(es) de servir', grams: 50 }
+        price_per_kg: 6.0, category:'cereal_main', ig: 73 
       },
       'arroz_integral_cozido': {
         name:'Arroz, Integral cozido',
         nutrition:{ kcal:111, protein_g:2.6, carb_g:23.5, fat_g:0.9, fiber_g:1.8 },
-        price_per_kg: 8.0, category:'cereal_main', ig: 50,
-        portion: { name: 'colher(es) de servir', grams: 50 }
+        price_per_kg: 8.0, category:'cereal_main', ig: 50
       },
       'macarrao_comum_cozido': {
         name:'Macarrão, comum cozido',
         nutrition:{ kcal:158, protein_g:5.8, carb_g:31, fat_g:0.9, fiber_g:1.8 },
-        price_per_kg: 10.0, category:'cereal_main', ig: 55,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 10.0, category:'cereal_main', ig: 55
       },
       'macarrao_integral_cozido': {
         name:'Macarrão, integral cozido',
         nutrition:{ kcal:141, protein_g:5.5, carb_g:27, fat_g:0.9, fiber_g:3.9 },
-        price_per_kg: 16.0, category:'cereal_main', ig: 40,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 16.0, category:'cereal_main', ig: 40
       },
       'batata_doce_cozida': {
         name:'Batata doce, cozida',
         nutrition:{ kcal:90, protein_g:1.0, carb_g:21.0, fat_g:0.1, fiber_g:2.5 },
-        price_per_kg: 5.0, category:'tuberculo', ig: 63,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 5.0, category:'tuberculo', ig: 63
       },
       'batata_inglesa_cozida': {
         name:'Batata inglesa, cozida',
         nutrition:{ kcal:87, protein_g:1.9, carb_g:20.1, fat_g:0.1, fiber_g:1.8 },
-        price_per_kg: 4.5, category:'tuberculo', ig: 82,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 4.5, category:'tuberculo', ig: 82
       },
       'mandioca_cozida': {
         name:'Mandioca (Aipim), cozida',
         nutrition:{ kcal:160, protein_g:1.4, carb_g:38, fat_g:0.3, fiber_g:1.8 },
-        price_per_kg: 6.0, category:'tuberculo', ig: 77,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 6.0, category:'tuberculo', ig: 77
       },
       'inhame_cozido': {
         name:'Inhame, cozido',
         nutrition:{ kcal:118, protein_g:1.5, carb_g:28, fat_g:0.2, fiber_g:4.1 },
-        price_per_kg: 7.0, category:'tuberculo', ig: 51,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 7.0, category:'tuberculo', ig: 51
       },
       'cuscuz_milho_cozido': {
         name:'Cuscuz, de milho (flocão) cozido',
         nutrition:{ kcal:113, protein_g:2.2, carb_g:25.5, fat_g:0.3, fiber_g:1.9 },
-        price_per_kg: 9.0, category:'cereal_main', ig: 65,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 9.0, category:'cereal_main', ig: 65
       },
 
       // snacks carbo
       'aveia_flocos': { 
         name:'Aveia, em flocos crus', 
         nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, 
-        price_per_kg: 12.0, category:'cereal_snack', ig: 55,
-        portion: { name: 'colher(es)', grams: 30 }
+        price_per_kg: 12.0, category:'cereal_snack', ig: 55 
       },
       'pao_integral_forma': {
         name:'Pão, de forma integral (1 fatia ≈ 25g)',
         nutrition:{ kcal:250, protein_g:9.5, carb_g:48, fat_g:2.5, fiber_g:6.0 },
-        price_per_kg: 20.0, category:'pao_snack', ig: 45,
-        portion: { name: 'fatia(s)', grams: 30 }
+        price_per_kg: 20.0, category:'pao_snack', ig: 45
       },
       'pao_frances': {
         name:'Pão, Francês (unidade ≈ 50g)',
         nutrition:{ kcal:289, protein_g:8.0, carb_g:58.5, fat_g:2.0, fiber_g:2.3 },
-        price_per_kg: 15.0, category:'pao_snack', ig: 70,
-        portion: { name: 'unidade(s)', grams: 50 }
+        price_per_kg: 15.0, category:'pao_snack', ig: 70
       },
       'tapioca_goma': {
         name:'Tapioca (goma hidratada)',
         nutrition:{ kcal:240, protein_g:0, carb_g:59, fat_g:0, fiber_g:0 },
-        price_per_kg: 10.0, category:'cereal_snack', ig: 80,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 10.0, category:'cereal_snack', ig: 80
       },
       'granola_tradicional': {
         name:'Granola, tradicional (com açúcar)',
         nutrition:{ kcal:420, protein_g:9.0, carb_g:70, fat_g:12, fiber_g:8.0 },
-        price_per_kg: 25.0, category:'cereal_snack', ig: 65,
-        portion: { name: 'colher(es)', grams: 40 }
+        price_per_kg: 25.0, category:'cereal_snack', ig: 65
       },
       'milho_pipoca_estourada': {
         name:'Pipoca (milho estourado, sem gordura)',
         nutrition:{ kcal:387, protein_g:12.9, carb_g:78, fat_g:4.5, fiber_g:15.1 },
-        price_per_kg: 14.0, category:'cereal_snack', ig: 55,
-        portion: { name: 'xícara(s)', grams: 30 }
+        price_per_kg: 14.0, category:'cereal_snack', ig: 55
       },
       'rap10_comum': {
         name:'Pão Folha (Rap10) comum',
         nutrition:{ kcal:306, protein_g:8.2, carb_g:55, fat_g:5.7, fiber_g:2.1 },
-        price_per_kg: 28.0, category:'pao_snack', ig: 68,
-        portion: { name: 'unidade(s)', grams: 60 }
+        price_per_kg: 28.0, category:'pao_snack', ig: 68
       },
 
       // leguminosas
       'feijao_carioca_cozido': { 
         name:'Feijão, Carioca cozido (com caldo)', 
         nutrition:{ kcal:76, protein_g:4.8, carb_g:13.6, fat_g:0.5, fiber_g:5.5 }, 
-        price_per_kg: 8.5, category:'leguminosa', ig: 29,
-        portion: { name: 'concha(s)', grams: 60 }
+        price_per_kg: 8.5, category:'leguminosa', ig: 29 
       },
       'feijao_preto_cozido': {
         name:'Feijão, Preto cozido (com caldo)',
         nutrition:{ kcal:77, protein_g:4.5, carb_g:14, fat_g:0.5, fiber_g:5.8 },
-        price_per_kg: 9.0, category:'leguminosa', ig: 30,
-        portion: { name: 'concha(s)', grams: 60 }
+        price_per_kg: 9.0, category:'leguminosa', ig: 30
       },
       'lentilha_cozida': {
         name:'Lentilha, cozida',
         nutrition:{ kcal:116, protein_g:9.0, carb_g:20.1, fat_g:0.4, fiber_g:7.9 },
-        price_per_kg: 14.0, category:'leguminosa', ig: 32,
-        portion: { name: 'concha(s)', grams: 80 }
+        price_per_kg: 14.0, category:'leguminosa', ig: 32
       },
       'grao_de_bico_cozido': {
         name:'Grão-de-bico, cozido',
         nutrition:{ kcal:139, protein_g:7.2, carb_g:25.5, fat_g:1.1, fiber_g:6.4 },
-        price_per_kg: 15.0, category:'leguminosa', ig: 28,
-        portion: { name: 'concha(s)', grams: 80 }
+        price_per_kg: 15.0, category:'leguminosa', ig: 28
       },
 
       // gorduras boas
       'azeite_oliva_extravirgem': { 
         name:'Azeite, de Oliva Extra Virgem', 
         nutrition:{ kcal:884, protein_g:0, carb_g:0, fat_g:100, fiber_g:0 }, 
-        price_per_kg: 45.0, category:'gordura_boa', ig: 0,
-        portion: { name: 'colher(es) de sopa', grams: 10 }
+        price_per_kg: 45.0, category:'gordura_boa', ig: 0 
       },
       'abacate': {
         name:'Abacate, cru',
         nutrition:{ kcal:160, protein_g:2, carb_g:8.5, fat_g:14.7, fiber_g:6.7 },
-        price_per_kg: 12.0, category:'gordura_boa', ig: 15,
-        portion: { name: 'metade(s)', grams: 100 }
+        price_per_kg: 12.0, category:'gordura_boa', ig: 15
       },
       'castanha_de_caju_torrada': {
         name:'Castanha de Caju, torrada',
         nutrition:{ kcal:580, protein_g:17, carb_g:30, fat_g:46, fiber_g:3.3 },
-        price_per_kg: 80.0, category:'gordura_boa', ig: 22,
-        portion: { name: 'colher(es)', grams: 20 }
+        price_per_kg: 80.0, category:'gordura_boa', ig: 22
       },
       'amendoim_torrado_sem_sal': {
         name:'Amendoim, torrado sem sal',
         nutrition:{ kcal:567, protein_g:25.8, carb_g:16.1, fat_g:49.2, fiber_g:8.5 },
-        price_per_kg: 25.0, category:'gordura_boa', ig: 14,
-        portion: { name: 'colher(es)', grams: 15 }
+        price_per_kg: 25.0, category:'gordura_boa', ig: 14
       },
       'pasta_amendoim_integral': {
         name:'Pasta de Amendoim, integral',
         nutrition:{ kcal:588, protein_g:25, carb_g:20, fat_g:50, fiber_g:8 },
-        price_per_kg: 40.0, category:'gordura_boa', ig: 14,
-        portion: { name: 'colher(es)', grams: 15 }
+        price_per_kg: 40.0, category:'gordura_boa', ig: 14
       },
       'acai_puro_congelado': {
         name:'Açaí, polpa pura congelada (sem açúcar)',
         nutrition:{ kcal:58, protein_g:0.8, carb_g:6.2, fat_g:3.9, fiber_g:2.9 },
-        price_per_kg: 20.0, category:'gordura_boa', ig: 10,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 20.0, category:'gordura_boa', ig: 10
       },
 
       // frutas
       'banana_nanica_crua': { 
         name:'Banana, nanica crua', 
         nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, 
-        price_per_kg: 4.5, category:'fruta', ig: 51,
-        portion: { name: 'unidade(s)', grams: 100 }
+        price_per_kg: 4.5, category:'fruta', ig: 51 
       },
       'maca_fuji_crua': {
         name:'Maçã, Fuji com casca crua',
         nutrition:{ kcal:56, protein_g:0.3, carb_g:15.2, fat_g:0, fiber_g:2.0 },
-        price_per_kg: 8.0, category:'fruta', ig: 38,
-        portion: { name: 'unidade(s)', grams: 120 }
+        price_per_kg: 8.0, category:'fruta', ig: 38
       },
       'mamao_papaia_cru': {
         name:'Mamão, Papaia cru',
         nutrition:{ kcal:43, protein_g:0.5, carb_g:11, fat_g:0.3, fiber_g:1.7 },
-        price_per_kg: 7.0, category:'fruta', ig: 60,
-        portion: { name: 'porção(ões)', grams: 120 }
+        price_per_kg: 7.0, category:'fruta', ig: 60
       },
       'laranja_pera_crua': {
         name:'Laranja, Pêra crua',
         nutrition:{ kcal:47, protein_g:0.9, carb_g:12, fat_g:0.1, fiber_g:2.4 },
-        price_per_kg: 4.0, category:'fruta', ig: 43,
-        portion: { name: 'unidade(s)', grams: 160 }
+        price_per_kg: 4.0, category:'fruta', ig: 43
       },
       'uva_thompson_crua': {
         name:'Uva, Thompson (verde) crua',
         nutrition:{ kcal:69, protein_g:0.7, carb_g:18, fat_g:0.2, fiber_g:0.9 },
-        price_per_kg: 15.0, category:'fruta', ig: 53,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 15.0, category:'fruta', ig: 53
       },
       'morango_cru': {
         name:'Morango, cru',
         nutrition:{ kcal:32, protein_g:0.7, carb_g:7.7, fat_g:0.3, fiber_g:2.0 },
-        price_per_kg: 25.0, category:'fruta', ig: 40,
-        portion: { name: 'porção(ões)', grams: 100 }
+        price_per_kg: 25.0, category:'fruta', ig: 40
       },
       'melao_amarelo_cru': {
         name:'Melão, Amarelo cru',
         nutrition:{ kcal:29, protein_g:0.9, carb_g:7.5, fat_g:0, fiber_g:0.5 },
-        price_per_kg: 6.0, category:'fruta', ig: 65,
-        portion: { name: 'porção(ões)', grams: 120 }
+        price_per_kg: 6.0, category:'fruta', ig: 65
       },
       'melancia_crua': {
         name:'Melancia, crua',
         nutrition:{ kcal:30, protein_g:0.6, carb_g:8, fat_g:0.2, fiber_g:0.4 },
-        price_per_kg: 3.5, category:'fruta', ig: 72,
-        portion: { name: 'fatia(s)', grams: 200 }
+        price_per_kg: 3.5, category:'fruta', ig: 72
       },
       'manga_tommy_crua': {
         name:'Manga, Tommy crua',
         nutrition:{ kcal:60, protein_g:0.8, carb_g:15, fat_g:0.4, fiber_g:1.6 },
-        price_per_kg: 7.5, category:'fruta', ig: 51,
-        portion: { name: 'porção(ões)', grams: 150 }
+        price_per_kg: 7.5, category:'fruta', ig: 51
       },
       'abacaxi_cru': {
         name:'Abacaxi, cru',
         nutrition:{ kcal:50, protein_g:0.5, carb_g:13, fat_g:0.1, fiber_g:1.4 },
-        price_per_kg: 7.0, category:'fruta', ig: 59,
-        portion: { name: 'fatia(s)', grams: 100 }
+        price_per_kg: 7.0, category:'fruta', ig: 59
       },
 
       // verduras
       'alface_crespa_crua': { 
         name:'Alface, Crespa crua', 
         nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, 
-        price_per_kg: 8.0, category:'verdura', ig: 15,
-        portion: { name: 'prato(s)', grams: 50 }
+        price_per_kg: 8.0, category:'verdura', ig: 15 
       },
       'tomate_salada_cru': {
         name:'Tomate, Salada cru',
         nutrition:{ kcal:18, protein_g:0.9, carb_g:3.9, fat_g:0.2, fiber_g:1.2 },
-        price_per_kg: 9.0, category:'verdura', ig: 15,
-        portion: { name: 'unidade(s)', grams: 80 }
+        price_per_kg: 9.0, category:'verdura', ig: 15
       },
       'cenoura_crua': {
         name:'Cenoura, crua',
         nutrition:{ kcal:41, protein_g:0.9, carb_g:9.6, fat_g:0.2, fiber_g:2.8 },
-        price_per_kg: 5.0, category:'verdura', ig: 39,
-        portion: { name: 'unidade(s)', grams: 60 }
+        price_per_kg: 5.0, category:'verdura', ig: 39
       },
       'brocolis_cozido': {
         name:'Brócolis, cozido',
         nutrition:{ kcal:35, protein_g:2.4, carb_g:7.2, fat_g:0.4, fiber_g:3.4 },
-        price_per_kg: 12.0, category:'verdura', ig: 15,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 12.0, category:'verdura', ig: 15
       },
       'cebola_crua': {
         name:'Cebola, crua',
         nutrition:{ kcal:40, protein_g:1.1, carb_g:9.3, fat_g:0.1, fiber_g:1.7 },
-        price_per_kg: 6.0, category:'verdura', ig: 15,
-        portion: { name: 'fatia(s)', grams: 30 }
+        price_per_kg: 6.0, category:'verdura', ig: 15
       },
       'abobrinha_refogada': {
         name:'Abobrinha, refogada',
         nutrition:{ kcal:20, protein_g:1.1, carb_g:4.0, fat_g:0.3, fiber_g:1.2 },
-        price_per_kg: 7.0, category:'verdura', ig: 15,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 7.0, category:'verdura', ig: 15
       },
       'beterraba_cozida': {
         name:'Beterraba, cozida',
         nutrition:{ kcal:44, protein_g:1.7, carb_g:10, fat_g:0.2, fiber_g:2 },
-        price_per_kg: 6.5, category:'verdura', ig: 64,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 6.5, category:'verdura', ig: 64
       },
       'couve_manteiga_refogada': {
         name:'Couve, Manteiga refogada',
         nutrition:{ kcal:38, protein_g:1.7, carb_g:7.9, fat_g:0.5, fiber_g:2.3 },
-        price_per_kg: 9.0, category:'verdura', ig: 15,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 9.0, category:'verdura', ig: 15
       },
       'espinafre_cozido': {
         name:'Espinafre, cozido',
         nutrition:{ kcal:23, protein_g:3, carb_g:3.6, fat_g:0.3, fiber_g:2.2 },
-        price_per_kg: 15.0, category:'verdura', ig: 15,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 15.0, category:'verdura', ig: 15
       },
       'pepino_cru': {
         name:'Pepino, comum cru',
         nutrition:{ kcal:15, protein_g:0.7, carb_g:3.6, fat_g:0.1, fiber_g:0.5 },
-        price_per_kg: 6.0, category:'verdura', ig: 15,
-        portion: { name: 'porção(ões)', grams: 80 }
+        price_per_kg: 6.0, category:'verdura', ig: 15
       }
     }; // end v5_FoodDatabase
 
@@ -710,8 +646,7 @@
       nutrition: { kcal:0, protein_g:0, carb_g:0, fat_g:0, fiber_g:0 },
       price_per_kg: 300.0,
       category: 'suplemento',
-      ig: 0,
-      portion: { name: 'dose(s)', grams: 5 } // small scoop ~5g
+      ig: 0
     };
     if(v5_FoodDatabase['whey_protein_concentrado']){
       v5_FoodDatabase['whey_concentrado'] = { ...v5_FoodDatabase['whey_protein_concentrado'], name: 'Whey concentrado' };
@@ -727,8 +662,7 @@
         nutrition: s.nutrition || {},
         price_per_kg: s.price_per_kg || 0,
         category: s.category || 'other',
-        ig: (typeof s.ig !== 'undefined') ? s.ig : null,
-        portion: s.portion || null
+        ig: (typeof s.ig !== 'undefined') ? s.ig : null
       };
     });
 
@@ -1025,58 +959,42 @@
       return weekArr;
     }
 
-    /* NEW v7.0: Calcula porções práticas, não gramas exatas */
-    function computePortionAmountsForMeal(foodDBFindFn, mealMacroTargets, components){
-      const protRec = findFood(components.protein);
-      const carbRec = findFood(components.carb);
-      const vegRec = findFood(components.veg);
+    function computeGramAmountsForMeal(foodDBFindFn, mealMacroTargets, components){
+      const protName = components.protein;
+      const carbName = components.carb;
+      const vegName = components.veg;
+      const protRec = findFood(protName);
+      const carbRec = findFood(carbName);
+      const vegRec = findFood(vegName);
       const out = { protein_grams:0, carb_grams:0, veg_grams:0, details:{} };
-
-      // Pega o tamanho da porção do DB, ou usa um padrão de 100g
-      const protPortGrams = _safeNum(protRec?.portion?.grams, 100);
-      const carbPortGrams = _safeNum(carbRec?.portion?.grams, 100);
-
-      // Pega os macros por 100g
       const protPer100 = _safeNum(protRec?.nutrition?.protein_g, 25);
       const carbPer100 = _safeNum(carbRec?.nutrition?.carb_g, 25);
+      out.protein_grams = protPer100 > 0 ? Math.max(10, Math.round(mealMacroTargets.prot_g / (protPer100/100))) : Math.max(10, Math.round(mealMacroTargets.prot_g / 0.25));
+      out.carb_grams = carbPer100 > 0 ? Math.max(10, Math.round(mealMacroTargets.carbs_g / (carbPer100/100))) : Math.max(10, Math.round(mealMacroTargets.carbs_g / 0.25));
+      out.veg_grams = vegName ? 100 : 0;
 
-      // Calcula quantos macros tem em UMA porção
-      const protInOnePortion = protPer100 * (protPortGrams / 100);
-      const carbInOnePortion = carbPer100 * (carbPortGrams / 100);
-
-      // Calcula o NÚMERO DE PORÇÕES (arredondando em 0.5)
-      let numProtPortions = (protInOnePortion > 0) ? (mealMacroTargets.prot_g / protInOnePortion) : 1;
-      let numCarbPortions = (carbInOnePortion > 0) ? (mealMacroTargets.carbs_g / carbInOnePortion) : 1;
-
-      // Arredonda para a 0.5 porção mais próxima (ex: 1.3 -> 1.5, 1.1 -> 1.0)
-      numProtPortions = Math.max(0.5, Math.round(numProtPortions * 2) / 2);
-      numCarbPortions = Math.max(0.5, Math.round(numCarbPortions * 2) / 2);
-
-      // Calcula as gramas finais com base nas porções arredondadas
-      out.protein_grams = Math.round(numProtPortions * protPortGrams);
-      out.carb_grams = Math.round(numCarbPortions * carbPortGrams);
-      out.veg_grams = vegRec ? 100 : 0; // Mantém vegetais/salada simples
-
-      // Armazena os nomes das porções para a UI
-      out.details = {
-        prot_portions: numProtPortions,
-        prot_portion_name: protRec?.portion?.name || 'gramas',
-        carb_portions: numCarbPortions,
-        carb_portion_name: carbRec?.portion?.name || 'gramas'
-      };
-
-      // ajuste simples de calorias (se fornecido)
-      if(mealMacroTargets.calories){
-        const kcalPerProt = _safeNum(protRec?.nutrition?.kcal, (protPer100 * 4));
-        const kcalPerCarb = _safeNum(carbRec?.nutrition?.kcal, (carbPer100 * 4));
-        const est = Math.round((out.protein_grams * (kcalPerProt/100)) + (out.carb_grams * (kcalPerCarb/100)) + (out.veg_grams * (_safeNum(vegRec?.nutrition?.kcal,20)/100)));
-        out.details.kcal_est = est;
+      function kcalFrom(name, grams){
+        const r = findFood(name);
+        return (r?.nutrition?.kcal || 0) * (grams || 0) / 100;
       }
-
+      let total = kcalFrom(protName, out.protein_grams) + kcalFrom(carbName, out.carb_grams) + kcalFrom(vegName, out.veg_grams);
+      if(mealMacroTargets.calories && Math.abs(total - mealMacroTargets.calories) > 50){
+        const diff = mealMacroTargets.calories - total;
+        // prefer adjusting carbs first; if none, fallback to protein
+        const carbKcalPerGram = (carbRec?.nutrition?.kcal || 0) / 100;
+        const protKcalPerGram = (protRec?.nutrition?.kcal || 0) / 100;
+        if(carbKcalPerGram > 0){
+          const carbAdd = Math.round(diff / carbKcalPerGram);
+          out.carb_grams = Math.max(0, out.carb_grams + carbAdd);
+        } else if(protKcalPerGram > 0){
+          const protAdd = Math.round(diff / protKcalPerGram);
+          out.protein_grams = Math.max(0, out.protein_grams + protAdd);
+        }
+        total = kcalFrom(protName, out.protein_grams) + kcalFrom(carbName, out.carb_grams) + kcalFrom(vegName, out.veg_grams);
+      }
+      out.details = { kcal_est: _round(total,0), kcalProt:_round(kcalFrom(protName, out.protein_grams),0), kcalCarb:_round(kcalFrom(carbName, out.carb_grams),0) };
       return out;
     }
-
-    /* Utilities for weekly template continued... used by planLongTerm */
 
     function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
 
@@ -1115,7 +1033,7 @@
       return q.includes(keyword);
     }
 
-    /* ========== planLongTerm (v7.0) with blueprints & portion logic ========== */
+    /* ========== planLongTerm (v6.1) ========== */
     async function planLongTerm(profile, options = {}){
       const start = options.startDate ? new Date(options.startDate) : new Date();
       const months = Math.max(1, _safeNum(options.months, 3));
@@ -1128,49 +1046,6 @@
       const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek:1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
       const totalWeeks = Math.max(1, Math.round(months * 4.345));
       const timeline_weeks = [];
-
-      // BLUEPRINTS (v7.0)
-      const BLUEPRINTS = {
-        'café': [
-          { name: 'Padrão', slots: ['snack_carb', 'snack_prot', 'fruta'] },
-          { name: 'Shake', slots: ['suplemento', 'fruta', 'gordura_boa'] },
-          { name: 'Reforçado', slots: ['proteina_main', 'tuberculo', null] }
-        ],
-        'almoço': [
-          { name: 'Padrão BR', slots: ['proteina_main', 'cereal_main', 'leguminosa'] },
-          { name: 'Fit', slots: ['peixe', 'tuberculo', 'verdura'] }
-        ],
-        'lanche': [
-          { name: 'Padrão', slots: ['fruta', 'gordura_boa', null] },
-          { name: 'Proteico', slots: ['laticinio_snack', 'cereal_snack', null] },
-          { name: 'Rápido', slots: ['suplemento', null, null] }
-        ],
-        'jantar': [
-          { name: 'Padrão', slots: ['proteina_main', 'tuberculo', 'verdura'] },
-          { name: 'Low-Carb', slots: ['peixe', 'verdura', 'gordura_boa'] },
-          { name: 'Repetir Almoço', slots: ['proteina_main', 'cereal_main', 'leguminosa'] }
-        ],
-        'ceia': [
-          { name: 'Proteica', slots: ['laticinio_snack', null, null] },
-          { name: 'Gordura', slots: ['gordura_boa', null, null] }
-        ]
-      };
-      const SLOT_MAP = {
-        'snack_carb': ['cereal_snack', 'pao_snack'],
-        'snack_prot': ['proteina_snack', 'laticinio_snack'],
-        'fruta': ['fruta'],
-        'suplemento': ['suplemento'],
-        'gordura_boa': ['gordura_boa'],
-        'proteina_main': ['proteina_main'],
-        'tuberculo': ['tuberculo'],
-        'cereal_main': ['cereal_main'],
-        'leguminosa': ['leguminosa'],
-        'verdura': ['verdura'],
-        'peixe': ['peixe'],
-        'laticinio_snack': ['laticinio_snack'],
-        'cereal_snack': ['cereal_snack'],
-        'pao_snack': ['pao_snack']
-      };
 
       // Build master rotations once (fullRotation lists)
       const cats = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
@@ -1185,14 +1060,7 @@
       const fallbackVeg = 'alface_crespa_crua';
       const fallbackFruit = 'banana_nanica_crua';
 
-      const MEMORY_CAP = 12; // short-term memory capacity
-
-      // helper deterministic get (0/1 parity style)
-      const get = (list, idx) => {
-        if (!list || list.length === 0) return null;
-        const pickIndex = (idx % list.length);
-        return list[pickIndex] || list[0];
-      };
+      const MEMORY_CAP = 12; // short-term memory capacity (increase as requested)
 
       for(let w=0; w<totalWeeks; w++){
         const monthIndex = Math.floor(w / 4.345); // used to compute long-term penalizations
@@ -1206,9 +1074,11 @@
         const daysData = [];
 
         // prepare long-term penalize lists based on monthIndex
+        // penalize top N from rotation for the month to favor variety
         const longTermPenalize = {};
         cats.forEach(cat => {
           const arr = fullRotation[cat] || [];
+          // penalize first monthIndex items (so monthIndex=0 -> penalize none)
           longTermPenalize[cat] = arr.slice(0, Math.max(0, monthIndex));
         });
 
@@ -1241,7 +1111,7 @@
           const dayProteinPicks = [];
           const dayCarbPicks = [];
 
-          // prepare candidate pools for day (we'll re-use below)
+          // Create dynamic candidate lists for this day using avoidList = recent picks and longTermPenalize lists
           const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks, longTermPenalize['proteina_main']);
           const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks, longTermPenalize['peixe']);
           const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks, (longTermPenalize['cereal_main'] || []).concat(longTermPenalize['tuberculo'] || []));
@@ -1251,6 +1121,14 @@
           const commonVegCandidates = _rankFoodsByCategory(['verdura'], profileWithTargets, [], longTermPenalize['verdura']);
           const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, [], longTermPenalize['fruta']);
           const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, [], longTermPenalize['gordura_boa']);
+
+          // deterministic get using parity (0 or 1)
+          const get = (list, idx) => {
+            if (!list || list.length === 0) return null;
+            const pickIndex = (idx % 2); // 0 or 1
+            if (pickIndex < list.length) return list[pickIndex];
+            return list[0]; // Fallback
+          };
 
           for(let m=0; m<mealsCount; m++){
             const mealName = mealNames[m];
@@ -1273,66 +1151,70 @@
             const carbsForMeal = Math.max(0, Math.round(baseCarbsForMeal * carbMultiplier));
             const fatForMeal = Math.round(baseFatForMeal * fatMultiplier);
 
-            // BLUEPRINT selection for this meal
-            let blueprintPool = [];
-            if (lname.includes('café')) blueprintPool = BLUEPRINTS['café'];
-            else if (lname.includes('almoço')) blueprintPool = BLUEPRINTS['almoço'];
-            else if (lname.includes('jantar')) {
-              blueprintPool = isTraining ? [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]] : [BLUEPRINTS.jantar[1], BLUEPRINTS.jantar[0]];
-            }
-            else if (lname.includes('lanche')) blueprintPool = BLUEPRINTS['lanche'];
-            else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
-            else blueprintPool = BLUEPRINTS['lanche'];
+            const pickIdx = (monthIndex * 300) + (d * 10) + m;
 
-            const blueprintIdx = (d + w) % blueprintPool.length;
-            const selectedBlueprint = blueprintPool[blueprintIdx];
-            const slots = selectedBlueprint.slots || [null,null,null];
-
-            // map slots to candidate categories and lists
-            const protSlot = slots[0];
-            const carbSlot = slots[1];
-            const vegSlot = slots[2];
-
-            const protCandidates = protSlot ? _rankFoodsByCategory(SLOT_MAP[protSlot] || [], profileWithTargets, recentProteinPicks, [].concat(...(SLOT_MAP[protSlot] || []).map(cat => longTermPenalize[cat] || []))) : [];
-            const carbCandidates = carbSlot ? _rankFoodsByCategory(SLOT_MAP[carbSlot] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlot] || []).map(cat => longTermPenalize[cat] || []))) : [];
-            const vegCandidates = vegSlot ? _rankFoodsByCategory(SLOT_MAP[vegSlot] || [], profileWithTargets, [], []) : [];
-
-            const pickIdx = (w*100)+(d*10)+m;
-
-            const protPick = protCandidates.length > 0 ? get(protCandidates, pickIdx) : (lname.includes('jantar') ? get(fishProteinsCandidates, pickIdx) : get(mainProteinsCandidates, pickIdx)) || fallbackProtein;
-            const carbPick = carbCandidates.length > 0 ? get(carbCandidates, pickIdx+1) : (lname.includes('café') ? get(snackCarbsCandidates, pickIdx+1) : get(mainCarbsCandidates, pickIdx+1)) || (lname.includes('café') ? 'pao_integral_forma' : fallbackCarb);
-            const vegPick = vegCandidates.length > 0 ? get(vegCandidates, pickIdx+2) : (lname.includes('lanche') ? get(commonFruitCandidates, pickIdx+2) : get(commonVegCandidates, pickIdx+2)) || fallbackVeg;
-
-            let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
+            // Blueprints / templates
+            let componentsToCalc = { protein: null, carb: null, veg: null };
             const extraComponents = [];
 
-            // Suplementos override
+            if (lname.includes('café')) {
+              const carbPick = get(snackCarbsCandidates, pickIdx) || 'pao_integral_forma';
+              const protPick = get(snackProteinsCandidates, pickIdx) || 'ovo_cozido';
+              const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+              componentsToCalc = { protein: protPick, carb: carbPick, veg: fruitPick };
+              if(protPick) dayProteinPicks.push(protPick);
+              if(carbPick) dayCarbPicks.push(carbPick);
+            } else if (lname.includes('almoço')) {
+              const protPick = get(mainProteinsCandidates, pickIdx) || fallbackProtein;
+              const carbPick = get(mainCarbsCandidates, pickIdx) || fallbackCarb;
+              const legPick = get(mainLegumesCandidates, pickIdx) || fallbackLegume;
+              componentsToCalc = { protein: protPick, carb: carbPick, veg: legPick };
+              extraComponents.push({ food: get(commonVegCandidates, pickIdx) || fallbackVeg, grams: 75, role: 'verdura' });
+              if(protPick) dayProteinPicks.push(protPick);
+              if(carbPick) dayCarbPicks.push(carbPick);
+            } else if (lname.includes('jantar')) {
+              // Jantar blueprint v7.0: carbs only on training days
+              const protPick = get(fishProteinsCandidates, pickIdx) || get(mainProteinsCandidates, pickIdx) || 'peixe_tilapia_grelhada';
+              const vegPick = get(commonVegCandidates, pickIdx) || 'brocolis_cozido';
+
+              let carbPick = null;
+              if (isTraining) {
+                carbPick = get(mainCarbsCandidates, pickIdx) || 'batata_doce_cozida';
+              } else {
+                carbPick = null; // low-carb on rest days
+              }
+
+              componentsToCalc = { protein: protPick, carb: carbPick, veg: vegPick };
+              if(protPick) dayProteinPicks.push(protPick);
+              if(carbPick) dayCarbPicks.push(carbPick);
+            } else if (lname.includes('lanche')) {
+              const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+              const fatPick = get(gordurasBoasCandidates, pickIdx) || get(['iogurte_nat_desnatado'], pickIdx) || 'amendoim_torrado_sem_sal';
+              componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
+              if(fruitPick) dayCarbPicks.push(fruitPick);
+            } else if (lname.includes('ceia')) {
+              const protPick = get(['iogurte_nat_desnatado','queijo_cottage','leite_desnatado'], pickIdx) || get(gordurasBoasCandidates, pickIdx) || 'iogurte_nat_desnatado';
+              componentsToCalc = { protein: protPick, carb: null, veg: null };
+              if(protPick) dayProteinPicks.push(protPick);
+            } else {
+              const fruitPick = get(commonFruitCandidates, pickIdx) || fallbackFruit;
+              const fatPick = get(gordurasBoasCandidates, pickIdx) || 'amendoim_torrado_sem_sal';
+              componentsToCalc = { protein: null, carb: fruitPick, veg: fatPick };
+              if(fruitPick) dayCarbPicks.push(fruitPick);
+            }
+
+            // supplements preference
             const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
             const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
             if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
               componentsToCalc.protein = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
-              if(!componentsToCalc.carb) componentsToCalc.carb = fallbackFruit;
+              if(componentsToCalc.protein) dayProteinPicks.push(componentsToCalc.protein);
             }
 
-            // Specific adaptions for certain meal types
-            if (lname.includes('café')) {
-              // sometimes prefer eggs as protein snack
-              if(!componentsToCalc.protein) componentsToCalc.protein = get(snackProteinsCandidates, pickIdx) || fallbackSnackProt;
-              if(!componentsToCalc.carb) componentsToCalc.carb = get(snackCarbsCandidates, pickIdx) || fallbackSnackCarb;
-            }
-            if (lname.includes('almoço')) {
-              extraComponents.push({ food: get(commonVegCandidates, pickIdx+3) || fallbackVeg, grams: 75, role: 'verdura' });
-            }
-            if (lname.includes('jantar') && !isTraining) {
-              // low-carb behaviour already handled by blueprint selection, ensure carb null
-              if(selectedBlueprint.name === 'Low-Carb') componentsToCalc.carb = null;
-            }
+            // compute grams for main components
+            const grams = computeGramAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, { protein: componentsToCalc.protein, carb: componentsToCalc.carb, veg: componentsToCalc.veg });
 
-            // Calcular Porções (v7.0)
-            const grams = computePortionAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, componentsToCalc);
-
-            // Build components for UI (use friendly portion info where available)
             const toDisplay = (idOrName) => {
               if(!idOrName) return null;
               const rec = findFood(idOrName);
@@ -1350,7 +1232,6 @@
               components.push({ food: stripParenthesis(rec.name || ex.food), grams: ex.grams || 50, role: ex.role || 'extra', source_id: ex.food });
             }
 
-            // supplements like creatine (add small fixed grams)
             if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
               components.push({ food: stripParenthesis(v5_FoodDatabase['creatina_monohidratada'].name || 'Creatina'), grams: 3, role:'suplemento', source_id:'creatina_monohidratada' });
             }
@@ -1382,7 +1263,7 @@
             meals.push({
               mealIndex: m, mealName, mealCaloriesTarget: mealCalories,
               components: finalComponents, isTrainingDay: isTraining, isCheatDay: isCheat,
-              gramsComputed: grams, mealKcalTotal: groupKcal
+              gramsComputed: grams.details || {}, mealKcalTotal: groupKcal
             });
           } // end meals loop
 
@@ -1406,20 +1287,22 @@
         });
       } // end weeks loop
 
+      // no rotateAlternativesForMonth post-processing: variety handled by rotation+penalties during generation
+
       const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s + (w.estimatedWeeklyCost || 0),0) / timeline_weeks.length, 2);
       const budgetAdherence = 0.9;
       const meta = { adherenceToCaloriesPct: 0.95, adherenceToBudgetPct: budgetAdherence, practicalityPct: 0.92, varietyScore: 0.9, feasibilityPct:0.9 };
       const credibilityScore = 90;
 
       const payload = {
-        version: 'super-algo-v7.0-portion-blueprints',
+        version: 'super-algo-v6.1-monthly-rotation-fix',
         created_at: nowISO(),
         profile_snapshot: profile,
         targets,
         timeline_weeks,
         estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
         credibility: { score: credibilityScore, breakdown: meta },
-        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v7.0' }
+        provenance: { food_db_version: 'v5_FoodDatabase_user', built_with: 'super-diet-engine-v6.1' }
       };
       if(options.debug) payload._internal = { fullRotation, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
       return payload;
@@ -1454,9 +1337,7 @@
     return {
       init: ({ supabase } = {}) => { if(!supabase) initModule({ supabase }); else if(supabase) initModule({ supabase }); },
       generatePlan: planLongTerm,
-      savePlan, loadPlans, loadLatestPlan, findFood,
-      // Expose calculateEndDate to be used from UI
-      calculateEndDate
+      savePlan, loadPlans, loadLatestPlan, findFood
     };
 
   })(); // end SuperDietEngine IIFE
@@ -1539,21 +1420,7 @@
         const mealLeft = document.createElement('div'); mealLeft.className = 'meal-left';
         const name = document.createElement('div'); name.className = 'meal-name'; name.textContent = m.mealName;
         const listPreview = document.createElement('div'); listPreview.style.color = '#bbb'; listPreview.style.fontSize = '13px';
-
-        // NEW: display friendly portions if available (v7.0)
-        const details = m.gramsComputed?.details || {};
-        const items = m.components.map(c => {
-          if (c.role === 'proteina' && details.prot_portion_name && typeof details.prot_portions !== 'undefined') {
-            // show prot_portions
-            return `${c.food} (${details.prot_portions} ${details.prot_portion_name})`;
-          }
-          if (c.role === 'carbo' && details.carb_portion_name && typeof details.carb_portions !== 'undefined') {
-            return `${c.food} (${details.carb_portions} ${details.carb_portion_name})`;
-          }
-          // fallback for supplements / veg / fats: use grams
-          return `${c.food} (${c.grams}g)`;
-        }).join(' • ');
-
+        const items = m.components.map(c => `${c.food} (${c.grams}g)`).join(' • ');
         listPreview.textContent = items;
         mealLeft.appendChild(name); mealLeft.appendChild(listPreview);
 
@@ -1779,21 +1646,13 @@
       await renderPercursoDietArea();
     })();
 
-    // FIX: Prevent Enter in non-textarea fields from submitting the form accidentally
-    const iaFitForm = document.getElementById('ia-fit-form');
-    if(iaFitForm){
-      iaFitForm.addEventListener('keydown', function(e){
-        if(e.key === 'Enter'){
-          const active = document.activeElement;
-          if(active && active.tagName !== 'TEXTAREA'){
-            e.preventDefault();
-            return false;
-          }
-        }
-      });
-    }
+    // IMPORTANT FIX: previously the form disappeared on first input.
+    // We remove that behavior: don't hide the form on first keypress.
+    // Instead, UI will switch when the user submits the form.
+    // So we DO NOT attach the old `onFirstInputHide` listeners.
 
     // Form submit handler (kept mostly as-is) — will generate plan, save and render percurso
+    const iaFitForm = document.getElementById('ia-fit-form');
     if(iaFitForm){
       iaFitForm.addEventListener('submit', async function(event){
         event.preventDefault();
@@ -1802,8 +1661,7 @@
         try{
           const formElements = event.target.elements;
           const prazoText = formElements.prazo.value;
-          // CHANGED: use SuperDietEngine.calculateEndDate (exposed)
-          const endDate = (SuperDietEngine && typeof SuperDietEngine.calculateEndDate === 'function') ? SuperDietEngine.calculateEndDate(prazoText) : null;
+          const endDate = calculateEndDate(prazoText);
           if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
           const startDate = new Date(); startDate.setHours(0,0,0,0);
