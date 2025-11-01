@@ -301,7 +301,7 @@
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
   /* ============================
-     SuperDietEngine v7.0 -> v9.0 (portion blueprints + analyzeMasterGoal)
+     SuperDietEngine v7.0 -> v9.1 (portion blueprints + analyzeMasterGoal + restrictions + variety fixes)
      ============================ */
   const SuperDietEngine = (function(){
     /* ========== FOOD DB (v5) with 'portion' added for each item ========== */
@@ -859,6 +859,45 @@
       return null;
     }
 
+    /* ========== NEW: extractRestrictions ========== */
+    function extractRestrictions(profile){
+      const text = (profile.grande_meta || profile.goal_prompt || '').toString().toLowerCase();
+      const supps = (profile.quais_suplementos || '').toString().toLowerCase();
+      const allText = (text + ' ' + supps).normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const restrictions = new Set();
+
+      const restrictionMap = {
+        'lactose': ['queijo_cottage','queijo_minas_frescal','queijo_mussarela','iogurte_nat_desnatado','leite_desnatado','requeijao_light','whey_protein_concentrado','whey_concentrado'],
+        'peixe': ['peixe_tilapia_grelhada','peixe_salmao_grelhado','atum_lata_agua','sardinha_lata_oleo'],
+        'atum': ['atum_lata_agua'],
+        'sardinha': ['sardinha_lata_oleo'],
+        'frango': ['frango_peito','frango_sobrecoxa'],
+        'carne vermelha': ['carne_patinho_moido','carne_alcatra_grelhada','carne_coxao_mole_cozido'],
+        'carne': ['carne_patinho_moido','carne_alcatra_grelhada','carne_coxao_mole_cozido','porco_lombo_grelhado'],
+        'porco': ['porco_lombo_grelhado'],
+        'amendoim': ['amendoim_torrado_sem_sal','pasta_amendoim_integral'],
+        'castanha': ['castanha_de_caju_torrada'],
+        'ovo': ['ovo_cozido','ovo_clara_cozida']
+      };
+
+      const negations = ['nao como','não como','odeio','sem','alergia','alergico','intolerante','intolerancia','nao','não'];
+
+      for(const key in restrictionMap){
+        if(!allText.includes(key)) continue;
+        let foundNeg = false;
+        for(const neg of negations){
+          if(allText.includes(`${neg} ${key}`) || allText.includes(`${key} ${neg}`) || allText.includes(`${neg} ${key}`.replace(/\s+/g,' '))){
+            foundNeg = true;
+            break;
+          }
+        }
+        if(foundNeg){
+          restrictionMap[key].forEach(id => restrictions.add(id));
+        }
+      }
+      return Array.from(restrictions);
+    }
+
     /* computeAggressiveness: updated to understand new strategy specificGoal strings */
     function computeAggressiveness(kgChange, months, goalType){
       // goalType may be legacy ('musculo'/'emagrecer') or v9 'MUSCLE_GAIN', 'FAT_LOSS', etc.
@@ -1091,8 +1130,8 @@
       return Math.max(0, Math.min(1, base));
     }
 
-    /* NEW: _rankFoodsByCategory with short and long term penalization */
-    function _rankFoodsByCategory(categories, profile, shortTermAvoidList = [], longTermPenalizeList = []){
+    /* UPDATED: _rankFoodsByCategory includes restrictions parameter and zeroes rank for restricted IDs */
+    function _rankFoodsByCategory(categories, profile, shortTermAvoidList = [], longTermPenalizeList = [], restrictionList = []){
       const recs = [];
       for(const id in v5_FoodDatabase){
         const rec = v5_FoodDatabase[id];
@@ -1100,6 +1139,11 @@
         if(categories.includes(rec.category)){
           const copy = { id, name: rec.name, nutrition: rec.nutrition || {}, price_per_kg: rec.price_per_kg || 0, ig: rec.ig };
           let rank = computeCBrank(copy, profile);
+
+          // zero-out restricted items
+          if(Array.isArray(restrictionList) && restrictionList.includes(id)){
+            rank = 0;
+          }
 
           // short-term penalize high
           if(Array.isArray(shortTermAvoidList) && shortTermAvoidList.includes(id)){
@@ -1254,7 +1298,7 @@
       return q.includes(keyword);
     }
 
-    /* ========== planLongTerm (v9.0) with blueprints & portion logic ========== */
+    /* ========== planLongTerm (v9.1) with blueprints & portion logic ========== */
     async function planLongTerm(profile, options = {}){
       const start = options.startDate ? new Date(options.startDate) : new Date();
       const months = Math.max(1, _safeNum(options.months, 3));
@@ -1270,6 +1314,10 @@
       const cheatPolicy = options.cheatPolicy || { type:'day', freqPerWeek:1, cheatCaloriesLimit: Math.round(dailyTargetCalories * 1.5) };
       const totalWeeks = Math.max(1, Math.round(months * 4.345));
       const timeline_weeks = [];
+
+      // --- NOVA LÓGICA DE RESTRIÇÃO ---
+      const restrictions = extractRestrictions(profile);
+      // --- FIM DA NOVA LÓGICA ---
 
       // BLUEPRINTS (v7.0)
       const BLUEPRINTS = {
@@ -1314,10 +1362,10 @@
         'pao_snack': ['pao_snack']
       };
 
-      // Build master rotations once (fullRotation lists)
+      // Build master rotations once (fullRotation lists) - pass restrictions
       const cats = ['proteina_main','peixe','cereal_main','tuberculo','leguminosa','proteina_snack','laticinio_snack','cereal_snack','pao_snack','fruta','verdura','gordura_boa'];
       const fullRotation = {};
-      cats.forEach(cat => { fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], []).slice(0, 40); });
+      cats.forEach(cat => { fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], [], restrictions).slice(0, 40); });
 
       const fallbackProtein = 'frango_peito';
       const fallbackCarb = 'arroz_branco_cozido';
@@ -1329,12 +1377,23 @@
 
       const MEMORY_CAP = 12; // short-term memory capacity
 
-      // helper deterministic get (0/1 parity style)
+      // helper deterministic get (CORRIGIDO para usar o ranking 0/1)
       const get = (list, idx) => {
         if (!list || list.length === 0) return null;
-        const pickIndex = (idx % list.length);
-        return list[pickIndex] || list[0];
+        // Usa a paridade (par/ímpar) do pickIdx para alternar entre o item 0 e o item 1
+        const pickIndex = (idx % 2); // Resultado será 0 ou 1
+        if (pickIndex < list.length) return list[pickIndex];
+        return list[0]; // Fallback se a lista só tiver 1 item
       };
+
+      // helper deterministic get (alternative: safe getter for first N)
+      const getFirst = (list) => (list && list.length ? list[0] : null);
+
+      // helper deterministic get with modulo (not used as main) - kept for compatibility
+      const pickModulo = (list, idx) => { if(!list || list.length===0) return null; const i = Math.abs(idx) % list.length; return list[i]; };
+
+      // deterministic rotation helper used earlier (kept)
+      const getByParity = get;
 
       for(let w=0; w<totalWeeks; w++){
         const monthIndex = Math.floor(w / 4.345); // used to compute long-term penalizations
@@ -1383,16 +1442,18 @@
           const dayProteinPicks = [];
           const dayCarbPicks = [];
 
-          // prepare candidate pools for day (we'll re-use below)
-          const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks, longTermPenalize['proteina_main']);
-          const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks, longTermPenalize['peixe']);
-          const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks, (longTermPenalize['cereal_main'] || []).concat(longTermPenalize['tuberculo'] || []));
-          const mainLegumesCandidates = _rankFoodsByCategory(['leguminosa'], profileWithTargets, recentProteinPicks, longTermPenalize['leguminosa']);
-          const snackProteinsCandidates = _rankFoodsByCategory(['proteina_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['proteina_snack']).concat(_rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack']));
-          const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['cereal_snack']).concat(_rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack']));
-          const commonVegCandidates = _rankFoodsByCategory(['verdura'], profileWithTargets, [], longTermPenalize['verdura']);
-          const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, [], longTermPenalize['fruta']);
-          const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, [], longTermPenalize['gordura_boa']);
+          // prepare candidate pools for day (we'll re-use below) - PASS restrictions
+          const mainProteinsCandidates = _rankFoodsByCategory(['proteina_main'], profileWithTargets, recentProteinPicks, longTermPenalize['proteina_main'], restrictions);
+          const fishProteinsCandidates = _rankFoodsByCategory(['peixe'], profileWithTargets, recentProteinPicks, longTermPenalize['peixe'], restrictions);
+          const mainCarbsCandidates = _rankFoodsByCategory(['cereal_main','tuberculo'], profileWithTargets, recentCarbPicks, (longTermPenalize['cereal_main'] || []).concat(longTermPenalize['tuberculo'] || []), restrictions);
+          const mainLegumesCandidates = _rankFoodsByCategory(['leguminosa'], profileWithTargets, recentProteinPicks, longTermPenalize['leguminosa'], restrictions);
+          const snackProteinsCandidates = _rankFoodsByCategory(['proteina_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['proteina_snack'], restrictions)
+                                            .concat(_rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions));
+          const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['cereal_snack'], restrictions)
+                                          .concat(_rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions));
+          const commonVegCandidates = _rankFoodsByCategory(['verdura'], profileWithTargets, [], longTermPenalize['verdura'], restrictions);
+          const commonFruitCandidates = _rankFoodsByCategory(['fruta'], profileWithTargets, [], longTermPenalize['fruta'], restrictions);
+          const gordurasBoasCandidates = _rankFoodsByCategory(['gordura_boa'], profileWithTargets, [], longTermPenalize['gordura_boa'], restrictions);
 
           for(let m=0; m<mealsCount; m++){
             const mealName = mealNames[m];
@@ -1432,6 +1493,8 @@
             else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
             else blueprintPool = BLUEPRINTS['lanche'];
 
+            // CÁLCULO pickIdx NOVO (usa monthIndex para rotação mensal real)
+            const pickIdx = (monthIndex * 300) + (d * 10) + m;
             const blueprintIdx = (d + w) % blueprintPool.length;
             const selectedBlueprint = blueprintPool[blueprintIdx];
             const slots = selectedBlueprint.slots || [null,null,null];
@@ -1441,38 +1504,70 @@
             const carbSlot = slots[1];
             const vegSlot = slots[2];
 
-            const protCandidates = protSlot ? _rankFoodsByCategory(SLOT_MAP[protSlot] || [], profileWithTargets, recentProteinPicks, [].concat(...(SLOT_MAP[protSlot] || []).map(cat => longTermPenalize[cat] || []))) : [];
-            const carbCandidates = carbSlot ? _rankFoodsByCategory(SLOT_MAP[carbSlot] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlot] || []).map(cat => longTermPenalize[cat] || []))) : [];
-            const vegCandidates = vegSlot ? _rankFoodsByCategory(SLOT_MAP[vegSlot] || [], profileWithTargets, [], []) : [];
+            const protCandidates = protSlot ? _rankFoodsByCategory(SLOT_MAP[protSlot] || [], profileWithTargets, recentProteinPicks, [].concat(...(SLOT_MAP[protSlot] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
+            const carbCandidates = carbSlot ? _rankFoodsByCategory(SLOT_MAP[carbSlot] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlot] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
+            const vegCandidates = vegSlot ? _rankFoodsByCategory(SLOT_MAP[vegSlot] || [], profileWithTargets, [], [], restrictions) : [];
 
-            const pickIdx = (w*100)+(d*10)+m;
+            // Seleção v9.1 - CORRIGIDA para respeitar os slots
+            let protPick = protCandidates.length > 0 ? get(protCandidates, pickIdx) : null;
+            let carbPick = carbCandidates.length > 0 ? get(carbCandidates, pickIdx + 1) : null; // +1 desempate
+            let vegPick  = vegCandidates.length > 0 ? get(vegCandidates, pickIdx + 2) : null; // +2 desempate
 
-            const protPick = protCandidates.length > 0 ? get(protCandidates, pickIdx) : (lname.includes('jantar') ? get(fishProteinsCandidates, pickIdx) : get(mainProteinsCandidates, pickIdx)) || fallbackProtein;
-            const carbPick = carbCandidates.length > 0 ? get(carbCandidates, pickIdx+1) : (lname.includes('café') ? get(snackCarbsCandidates, pickIdx+1) : get(mainCarbsCandidates, pickIdx+1)) || (lname.includes('café') ? 'pao_integral_forma' : fallbackCarb);
-            const vegPick = vegCandidates.length > 0 ? get(vegCandidates, pickIdx+2) : (lname.includes('lanche') ? get(commonFruitCandidates, pickIdx+2) : get(commonVegCandidates, pickIdx+2)) || fallbackVeg;
+            // --- INÍCIO: PASSO DE COESÃO (v9.1) ---
+            // Garante que 'aveia'/'granola' venham com 'leite'/'iogurte'
+            if (lname.includes('café') || lname.includes('lanche')) {
+              const isCereal = (carbPick === 'aveia_flocos' || carbPick === 'granola_tradicional');
+              if (isCereal) {
+                // Verifica se a proteína selecionada NÃO é um laticínio
+                const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado' || (protCandidates && protCandidates.includes('iogurte_nat_desnatado')) );
+                if (!protIsLaticinio) {
+                  // Tenta forçar a troca da proteína por um laticínio.
+                  const laticinioCandidates = _rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions);
+                  if (laticinioCandidates.length > 0) {
+                    protPick = get(laticinioCandidates, pickIdx); // Troca 'Ovo' por 'Iogurte'
+                  } else {
+                    // Se laticínios estiverem restringidos (ex: "sem lactose"),
+                    // temos que trocar o carbo, pois aveia não pode ser usada.
+                    const paoCandidates = _rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions);
+                    carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma'; // Troca 'Aveia' por 'Pão'
+                  }
+                }
+              }
+            }
+            // --- FIM: PASSO DE COESÃO ---
 
-            let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
-            const extraComponents = [];
+            // Specific adaptions for certain meal types
+            if (lname.includes('café')) {
+              if(!protPick) protPick = get(snackProteinsCandidates, pickIdx) || fallbackSnackProt;
+              if(!carbPick) carbPick = get(snackCarbsCandidates, pickIdx+1) || fallbackSnackCarb;
+            }
+            if (lname.includes('almoço')) {
+              // nothing special here; vegPick handled by blueprint slots
+            }
+            if (lname.includes('jantar') && !isTraining) {
+              if(selectedBlueprint.name === 'Low-Carb') carbPick = null;
+            }
 
             // Suplementos override
             const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
             const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
             if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
-              componentsToCalc.protein = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
-              if(!componentsToCalc.carb) componentsToCalc.carb = fallbackFruit;
+              protPick = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
+              if(!carbPick) carbPick = fallbackFruit;
             }
 
-            // Specific adaptions for certain meal types
-            if (lname.includes('café')) {
-              if(!componentsToCalc.protein) componentsToCalc.protein = get(snackProteinsCandidates, pickIdx) || fallbackSnackProt;
-              if(!componentsToCalc.carb) componentsToCalc.carb = get(snackCarbsCandidates, pickIdx) || fallbackSnackCarb;
-            }
+            // A linha original 'componentsToCalc' vem DEPOIS deste passo
+            let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
+
+            const extraComponents = [];
+
             if (lname.includes('almoço')) {
               extraComponents.push({ food: get(commonVegCandidates, pickIdx+3) || fallbackVeg, grams: 75, role: 'verdura' });
             }
-            if (lname.includes('jantar') && !isTraining) {
-              if(selectedBlueprint.name === 'Low-Carb') componentsToCalc.carb = null;
+
+            if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
+              extraComponents.push({ food: 'creatina_monohidratada', grams: 3, role:'suplemento' });
             }
 
             // Calcular Porções (v7.0 improved)
@@ -1494,10 +1589,6 @@
             for(const ex of extraComponents){
               const rec = findFood(ex.food) || { name: ex.food };
               components.push({ food: stripParenthesis(rec.name || ex.food), grams: ex.grams || 50, role: ex.role || 'extra', source_id: ex.food });
-            }
-
-            if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
-              components.push({ food: stripParenthesis(v5_FoodDatabase['creatina_monohidratada'].name || 'Creatina'), grams: 3, role:'suplemento', source_id:'creatina_monohidratada' });
             }
 
             let groupKcal = 0;
@@ -1574,14 +1665,14 @@
       const credibilityScore = 90;
 
       const payload = {
-        version: 'super-algo-v9.0-portion-blueprints',
+        version: 'super-algo-v9.1-portion-blueprints',
         created_at: nowISO(),
         profile_snapshot: profile,
         targets,
         timeline_weeks,
         estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
         credibility: { score: credibilityScore, breakdown: meta },
-        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v9.0' }
+        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v9.1' }
       };
       if(options.debug) payload._internal = { fullRotation, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
       return payload;
