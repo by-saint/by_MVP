@@ -801,7 +801,7 @@
       return Math.round(447.593 + (9.247 * peso) + (3.098 * hcm) - (4.330 * idade));
     }
     function activityFactor(profile){
-      const nivel = (profile.nivel||'').toLowerCase();
+      const nivel = (profile.nivel||'').toString().toLowerCase();
       const dias = _safeNum(profile.disponibilidade,3);
       if(nivel.includes('inic') || dias<=2) return 1.3;
       if(nivel.includes('inter') || dias<=4) return 1.55;
@@ -850,20 +850,11 @@
       return 'ambos';
     }
 
-    function extractKgFromGoalText(text){
-      const s = (text||'').toLowerCase().replace(',', '.');
-      let match = s.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|kilos|quilos|quilo|kilos?)/);
-      if(match) return parseFloat(match[1].replace(',','.'));
-      match = s.match(/(perder|ganhar)\s+(-?\d+(?:[.,]\d+)?)/);
-      if(match) return parseFloat(match[2].replace(',','.')) * (match[1].startsWith('perder') ? -1 : 1);
-      return null;
-    }
-
     /* ========== NEW: extractRestrictions ========== */
     function extractRestrictions(profile){
-      const text = (profile.grande_meta || profile.goal_prompt || '').toString().toLowerCase();
+      const text = (profile.grande_meta || profile.goal_prompt || profile.quais_suplementos || '').toString().toLowerCase();
       const supps = (profile.quais_suplementos || '').toString().toLowerCase();
-      const allText = (text + ' ' + supps).normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const allText = (text + ' ' + supps).normalize('NFD').replace(/[\u0300-\u036f]/g,' ');
       const restrictions = new Set();
 
       const restrictionMap = {
@@ -886,10 +877,16 @@
         if(!allText.includes(key)) continue;
         let foundNeg = false;
         for(const neg of negations){
+          // verifica variações "nao como peixe", "peixe sem" etc.
           if(allText.includes(`${neg} ${key}`) || allText.includes(`${key} ${neg}`) || allText.includes(`${neg} ${key}`.replace(/\s+/g,' '))){
             foundNeg = true;
             break;
           }
+        }
+        // check for patterns like "alergia a peixe" ou "intolerante a lactose"
+        if(!foundNeg){
+          const patt = new RegExp('\\b(?:nao como|não como|sem|alergia a|alergico a|intolerante a|intolerancia a|nao|não)\\s+' + key.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&'), 'i');
+          if(patt.test(allText)) foundNeg = true;
         }
         if(foundNeg){
           restrictionMap[key].forEach(id => restrictions.add(id));
@@ -1342,7 +1339,7 @@
     }
 
     /* ========== planLongTerm (v10.0) with blueprints & portion logic ========== */
-    async function planLongTerm(profile, options = {}){
+    async function planLongTerm(profile, options = {}) {
       const start = options.startDate ? new Date(options.startDate) : new Date();
       const months = Math.max(1, _safeNum(options.months, 3));
 
@@ -1424,7 +1421,7 @@
       const get = (list, idx) => {
         if (!list || list.length === 0) return null;
         // Usa a paridade (par/ímpar) do pickIdx para alternar entre o item 0 e o item 1
-        const pickIndex = (idx % 2); // Resultado será 0 ou 1
+        const pickIndex = (Math.abs(idx) % 2); // Resultado será 0 ou 1
         if (pickIndex < list.length) return list[pickIndex];
         return list[0]; // Fallback se a lista só tiver 1 item
       };
@@ -1553,7 +1550,7 @@
             else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
             else blueprintPool = BLUEPRINTS['lanche'];
 
-            // CÁLCULO pickIdx CORRIGIDO (v10.0 - usa monthIndex para rotação mensal)
+            // CÁLCALO pickIdx CORRIGIDO (v10.0 - usa monthIndex para rotação mensal)
             const pickIdx = (monthIndex * 300) + (d * 10) + m;
             const blueprintIdx = (d + w) % blueprintPool.length;
             const selectedBlueprint = blueprintPool[blueprintIdx];
@@ -1585,19 +1582,19 @@
               if(selectedBlueprint.name === 'Low-Carb') carbPick = null;
             }
 
-            // --- INÍCIO: PASSO DE COESÃO (v10.0 - CORRIGIDO) ---
+            // --- INÍCIO: PASSO DE COESÃO (v10.0 - Localização Corrigida) ---
             // Garante que 'aveia'/'granola' venham com 'leite'/'iogurte'
             if (lname.includes('café') || lname.includes('lanche')) {
               const isCereal = (carbPick === 'aveia_flocos' || carbPick === 'granola_tradicional');
               if (isCereal) {
                 // Verifica se a proteína selecionada NÃO é um laticínio
-                const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado');
+                const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado' || protPick === 'queijo_cottage' || protPick === 'queijo_minas_frescal' || protPick === 'queijo_mussarela');
                 
                 if (!protIsLaticinio) {
                   // O blueprint selecionou "Aveia" com "Ovos" (ruim).
                   const laticinioCandidates = _rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions);
                   if (laticinioCandidates.length > 0) {
-                    protPick = get(laticinioCandidates, pickIdx); // Troca 'Ovo' por 'Iogurte'
+                    protPick = get(laticinioCandidates, pickIdx); // Troca 'Ovo' por 'Iogurte' preferencialmente
                   } else {
                     // Sem laticínios (ex: "sem lactose"), troca 'Aveia' por 'Pão'
                     const paoCandidates = _rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions);
@@ -1608,18 +1605,18 @@
             }
             // --- FIM: PASSO DE COESÃO ---
 
-            // Suplementos override (movemos para depois da coesão)
+            // Agora definimos componentsToCalc e extraComponents (posição corrigida)
+            let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
+            const extraComponents = [];
+
+            // Mover lógica de suplemento e extra para DEPOIS da coesão (override de whey/creatina)
             const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
             const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
             if(isTraining && wantsWhey && (/jantar|ceia/.test(lname))){
-              protPick = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
-              if(!carbPick) carbPick = fallbackFruit;
+              componentsToCalc.protein = (v5_FoodDatabase['whey_concentrado'] ? 'whey_concentrado' : 'whey_protein_concentrado');
+              if(!componentsToCalc.carb) componentsToCalc.carb = fallbackFruit;
             }
-
-            // Agora, componentsToCalc é definido com as escolhas finais
-            let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
-            const extraComponents = [];
 
             if (lname.includes('almoço')) {
               extraComponents.push({ food: get(commonVegCandidates, pickIdx+3) || fallbackVeg, grams: 75, role: 'verdura' });
