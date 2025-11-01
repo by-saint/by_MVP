@@ -301,7 +301,7 @@
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
   /* ============================
-     SuperDietEngine v7.0 -> v9.1 (portion blueprints + analyzeMasterGoal + restrictions + variety fixes)
+     SuperDietEngine v7.0 -> v10.0 (portion blueprints + analyzeMasterGoal v10.0 + restrictions + variety fixes)
      ============================ */
   const SuperDietEngine = (function(){
     /* ========== FOOD DB (v5) with 'portion' added for each item ========== */
@@ -921,7 +921,7 @@
       }
     }
 
-    /* ========== NEW: analyzeMasterGoal (v9.0) - strategic brain ========== */
+    /* ========== KEYWORDS & helpers (unchanged) ========== */
     const KEYWORDS_COMPOSITION = ['perder peso','gordura','kg','quilos','hipertrofia','massa muscular','recomposicao','definir','definicao','estetica','percentual de gordura','recomposição'];
     const KEYWORDS_PERFORMANCE = ['maratona','correr','corrida','triatlo','ironman','endurance','resistencia','forca','powerlifting','supino','agachamento','levantamento terra','lpo','muscle-up','calistenia','bandeira humana','handstand','futebol','trilha','competir','crossfit','performance','desempenho'];
     const KEYWORDS_HEALTH = ['lesao','recuperar','joelho','ombro','saude','exame de sangue','colesterol','glicose','hipertensao','diabetes','estresse','ansiedade','cognitiva','longevidade'];
@@ -932,14 +932,17 @@
 
     function normalizeForSearch(s){ if(!s) return ''; return s.toString().toLowerCase().replace(/[_\-]+/g,' ').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 
+    /* ========== NOVO CÉREBRO (v10.0): analyzeMasterGoal com Análise Híbrida ========== */
     function analyzeMasterGoal(profile){
       const text = normalizeForSearch(profile.grande_meta || '');
       const nivel = (profile.nivel || 'iniciante').toString().toLowerCase();
 
+      // 1. Pontuação
       const scoreComp = scoreKeywords(text, KEYWORDS_COMPOSITION);
       const scorePerf = scoreKeywords(text, KEYWORDS_PERFORMANCE);
       const scoreHealth = scoreKeywords(text, KEYWORDS_HEALTH);
 
+      // 2. Estratégia Padrão (Fallback)
       let strategy = {
         primaryGoal: 'COMPOSITION',
         specificGoal: 'FAT_LOSS',
@@ -949,7 +952,9 @@
         nextQuestions: []
       };
 
-      // Health priority
+      // 3. Lógica de Decisão v10.0 (Prioridades)
+
+      // --- PRIORIDADE 1: SAÚDE (Inalterada, é a mais importante) ---
       if(scoreHealth > 0){
         strategy.primaryGoal = 'HEALTH';
         strategy.dietStrategy = 'MAINTENANCE';
@@ -971,8 +976,47 @@
           ];
         }
       }
-      // Performance
-      else if(scorePerf > scoreComp){
+
+      // --- NOVA PRIORIDADE 2: METAS HÍBRIDAS (Comp + Perf) ---
+      else if (scoreComp > 0 && scorePerf > 0) {
+        strategy.primaryGoal = 'HYBRID';
+        strategy.proteinProfile = 'HIGH'; // Metas híbridas quase sempre exigem proteína alta
+
+        // Detectar sub-metas
+        const isFatLoss = text.includes('perder') || text.includes('emagrecer') || text.includes('secar') || text.includes('definir');
+        const isMuscleGain = text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular');
+        const isResistance = text.includes('resistencia') || text.includes('correr') || text.includes('futebol') || text.includes('maratona');
+        const isStrength = text.includes('forca') || text.includes('powerlifting') || text.includes('calistenia') || text.includes('muscle-up');
+
+        // CASO 1: Perder Gordura + Ganhar Resistência
+        if (isFatLoss && isResistance) {
+          strategy.specificGoal = 'HYBRID_FATLOSS_ENDURANCE';
+          strategy.dietStrategy = 'MODERATE_DEFICIT';
+          strategy.workoutFocus = 'HYBRID_ENDURANCE_STRENGTH';
+        }
+        // CASO 2: Ganhar Músculo + Ganhar Resistência/Força
+        else if (isMuscleGain && (isResistance || isStrength)) {
+          strategy.specificGoal = 'HYBRID_MUSCLE_ATHLETICISM';
+          strategy.dietStrategy = 'LIGHT_SURPLUS';
+          strategy.workoutFocus = 'HYBRID_STRENGTH_ENDURANCE';
+        }
+        // CASO 3: Recomposição (Ganhar Músculo + Perder Gordura)
+        else if ((isMuscleGain && isFatLoss) || text.includes('recomposicao')) {
+          strategy.primaryGoal = 'COMPOSITION';
+          strategy.specificGoal = 'RECOMPOSITION';
+          strategy.dietStrategy = 'MAINTENANCE';
+          strategy.workoutFocus = 'HYPERTROPHY';
+        }
+        // Fallback Híbrido Genérico
+        else {
+          strategy.specificGoal = 'HYBRID_GENERAL';
+          strategy.dietStrategy = 'MAINTENANCE';
+          strategy.workoutFocus = 'HYBRID_STRENGTH_ENDURANCE';
+        }
+      }
+
+      // --- PRIORIDADE 3: METAS PURAS (Se não for Saúde nem Híbrido) ---
+      else if (scorePerf > 0) {
         strategy.primaryGoal = 'PERFORMANCE';
         strategy.proteinProfile = 'HIGH';
         if(text.includes('maratona') || text.includes('correr') || text.includes('triatlo') || text.includes('ironman') || text.includes('resistencia') || text.includes('futebol') || text.includes('trilha')){
@@ -980,28 +1024,21 @@
           strategy.dietStrategy = 'PERFORMANCE_CARB_FOCUS';
           strategy.proteinProfile = 'MODERATE';
           strategy.workoutFocus = 'ENDURANCE';
-          strategy.nextQuestions = [{ id:'perf_meta', label:'Qual sua meta de performance?', type:'text', placeholder:'Ex: Correr 21km'}];
         } else if(text.includes('calistenia') || text.includes('muscle-up') || text.includes('bandeira') || text.includes('handstand')){
           strategy.specificGoal = 'SKILL';
           strategy.dietStrategy = (nivel === 'iniciante') ? 'MAINTENANCE' : 'MODERATE_SURPLUS';
           strategy.workoutFocus = 'CALISTHENICS';
-          strategy.nextQuestions = [{ id:'skill_meta', label:'Qual movimento de calistenia você quer dominar?', type:'text'}];
         } else if(text.includes('forca') || text.includes('powerlifting') || text.includes('supino') || text.includes('agachamento') || text.includes('competir')){
           strategy.specificGoal = 'STRENGTH';
           strategy.dietStrategy = 'MODERATE_SURPLUS';
           strategy.workoutFocus = 'STRENGTH';
-          strategy.nextQuestions = [{ id:'strength_meta', label:'Qual seu marco de força desejado?', type:'text'}];
         }
       }
-      // Composition (default)
-      else {
+      else { // (Default é Composição Pura, como na v9.0)
         strategy.primaryGoal = 'COMPOSITION';
         strategy.proteinProfile = 'HIGH';
         strategy.workoutFocus = 'HYPERTROPHY';
-        if(text.includes('recomposicao') || (text.includes('ganhar') && text.includes('perder'))){
-          strategy.specificGoal = 'RECOMPOSITION';
-          strategy.dietStrategy = 'MAINTENANCE';
-        } else if(text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular')){
+        if(text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular')){
           strategy.specificGoal = 'MUSCLE_GAIN';
           strategy.dietStrategy = 'MODERATE_SURPLUS';
         } else if(text.includes('perder') || text.includes('emagrecer') || text.includes('secar') || text.includes('definir')){
@@ -1015,7 +1052,7 @@
         }
       }
 
-      // Final aggressiveness adjustment
+      // 4. Ajuste Final de Agressividade (lógica v9.0)
       const kgWanted = extractKgFromGoalText(text);
       let months = 3;
       try{
@@ -1025,15 +1062,21 @@
         }
       } catch(e){}
       const aggressiveness = computeAggressiveness(kgWanted, months, strategy.specificGoal);
-      if(strategy.specificGoal === 'FAT_LOSS' || strategy.specificGoal === 'SIGNIFICANT_FAT_LOSS'){
+      
+      const goalSpec = strategy.specificGoal.toUpperCase();
+      if(goalSpec.includes('FAT_LOSS')){
         if(aggressiveness === 'agressivo') strategy.dietStrategy = 'AGGRESSIVE_DEFICIT';
         else if(aggressiveness === 'moderado') strategy.dietStrategy = 'MODERATE_DEFICIT';
         else strategy.dietStrategy = 'LIGHT_DEFICIT';
       }
-      if(strategy.specificGoal === 'MUSCLE_GAIN'){
+      if(goalSpec.includes('MUSCLE_GAIN')){
         if(aggressiveness === 'agressivo') strategy.dietStrategy = 'AGGRESSIVE_SURPLUS';
         else if(aggressiveness === 'moderado') strategy.dietStrategy = 'MODERATE_SURPLUS';
         else strategy.dietStrategy = 'LIGHT_SURPLUS';
+      }
+      // Se for híbrido de perda, força o déficit
+      if(goalSpec === 'HYBRID_FATLOSS_ENDURANCE' && strategy.dietStrategy.includes('SURPLUS')) {
+        strategy.dietStrategy = 'MODERATE_DEFICIT';
       }
 
       return strategy;
@@ -1167,9 +1210,9 @@
     /* Utilities for weekly template, rotation */
     function weeklyBudgetFromMonthly(monthly){ return _safeNum(monthly,0) / 4.345; }
 
-    function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){
-      const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
-      const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 };
+    function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){ 
+      const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null })); 
+      const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 }; 
       if(selectedDaysArr && selectedDaysArr.length>0){
         selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }}); 
       } else {
@@ -1298,7 +1341,7 @@
       return q.includes(keyword);
     }
 
-    /* ========== planLongTerm (v9.1) with blueprints & portion logic ========== */
+    /* ========== planLongTerm (v10.0) with blueprints & portion logic ========== */
     async function planLongTerm(profile, options = {}){
       const start = options.startDate ? new Date(options.startDate) : new Date();
       const months = Math.max(1, _safeNum(options.months, 3));
@@ -1377,7 +1420,7 @@
 
       const MEMORY_CAP = 12; // short-term memory capacity
 
-      // helper deterministic get (CORRIGIDO para usar o ranking 0/1)
+      // helper deterministic get (CORRIGIDO v10.0 - usa o ranking 0/1)
       const get = (list, idx) => {
         if (!list || list.length === 0) return null;
         // Usa a paridade (par/ímpar) do pickIdx para alternar entre o item 0 e o item 1
@@ -1476,7 +1519,7 @@
             const carbsForMeal = Math.max(0, Math.round(baseCarbsForMeal * carbMultiplier));
             const fatForMeal = Math.round(baseFatForMeal * fatMultiplier);
 
-            // BLUEPRINT selection for this meal - CONTEXTUAL (v9.0)
+            // BLUEPRINT selection for this meal - CONTEXTUAL (v10.0)
             let blueprintPool = [];
             if (lname.includes('café')) {
               const isAdvanced = (profile.nivel === 'avancado' || (profile.nivel || '').toString().toLowerCase() === 'avancado');
@@ -1488,12 +1531,29 @@
                 blueprintPool = [BLUEPRINTS['café'][0], BLUEPRINTS['café'][1]]; // only padrão + shake for most users
               }
             } else if (lname.includes('almoço')) blueprintPool = BLUEPRINTS['almoço'];
-            else if (lname.includes('jantar')) blueprintPool = BLUEPRINTS['jantar'];
+            else if (lname.includes('jantar')) {
+              // v10.0 - Jantar Contextual: respeita dietStrategy (não cortar carbo se não for déficit)
+              const primaryGoal = String(targets.strategy?.primaryGoal || '').toUpperCase();
+              const dietStrategy = String(targets.strategy?.dietStrategy || '').toUpperCase();
+
+              // Se a estratégia NÃO for de déficit (ou seja, é Manutenção ou Superávit)
+              // NUNCA corte carboidratos no jantar.
+              if (!dietStrategy.includes('DEFICIT')) {
+                blueprintPool = [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]]; // Padrão ou Repetir Almoço
+              } else {
+                // A meta é de DÉFICIT (Fat Loss ou Hybrid Fat Loss)
+                // Em dia de treino: Mantenha carbos (Padrão/Repetir)
+                // Em dia de descanso: CORTE carbos (Low-Carb/Padrão)
+                blueprintPool = isTraining
+                  ? [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]] 
+                  : [BLUEPRINTS.jantar[1], BLUEPRINTS.jantar[0]];
+              }
+            }
             else if (lname.includes('lanche')) blueprintPool = BLUEPRINTS['lanche'];
             else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
             else blueprintPool = BLUEPRINTS['lanche'];
 
-            // CÁLCULO pickIdx NOVO (usa monthIndex para rotação mensal real)
+            // CÁLCULO pickIdx CORRIGIDO (v10.0 - usa monthIndex para rotação mensal)
             const pickIdx = (monthIndex * 300) + (d * 10) + m;
             const blueprintIdx = (d + w) % blueprintPool.length;
             const selectedBlueprint = blueprintPool[blueprintIdx];
@@ -1508,47 +1568,47 @@
             const carbCandidates = carbSlot ? _rankFoodsByCategory(SLOT_MAP[carbSlot] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlot] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
             const vegCandidates = vegSlot ? _rankFoodsByCategory(SLOT_MAP[vegSlot] || [], profileWithTargets, [], [], restrictions) : [];
 
-            // Seleção v9.1 - CORRIGIDA para respeitar os slots
+            // Seleção v10.0 - CORRIGIDA para respeitar os slots
             let protPick = protCandidates.length > 0 ? get(protCandidates, pickIdx) : null;
             let carbPick = carbCandidates.length > 0 ? get(carbCandidates, pickIdx + 1) : null; // +1 desempate
             let vegPick  = vegCandidates.length > 0 ? get(vegCandidates, pickIdx + 2) : null; // +2 desempate
 
-            // --- INÍCIO: PASSO DE COESÃO (v9.1) ---
+            // Specific adaptions for certain meal types (Fallbacks)
+            if (lname.includes('café')) {
+              if(!protPick) protPick = get(snackProteinsCandidates, pickIdx) || fallbackSnackProt;
+              if(!carbPick) carbPick = get(snackCarbsCandidates, pickIdx+1) || fallbackSnackCarb;
+            }
+            if (lname.includes('almoço')) {
+              // extraComponents will be added later
+            }
+            if (lname.includes('jantar') && !isTraining) {
+              if(selectedBlueprint.name === 'Low-Carb') carbPick = null;
+            }
+
+            // --- INÍCIO: PASSO DE COESÃO (v10.0 - CORRIGIDO) ---
             // Garante que 'aveia'/'granola' venham com 'leite'/'iogurte'
             if (lname.includes('café') || lname.includes('lanche')) {
               const isCereal = (carbPick === 'aveia_flocos' || carbPick === 'granola_tradicional');
               if (isCereal) {
                 // Verifica se a proteína selecionada NÃO é um laticínio
-                const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado' || (protCandidates && protCandidates.includes('iogurte_nat_desnatado')) );
+                const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado');
+                
                 if (!protIsLaticinio) {
-                  // Tenta forçar a troca da proteína por um laticínio.
+                  // O blueprint selecionou "Aveia" com "Ovos" (ruim).
                   const laticinioCandidates = _rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions);
                   if (laticinioCandidates.length > 0) {
                     protPick = get(laticinioCandidates, pickIdx); // Troca 'Ovo' por 'Iogurte'
                   } else {
-                    // Se laticínios estiverem restringidos (ex: "sem lactose"),
-                    // temos que trocar o carbo, pois aveia não pode ser usada.
+                    // Sem laticínios (ex: "sem lactose"), troca 'Aveia' por 'Pão'
                     const paoCandidates = _rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions);
-                    carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma'; // Troca 'Aveia' por 'Pão'
+                    carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma'; 
                   }
                 }
               }
             }
             // --- FIM: PASSO DE COESÃO ---
 
-            // Specific adaptions for certain meal types
-            if (lname.includes('café')) {
-              if(!protPick) protPick = get(snackProteinsCandidates, pickIdx) || fallbackSnackProt;
-              if(!carbPick) carbPick = get(snackCarbsCandidates, pickIdx+1) || fallbackSnackCarb;
-            }
-            if (lname.includes('almoço')) {
-              // nothing special here; vegPick handled by blueprint slots
-            }
-            if (lname.includes('jantar') && !isTraining) {
-              if(selectedBlueprint.name === 'Low-Carb') carbPick = null;
-            }
-
-            // Suplementos override
+            // Suplementos override (movemos para depois da coesão)
             const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
             const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
@@ -1557,15 +1617,13 @@
               if(!carbPick) carbPick = fallbackFruit;
             }
 
-            // A linha original 'componentsToCalc' vem DEPOIS deste passo
+            // Agora, componentsToCalc é definido com as escolhas finais
             let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
-
             const extraComponents = [];
 
             if (lname.includes('almoço')) {
               extraComponents.push({ food: get(commonVegCandidates, pickIdx+3) || fallbackVeg, grams: 75, role: 'verdura' });
             }
-
             if(isTraining && wantsCreatine && (/jantar|ceia/.test(lname))){
               extraComponents.push({ food: 'creatina_monohidratada', grams: 3, role:'suplemento' });
             }
@@ -1665,14 +1723,14 @@
       const credibilityScore = 90;
 
       const payload = {
-        version: 'super-algo-v9.1-portion-blueprints',
+        version: 'super-algo-v10.0-portion-blueprints',
         created_at: nowISO(),
         profile_snapshot: profile,
         targets,
         timeline_weeks,
         estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
         credibility: { score: credibilityScore, breakdown: meta },
-        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v9.1' }
+        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v10.0' }
       };
       if(options.debug) payload._internal = { fullRotation, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
       return payload;
@@ -2127,8 +2185,8 @@
             nivel: formElements.nivel.value
           };
 
-          // --- MUDANÇA v9.0 ---
-          // 1. O CÉREBRO ANALISA O PERFIL
+          // --- MUDANÇA v10.0 ---
+          // 1. O CÉREBRO ANALISA O PERFIL (versão v10.0 híbrida)
           const strategy = (SuperDietEngine && typeof SuperDietEngine.analyzeMasterGoal === 'function') ? SuperDietEngine.analyzeMasterGoal(inputs) : null;
 
           // 2. VERIFICA SE HÁ PRÓXIMAS PERGUNTAS
@@ -2167,7 +2225,7 @@
           const diffDays = Math.ceil(diffTime / (1000*60*60*24));
           const months = Math.max(1, Math.round(diffDays / 30.44));
 
-          // 4. Gera o plano passando a ESTRATÉGIA (v9.0)
+          // 4. Gera o plano passando a ESTRATÉGIA (v10.0)
           const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
           // save plan using engine
