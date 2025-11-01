@@ -1614,13 +1614,15 @@
 
     /* ========== PUBLIC API ========== */
     return {
-      init: ({ supabase } = {}) => { if(!supabase) initModule({ supabase }); else if(supabase) initModule({ supabase }); },
+      // CORREÇÃO APLICADA: repassa o cliente com a chave esperada por initModule
+      init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
       generatePlan: planLongTerm,
       savePlan, loadPlans, loadLatestPlan, findFood,
-      // Expose calculateEndDate and analyzeMasterGoal and deriveTargets to be used from UI
+      // Expose calculateEndDate, analyzeMasterGoal, deriveTargets and detectGoalType
       calculateEndDate,
       analyzeMasterGoal,
-      deriveTargets
+      deriveTargets,
+      detectGoalType
     };
 
   })(); // end SuperDietEngine IIFE
