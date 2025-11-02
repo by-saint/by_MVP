@@ -1,10 +1,10 @@
+Código ultimo usado
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
   <title>Plataforma de IA — Saúde & Estética</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="robots" content="noindex,nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -138,9 +138,9 @@
   </style>
 </head>
 <body>
-  <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+  <button class="menu-toggle" id="menu-toggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
 
-  <div class="sidebar" id="sidebar" role="navigation" aria-label="Navegação lateral">
+  <div class="sidebar" id="sidebar">
     <nav>
       <ul>
         <li><a href="#" class="nav-link link-ia active" data-tab="ia-planejamento">IA Especialista</a></li>
@@ -149,13 +149,13 @@
       </ul>
     </nav>
     <div class="sidebar-footer">
-      <button id="config-btn" class="sidebar-config-btn" aria-expanded="false"><span>⚙️</span><span>Configurações</span></button>
+      <button id="config-btn" class="sidebar-config-btn"><span>⚙️</span><span>Configurações</span></button>
       <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
       <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
     </div>
   </div>
 
-  <div class="overlay" id="overlay" tabindex="-1"></div>
+  <div class="overlay" id="overlay"></div>
 
   <div class="container">
     <div class="header">
@@ -170,37 +170,37 @@
           <form id="ia-fit-form">
             <div class="goal-section">
               <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
-              <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo... (Ex: perder 10kg, ganhar massa muscular)" required aria-label="Objetivo principal"></textarea>
+              <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo... (Ex: perder 10kg, ganhar massa muscular)" required></textarea>
 
               <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
                 <label for="prazo">Qual o prazo para esta meta?</label>
-                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required aria-label="Prazo da meta">
+                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required>
               </div>
             </div>
 
             <h3>Informações Básicas e Realidade Atual</h3>
 
             <div class="form-group"><label for="sexo">Sexo</label>
-              <select id="sexo" name="sexo" required aria-label="Sexo">
+              <select id="sexo" name="sexo" required>
                 <option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option>
               </select>
             </div>
 
-            <div class="form-group"><label for="altura">Altura (m)</label><input type="number" step="0.01" min="0.5" max="2.5" id="altura" name="altura" placeholder="Ex: 1.75" required aria-label="Altura"></div>
-            <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" step="0.1" min="20" max="400" id="peso" name="peso" placeholder="Ex: 75" required aria-label="Peso"></div>
-            <div class="form-group"><label for="idade">Idade</label><input type="number" min="10" max="120" id="idade" name="idade" placeholder="Ex: 25" required aria-label="Idade"></div>
+            <div class="form-group"><label for="altura">Altura (m)</label><input type="text" inputmode="decimal" id="altura" name="altura" placeholder="Ex: 1.75" required></div>
+            <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" placeholder="Ex: 75" required></div>
+            <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 25" required></div>
 
             <div class="form-group">
               <details class="day-selector-container">
                 <summary class="day-selector-summary">Dias de treino</summary>
                 <div class="day-selector-grid">
-                  <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input"><label for="dia-dom" class="day-circle-label">Dom</label>
                   <input type="checkbox" name="dias_treino" value="seg" id="dia-seg" class="day-circle-input"><label for="dia-seg" class="day-circle-label">Seg</label>
                   <input type="checkbox" name="dias_treino" value="ter" id="dia-ter" class="day-circle-input"><label for="dia-ter" class="day-circle-label">Ter</label>
                   <input type="checkbox" name="dias_treino" value="qua" id="dia-qua" class="day-circle-input"><label for="dia-qua" class="day-circle-label">Qua</label>
                   <input type="checkbox" name="dias_treino" value="qui" id="dia-qui" class="day-circle-input"><label for="dia-qui" class="day-circle-label">Qui</label>
                   <input type="checkbox" name="dias_treino" value="sex" id="dia-sex" class="day-circle-input"><label for="dia-sex" class="day-circle-label">Sex</label>
                   <input type="checkbox" name="dias_treino" value="sab" id="dia-sab" class="day-circle-input"><label for="dia-sab" class="day-circle-label">Sáb</label>
+                  <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input"><label for="dia-dom" class="day-circle-label">Dom</label>
                 </div>
               </details>
             </div>
@@ -211,7 +211,7 @@
               </select>
             </div>
 
-            <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="number" step="0.01" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4500.50" required></div>
+            <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="text" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4.500,50" required></div>
 
             <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
               <select id="uso_suplemento" name="uso_suplemento" required>
@@ -235,9 +235,9 @@
       <div class="results-wrapper" id="results-wrapper" style="display:none;">
         <div class="results-container">
           <h2>Fale com a IA</h2>
-          <div id="dify-container" class="iframe-container" aria-hidden="false">
+          <div id="dify-container" class="iframe-container">
             <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
-            <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+            <iframe id="dify-iframe" src="" frameborder="0" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
             <div class="dify-bottom-mask"></div>
           </div>
 
@@ -249,7 +249,7 @@
 
           <div class="progress-section">
             <h3>Sua Jornada</h3>
-            <div class="progress-bar-container"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
+            <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
             <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
             <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
           </div>
@@ -258,15 +258,15 @@
     </div>
 
     <!-- VIDEO AULAS -->
-    <div id="video-aulas" class="tab-content" aria-hidden="true">
+    <div id="video-aulas" class="tab-content">
       <h2>Nossas Aulas</h2>
-      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
     </div>
 
     <!-- PERCURSO -->
-    <div id="percurso" class="tab-content" aria-hidden="true">
+    <div id="percurso" class="tab-content">
       <div class="percurso-container">
         <h2>Meu Percurso</h2>
         <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
@@ -294,18 +294,16 @@
   <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  // PLACEHOLDERS - replace with your real keys in runtime/environment
+  // Supabase example (use your credentials)
   const SUPABASE_URL = 'https://edxsgmchmwtpgnoxgrkb.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkeHNnbWNobXd0cGdub3hncmtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjMyMjYsImV4cCI6MjA3NjAzOTIyNn0.TPM9xK6UrpQ_0IyoC-GHvCoXu9Ur4HN9IrFPdV8VEDs';
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const DIFY_APP_TOKEN = 'YOUR_DIFY_APP_TOKEN';
+  const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  /* =========================
-     SuperDietEngine (preserved logic from user's file)
-     -- I applied only the exact changes you requested (BLUEPRINTS slots shape and selection logic, get, pickIdx).
-     ========================= */
-
+  /* ============================
+     SuperDietEngine v7.0 -> v10.0 (portion blueprints + analyzeMasterGoal v10.0 + restrictions + variety fixes)
+     ============================ */
   const SuperDietEngine = (function(){
     /* ========== FOOD DB (v5) with 'portion' added for each item ========== */
     const v5_FoodDatabase = {
@@ -880,11 +878,13 @@
         if(!allText.includes(key)) continue;
         let foundNeg = false;
         for(const neg of negations){
+          // verifica variações "nao como peixe", "peixe sem" etc.
           if(allText.includes(`${neg} ${key}`) || allText.includes(`${key} ${neg}`) || allText.includes(`${neg} ${key}`.replace(/\s+/g,' '))){
             foundNeg = true;
             break;
           }
         }
+        // check for patterns like "alergia a peixe" ou "intolerante a lactose"
         if(!foundNeg){
           const patt = new RegExp('\\b(?:nao como|não como|sem|alergia a|alergico a|intolerante a|intolerancia a|nao|não)\\s+' + key.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&'), 'i');
           if(patt.test(allText)) foundNeg = true;
@@ -896,8 +896,9 @@
       return Array.from(restrictions);
     }
 
-    /* computeAggressiveness */
+    /* computeAggressiveness: updated to understand new strategy specificGoal strings */
     function computeAggressiveness(kgChange, months, goalType){
+      // goalType may be legacy ('musculo'/'emagrecer') or v9 'MUSCLE_GAIN', 'FAT_LOSS', etc.
       const goal = (goalType || '').toString().toLowerCase();
       const isMuscle = goal.includes('muscl') || goal.includes('musculo') || goal.includes('muscle');
       const isFat = goal.includes('fat') || goal.includes('loss') || goal.includes('perd') || goal.includes('emagrec');
@@ -911,13 +912,14 @@
         if(kgPerMonth <= 0.8) return 'moderado';
         return 'agressivo';
       } else {
+        // fallback assumes fat loss
         if(kgPerMonth <= 0.5) return 'baixo';
         if(kgPerMonth <= 1.0) return 'moderado';
         return 'agressivo';
       }
     }
 
-    /* ========== KEYWORDS & helpers ========== */
+    /* ========== KEYWORDS & helpers (unchanged) ========== */
     const KEYWORDS_COMPOSITION = ['perder peso','gordura','kg','quilos','hipertrofia','massa muscular','recomposicao','definir','definicao','estetica','percentual de gordura','recomposição'];
     const KEYWORDS_PERFORMANCE = ['maratona','correr','corrida','triatlo','ironman','endurance','resistencia','forca','powerlifting','supino','agachamento','levantamento terra','lpo','muscle-up','calistenia','bandeira humana','handstand','futebol','trilha','competir','crossfit','performance','desempenho'];
     const KEYWORDS_HEALTH = ['lesao','recuperar','joelho','ombro','saude','exame de sangue','colesterol','glicose','hipertensao','diabetes','estresse','ansiedade','cognitiva','longevidade'];
@@ -928,15 +930,17 @@
 
     function normalizeForSearch(s){ if(!s) return ''; return s.toString().toLowerCase().replace(/[_\-]+/g,' ').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 
-    /* ========== analyzeMasterGoal (v10.0) ========== */
+    /* ========== NOVO CÉREBRO (v10.0): analyzeMasterGoal com Análise Híbrida ========== */
     function analyzeMasterGoal(profile){
       const text = normalizeForSearch(profile.grande_meta || '');
       const nivel = (profile.nivel || 'iniciante').toString().toLowerCase();
 
+      // 1. Pontuação
       const scoreComp = scoreKeywords(text, KEYWORDS_COMPOSITION);
       const scorePerf = scoreKeywords(text, KEYWORDS_PERFORMANCE);
       const scoreHealth = scoreKeywords(text, KEYWORDS_HEALTH);
 
+      // 2. Estratégia Padrão (Fallback)
       let strategy = {
         primaryGoal: 'COMPOSITION',
         specificGoal: 'FAT_LOSS',
@@ -946,6 +950,9 @@
         nextQuestions: []
       };
 
+      // 3. Lógica de Decisão v10.0 (Prioridades)
+
+      // --- PRIORIDADE 1: SAÚDE (Inalterada, é a mais importante) ---
       if(scoreHealth > 0){
         strategy.primaryGoal = 'HEALTH';
         strategy.dietStrategy = 'MAINTENANCE';
@@ -966,33 +973,48 @@
             { id: 'saude_condicao', label: 'Qual condição de saúde você gostaria de gerenciar?', type: 'text', placeholder: 'Ex: Colesterol alto, ansiedade...' }
           ];
         }
-      } else if (scoreComp > 0 && scorePerf > 0) {
+      }
+
+      // --- NOVA PRIORIDADE 2: METAS HÍBRIDAS (Comp + Perf) ---
+      else if (scoreComp > 0 && scorePerf > 0) {
         strategy.primaryGoal = 'HYBRID';
-        strategy.proteinProfile = 'HIGH';
+        strategy.proteinProfile = 'HIGH'; // Metas híbridas quase sempre exigem proteína alta
+
+        // Detectar sub-metas
         const isFatLoss = text.includes('perder') || text.includes('emagrecer') || text.includes('secar') || text.includes('definir');
         const isMuscleGain = text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular');
         const isResistance = text.includes('resistencia') || text.includes('correr') || text.includes('futebol') || text.includes('maratona');
         const isStrength = text.includes('forca') || text.includes('powerlifting') || text.includes('calistenia') || text.includes('muscle-up');
 
+        // CASO 1: Perder Gordura + Ganhar Resistência
         if (isFatLoss && isResistance) {
           strategy.specificGoal = 'HYBRID_FATLOSS_ENDURANCE';
           strategy.dietStrategy = 'MODERATE_DEFICIT';
           strategy.workoutFocus = 'HYBRID_ENDURANCE_STRENGTH';
-        } else if (isMuscleGain && (isResistance || isStrength)) {
+        }
+        // CASO 2: Ganhar Músculo + Ganhar Resistência/Força
+        else if (isMuscleGain && (isResistance || isStrength)) {
           strategy.specificGoal = 'HYBRID_MUSCLE_ATHLETICISM';
           strategy.dietStrategy = 'LIGHT_SURPLUS';
           strategy.workoutFocus = 'HYBRID_STRENGTH_ENDURANCE';
-        } else if ((isMuscleGain && isFatLoss) || text.includes('recomposicao')) {
+        }
+        // CASO 3: Recomposição (Ganhar Músculo + Perder Gordura)
+        else if ((isMuscleGain && isFatLoss) || text.includes('recomposicao')) {
           strategy.primaryGoal = 'COMPOSITION';
           strategy.specificGoal = 'RECOMPOSITION';
           strategy.dietStrategy = 'MAINTENANCE';
           strategy.workoutFocus = 'HYPERTROPHY';
-        } else {
+        }
+        // Fallback Híbrido Genérico
+        else {
           strategy.specificGoal = 'HYBRID_GENERAL';
           strategy.dietStrategy = 'MAINTENANCE';
           strategy.workoutFocus = 'HYBRID_STRENGTH_ENDURANCE';
         }
-      } else if (scorePerf > 0) {
+      }
+
+      // --- PRIORIDADE 3: METAS PURAS (Se não for Saúde nem Híbrido) ---
+      else if (scorePerf > 0) {
         strategy.primaryGoal = 'PERFORMANCE';
         strategy.proteinProfile = 'HIGH';
         if(text.includes('maratona') || text.includes('correr') || text.includes('triatlo') || text.includes('ironman') || text.includes('resistencia') || text.includes('futebol') || text.includes('trilha')){
@@ -1010,7 +1032,7 @@
           strategy.workoutFocus = 'STRENGTH';
         }
       }
-      else {
+      else { // (Default é Composição Pura, como na v9.0)
         strategy.primaryGoal = 'COMPOSITION';
         strategy.proteinProfile = 'HIGH';
         strategy.workoutFocus = 'HYPERTROPHY';
@@ -1028,6 +1050,7 @@
         }
       }
 
+      // 4. Ajuste Final de Agressividade (lógica v9.0)
       const kgWanted = extractKgFromGoalText(text);
       let months = 3;
       try{
@@ -1037,7 +1060,7 @@
         }
       } catch(e){}
       const aggressiveness = computeAggressiveness(kgWanted, months, strategy.specificGoal);
-
+      
       const goalSpec = strategy.specificGoal.toUpperCase();
       if(goalSpec.includes('FAT_LOSS')){
         if(aggressiveness === 'agressivo') strategy.dietStrategy = 'AGGRESSIVE_DEFICIT';
@@ -1049,6 +1072,7 @@
         else if(aggressiveness === 'moderado') strategy.dietStrategy = 'MODERATE_SURPLUS';
         else strategy.dietStrategy = 'LIGHT_SURPLUS';
       }
+      // Se for híbrido de perda, força o déficit
       if(goalSpec === 'HYBRID_FATLOSS_ENDURANCE' && strategy.dietStrategy.includes('SURPLUS')) {
         strategy.dietStrategy = 'MODERATE_DEFICIT';
       }
@@ -1056,7 +1080,7 @@
       return strategy;
     }
 
-    /* ========== deriveTargets ========== */
+    /* ========== UPDATED deriveTargets (v9.0): obeys strategy ========== */
     function deriveTargets(profile, strategy) {
       const ABS_MAX_CALORIES = 5000;
       const ABS_MIN_CALORIES = 1400;
@@ -1222,7 +1246,7 @@
       return weekArr;
     }
 
-    /* computePortionAmountsForMeal */
+    /* NEW v7.0 (replaced): computePortionAmountsForMeal (corrigida e enriquecida) */
     function computePortionAmountsForMeal(foodDBFindFn, mealMacroTargets = {}, components = {}) {
       const finder = typeof foodDBFindFn === 'function' ? foodDBFindFn : findFood;
 
@@ -1336,34 +1360,32 @@
       const restrictions = extractRestrictions(profile);
       // --- FIM DA NOVA LÓGICA ---
 
-      // BLUEPRINTS (v7.0) -- MODIFIED: slots are objects { carb, prot, veg }
+      // BLUEPRINTS (v7.0)
       const BLUEPRINTS = {
         'café': [
-          { name: 'Padrão', slots: { carb: 'snack_carb', prot: 'snack_prot', veg: 'fruta' } },
-          { name: 'Shake', slots: { prot: 'suplemento', carb: 'fruta', veg: 'gordura_boa' } },
-          { name: 'Reforçado', slots: { prot: 'proteina_main', carb: 'tuberculo', veg: null } }
+          { name: 'Padrão', slots: ['snack_carb', 'snack_prot', 'fruta'] },
+          { name: 'Shake', slots: ['suplemento', 'fruta', 'gordura_boa'] },
+          { name: 'Reforçado', slots: ['proteina_main', 'tuberculo', null] }
         ],
         'almoço': [
-          { name: 'Padrão BR', slots: { prot: 'proteina_main', carb: 'cereal_main', veg: 'leguminosa' } },
-          { name: 'Fit', slots: { prot: 'peixe', carb: 'tuberculo', veg: 'verdura' } }
+          { name: 'Padrão BR', slots: ['proteina_main', 'cereal_main', 'leguminosa'] },
+          { name: 'Fit', slots: ['peixe', 'tuberculo', 'verdura'] }
         ],
         'lanche': [
-          { name: 'Padrão', slots: { carb: 'fruta', prot: 'gordura_boa', veg: null } },
-          { name: 'Proteico', slots: { prot: 'laticinio_snack', carb: 'cereal_snack', veg: null } },
-          { name: 'Rápido', slots: { prot: 'suplemento', carb: null, veg: null } }
+          { name: 'Padrão', slots: ['fruta', 'gordura_boa', null] },
+          { name: 'Proteico', slots: ['laticinio_snack', 'cereal_snack', null] },
+          { name: 'Rápido', slots: ['suplemento', null, null] }
         ],
         'jantar': [
-          { name: 'Padrão', slots: { prot: 'proteina_main', carb: 'tuberculo', veg: 'verdura' } },
-          { name: 'Low-Carb', slots: { prot: 'peixe', carb: null, veg: 'verdura' } },
-          { name: 'Repetir Almoço', slots: { prot: 'proteina_main', carb: 'cereal_main', veg: 'leguminosa' } }
+          { name: 'Padrão', slots: ['proteina_main', 'tuberculo', 'verdura'] },
+          { name: 'Low-Carb', slots: ['peixe', 'verdura', 'gordura_boa'] },
+          { name: 'Repetir Almoço', slots: ['proteina_main', 'cereal_main', 'leguminosa'] }
         ],
         'ceia': [
-          { name: 'Proteica', slots: { prot: 'laticinio_snack', carb: null, veg: null } },
-          { name: 'Gordura', slots: { prot: 'gordura_boa', carb: null, veg: null } }
+          { name: 'Proteica', slots: ['laticinio_snack', null, null] },
+          { name: 'Gordura', slots: ['gordura_boa', null, null] }
         ]
       };
-
-      // SLOT_MAP remains mapping slot types to food categories
       const SLOT_MAP = {
         'snack_carb': ['cereal_snack', 'pao_snack'],
         'snack_prot': ['proteina_snack', 'laticinio_snack'],
@@ -1396,18 +1418,19 @@
 
       const MEMORY_CAP = 12; // short-term memory capacity
 
-      // helper deterministic get: choose between top 2 (0 or 1) — FIX for "Roleta Russa"
+      // helper deterministic get (CORRIGIDO v10.0 - usa o ranking 0/1)
       const get = (list, idx) => {
         if (!list || list.length === 0) return null;
-        const pickIndex = Math.abs(idx) % 2; // 0 or 1
+        // Usa a paridade (par/ímpar) do pickIdx para alternar entre o item 0 e o item 1
+        const pickIndex = (Math.abs(idx) % 2); // Resultado será 0 ou 1
         if (pickIndex < list.length) return list[pickIndex];
-        return list[0];
+        return list[0]; // Fallback se a lista só tiver 1 item
       };
 
       // helper deterministic get (alternative: safe getter for first N)
       const getFirst = (list) => (list && list.length ? list[0] : null);
 
-      // helper deterministic get with modulo (kept for compatibility)
+      // helper deterministic get with modulo (not used as main) - kept for compatibility
       const pickModulo = (list, idx) => { if(!list || list.length===0) return null; const i = Math.abs(idx) % list.length; return list[i]; };
 
       // deterministic rotation helper used earlier (kept)
@@ -1507,12 +1530,18 @@
               }
             } else if (lname.includes('almoço')) blueprintPool = BLUEPRINTS['almoço'];
             else if (lname.includes('jantar')) {
+              // v10.0 - Jantar Contextual: respeita dietStrategy (não cortar carbo se não for déficit)
               const primaryGoal = String(targets.strategy?.primaryGoal || '').toUpperCase();
               const dietStrategy = String(targets.strategy?.dietStrategy || '').toUpperCase();
 
+              // Se a estratégia NÃO for de déficit (ou seja, é Manutenção ou Superávit)
+              // NUNCA corte carboidratos no jantar.
               if (!dietStrategy.includes('DEFICIT')) {
                 blueprintPool = [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]]; // Padrão ou Repetir Almoço
               } else {
+                // A meta é de DÉFICIT (Fat Loss ou Hybrid Fat Loss)
+                // Em dia de treino: Mantenha carbos (Padrão/Repetir)
+                // Em dia de descanso: CORTE carbos (Low-Carb/Padrão)
                 blueprintPool = isTraining
                   ? [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]] 
                   : [BLUEPRINTS.jantar[1], BLUEPRINTS.jantar[0]];
@@ -1522,20 +1551,20 @@
             else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
             else blueprintPool = BLUEPRINTS['lanche'];
 
-            // CÁLCALO pickIdx CORRIGIDO (v10.0 - usa monthIndex para rotação mensal) — FIX applied
+            // CÁLCALO pickIdx CORRIGIDO (v10.0 - usa monthIndex para rotação mensal)
             const pickIdx = (monthIndex * 300) + (d * 10) + m;
             const blueprintIdx = (d + w) % blueprintPool.length;
             const selectedBlueprint = blueprintPool[blueprintIdx];
-            const slotsObj = selectedBlueprint.slots || {};
+            const slots = selectedBlueprint.slots || [null,null,null];
 
-            // map slots to candidate categories and lists — FIXED mapping: use named slots (prot/carb/veg)
-            const protSlotType = slotsObj.prot || null;
-            const carbSlotType = slotsObj.carb || null;
-            const vegSlotType  = slotsObj.veg  || null;
+            // map slots to candidate categories and lists
+            const protSlot = slots[0];
+            const carbSlot = slots[1];
+            const vegSlot = slots[2];
 
-            const protCandidates = protSlotType ? _rankFoodsByCategory(SLOT_MAP[protSlotType] || [], profileWithTargets, recentProteinPicks, [].concat(...(SLOT_MAP[protSlotType] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
-            const carbCandidates = carbSlotType ? _rankFoodsByCategory(SLOT_MAP[carbSlotType] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlotType] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
-            const vegCandidates = vegSlotType ? _rankFoodsByCategory(SLOT_MAP[vegSlotType] || [], profileWithTargets, [], [], restrictions) : [];
+            const protCandidates = protSlot ? _rankFoodsByCategory(SLOT_MAP[protSlot] || [], profileWithTargets, recentProteinPicks, [].concat(...(SLOT_MAP[protSlot] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
+            const carbCandidates = carbSlot ? _rankFoodsByCategory(SLOT_MAP[carbSlot] || [], profileWithTargets, recentCarbPicks, [].concat(...(SLOT_MAP[carbSlot] || []).map(cat => longTermPenalize[cat] || [])), restrictions) : [];
+            const vegCandidates = vegSlot ? _rankFoodsByCategory(SLOT_MAP[vegSlot] || [], profileWithTargets, [], [], restrictions) : [];
 
             // Seleção v10.0 - CORRIGIDA para respeitar os slots
             let protPick = protCandidates.length > 0 ? get(protCandidates, pickIdx) : null;
@@ -1555,7 +1584,7 @@
             }
 
             // --- INÍCIO: PASSO DE COESÃO (v10.0 - Localização Corrigida) ---
-            // AFTER fixing mapping, this cohesion step will detect cereal+non-dairy and swap to laticínio when appropriate
+            // Garante que 'aveia'/'granola' venham com 'leite'/'iogurte'
             if (lname.includes('café') || lname.includes('lanche')) {
               const isCereal = (carbPick === 'aveia_flocos' || carbPick === 'granola_tradicional');
               if (isCereal) {
@@ -1692,7 +1721,7 @@
       const credibilityScore = 90;
 
       const payload = {
-        version: 'super-algo-v10.0-portion-blueprints-fixed',
+        version: 'super-algo-v10.0-portion-blueprints',
         created_at: nowISO(),
         profile_snapshot: profile,
         targets,
@@ -1732,9 +1761,11 @@
 
     /* ========== PUBLIC API ========== */
     return {
+      // CORREÇÃO APLICADA: repassa o cliente com a chave esperada por initModule
       init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
       generatePlan: planLongTerm,
       savePlan, loadPlans, loadLatestPlan, findFood,
+      // Expose calculateEndDate, analyzeMasterGoal, deriveTargets and detectGoalType
       calculateEndDate,
       analyzeMasterGoal,
       deriveTargets,
@@ -2029,7 +2060,6 @@
       e.preventDefault();
       logoutBtn.classList.toggle('hidden');
       resetBtn.classList.toggle('hidden');
-      configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
     });
 
     resetBtn.addEventListener('click', () => {
@@ -2153,16 +2183,20 @@
             nivel: formElements.nivel.value
           };
 
+          // --- MUDANÇA v10.0 ---
           // 1. O CÉREBRO ANALISA O PERFIL (versão v10.0 híbrida)
           const strategy = (SuperDietEngine && typeof SuperDietEngine.analyzeMasterGoal === 'function') ? SuperDietEngine.analyzeMasterGoal(inputs) : null;
 
           // 2. VERIFICA SE HÁ PRÓXIMAS PERGUNTAS
           if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
+            // Show follow-up modal and wait for answers
             const answers = await showFollowupQuestions(strategy.nextQuestions);
             if(!answers){
+              // user cancelled
               submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
               return;
             }
+            // merge answers into inputs
             Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
           }
 
