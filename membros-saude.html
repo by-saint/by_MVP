@@ -36,12 +36,10 @@
     .sidebar.open { left: 0; }
     .sidebar nav { padding-top: 100px; }
     .sidebar nav ul{ list-style:none; padding:0; margin:0; }
-    /* Nav link style updated to show colored rectangle at left when active */
     .sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
     .sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
     .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
     .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-    /* colored rectangle per tab */
     .link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
     .link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
     .link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
@@ -75,6 +73,7 @@
     .goal-section{ background: linear-gradient(145deg,#2a2a2a,#1a1a1a); border:1px solid #444; padding:30px; margin-bottom:24px; border-radius:10px; text-align:center; }
     .goal-title{ font-size:28px; font-weight:700; background: linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90deg,#007BFF,#0056b3); border:none; border-radius:8px; color:#fff; font-size:18px; font-weight:600; cursor:pointer; }
+    button[type="submit"]:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
 
     .progress-section{ margin-top:24px; padding:20px; background-color:#2C2C2C; border-radius:10px; }
     .progress-bar-container{ width:100%; background-color:#444; border-radius:10px; overflow:hidden; }
@@ -98,19 +97,24 @@
     .plan-days{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
     .plan-day{ background: linear-gradient(180deg,#141414,#0f0f0f); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
     .meal-row{ margin-bottom:10px; padding:8px; border-radius:8px; background:#0d0d0d; display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid rgba(255,255,255,0.02); }
-    .meal-left{ display:flex; gap:10px; align-items:center; }
-    .meal-name{ font-weight:700; color:#fff; }
-    .meal-kcal{ font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; }
+    .meal-left{ display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    .meal-name{ font-weight:700; color:#fff; flex-shrink: 0; }
+    .meal-items-preview { color:#bbb; font-size:13px; flex-grow: 1; }
+    .meal-kcal{ font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; flex-shrink: 0; }
 
     /* dify */
     .iframe-container{ border-radius:12px; overflow:hidden; position:relative; height:70vh; min-height:340px; max-height:720px; background:#000; }
     .dify-top-strip{ position:absolute; top:0; left:0; width:100%; height:50px; background:#000000; z-index:2; pointer-events:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-sizing:border-box; }
     .dify-top-badge{ font-weight:700; font-size:1.1em; color:#fff; background: linear-gradient(90deg,#007BFF,#0056b3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .mvp-label{ font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
+    .dify-bottom-mask { position: absolute; bottom: 0; left: 0; width: 100%; height: 42px; background-color: #000000; z-index: 2; pointer-events: none; }
+
 
     /* day selector */
     .day-selector-container { background-color: #2C2C2C; border:1px solid #444; border-radius:8px; }
-    .day-selector-summary { padding:12px; font-weight:600; color:#BBBBBB; cursor:pointer; position:relative; }
+    .day-selector-summary { padding:12px; font-weight:600; color:#BBBBBB; cursor:pointer; position:relative; list-style: none; }
+    .day-selector-summary::-webkit-details-marker { display: none; }
+    .day-selector-summary::marker { display: none; }
     .day-selector-summary::after { content:'▼'; font-size:0.8em; position:absolute; right:15px; top:14px; transition:transform 0.2s; }
     .day-selector-container[open] .day-selector-summary::after { transform: rotate(180deg); }
     .day-selector-grid { display:flex; flex-wrap:wrap; gap:10px; padding:0 12px 12px 12px; justify-content:center; }
@@ -124,6 +128,8 @@
       body{ padding:20px 12px; }
       .day-circle-label{ width:36px; height:36px; font-size:13px; }
       .iframe-container{ height:48vh; min-height:220px; }
+      .meal-left { flex-wrap: nowrap; }
+      .meal-items-preview { display: none; }
     }
 
     /* modal for follow-up questions */
@@ -162,7 +168,6 @@
       <p id="welcome-msg">A carregar...</p>
     </div>
 
-    <!-- IA PLANEJAMENTO -->
     <div id="ia-planejamento" class="tab-content active">
       <div class="form-wrapper" id="form-wrapper" style="display:block;">
         <div class="form-container">
@@ -257,7 +262,6 @@
       </div>
     </div>
 
-    <!-- VIDEO AULAS -->
     <div id="video-aulas" class="tab-content" aria-hidden="true">
       <h2>Nossas Aulas</h2>
       <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
@@ -265,13 +269,11 @@
       <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
     </div>
 
-    <!-- PERCURSO -->
     <div id="percurso" class="tab-content" aria-hidden="true">
       <div class="percurso-container">
         <h2>Meu Percurso</h2>
         <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
 
-        <!-- Swap button trigger (Melhoria 2) -->
         <div style="text-align: center; margin-bottom: 20px;">
           <button id="show-swap-modal-btn" class="sidebar-action-btn sidebar-reset-btn" style="width: auto; padding: 10px 20px; display: inline-block;">Trocar Alimento</button>
         </div>
@@ -293,7 +295,6 @@
 
   </div>
 
-  <!-- Swap Modal (Melhoria 2) -->
   <div id="swap-modal-overlay" class="followup-overlay" style="display:none; z-index: 3000;">
     <div class="followup-modal" style="width: 600px;">
       <h4>Trocar Alimento da Dieta</h4>
@@ -344,10 +345,8 @@
     </div>
   </div>
 
-  <!-- Follow-up modal placeholder -->
   <div id="followup-root" style="display:none;"></div>
 
-  <!-- SCRIPT -->
   <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -359,13 +358,620 @@
   // DIFY token inserted as requested
   const DIFY_APP_TOKEN = 'lbpbrmsV3IaH9e0X';
 
-  /* =========================
-     SuperDietEngine (updated with fixes & features)
-     ========================= */
+  // ============================================
+  // INÍCIO BLOCO 1 - FUNÇÕES GLOBAIS CORRIGIDAS
+  // ============================================
+  /* ============================================
+    Helper functions reused in UI & Engine (Globally Scoped)
+    ============================================ */
+  
+  // Normaliza nomes (usado por várias funções globais e internas)
+  function normalizeName(s){ if(!s) return ''; return s.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,' ').trim(); }
 
-  const SuperDietEngine = (function(){
-    /* ========== FOOD DB (v5) with sub_category, allowed_meals, max_portions ========== */
-    const v5_FoodDatabase = {
+  // getEaster (necessário para calculateEndDate)
+  function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
+
+  // Robust calculateEndDate (aceita anos, meses, '1 ano e meio', '12 meses', '3 anos', '36 meses', 'até 1 ano', etc.)
+  function calculateEndDate(prazoText) {
+    if (!prazoText) return null;
+    const now = new Date();
+    const year = now.getFullYear();
+    const text = prazoText.toString().toLowerCase().trim();
+    // Limpeza mais robusta: remove acentos, substitui vírgulas, normaliza espaços
+    const clean = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[,]/g, '.').replace(/\s+/g, ' ');
+
+    let match;
+    // Expressões regulares mais abrangentes
+    
+    // "X ano(s) e meio"
+    match = clean.match(/(\d+)\s*ano(?:s)?\s*e\s*mei[oa]/);
+    if (match) { const d = new Date(); d.setMonth(d.getMonth() + (parseInt(match[1],10) * 12) + 6); return d; }
+
+    // "meio ano"
+    if (clean.includes('meio ano') || clean.includes('1/2 ano')) { const d = new Date(); d.setMonth(d.getMonth() + 6); return d; }
+    
+    // X.Y ano(s) / X ano(s)
+    match = clean.match(/(\d+(?:[.,]\d+)?)\s*(?:ano|anos|year|years)/);
+     if (match) {
+      const value = parseFloat(match[1].replace(',', '.'));
+      if (!isNaN(value)) {
+        const monthsToAdd = Math.round(value * 12);
+        const d = new Date();
+        d.setMonth(d.getMonth() + monthsToAdd);
+        return d;
+      }
+    }
+
+    // X mes(es) / X month(s)
+    match = clean.match(/(\d+(?:[.,]\d+)?)\s*(?:mes|meses|mês|month|months)/);
+    if (match) {
+      const value = parseFloat(match[1].replace(',', '.'));
+      if (!isNaN(value)) {
+        const d = new Date();
+        d.setMonth(d.getMonth() + Math.round(value));
+        return d;
+      }
+    }
+
+    // "até/em/para X ano(s)/mes(es)"
+    match = clean.match(/(?:ate|em|para|dentro de)\s+(\d+(?:[.,]\d+)?)\s*(?:ano|anos|mes|meses|mês)/);
+     if (match) {
+      const val = parseFloat(match[2].replace(',', '.'));
+       if (!isNaN(val)) {
+          const d = new Date();
+          const unit = match[3];
+          if (unit?.startsWith('ano')) {
+               d.setFullYear(d.getFullYear() + Math.round(val)); // Usa anos para evitar erro com decimal
+          } else {
+               d.setMonth(d.getMonth() + Math.round(val));
+          }
+          return d;
+       }
+    }
+
+    // Datas específicas
+    if (clean.includes('verao')) { const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); }
+    if (clean.includes('natal')) { const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); }
+    if (clean.includes('ano novo')) { return new Date(year+1,0,1); }
+    if (clean.includes('pascoa')) { const e=getEaster(year); return now<e?e:getEaster(year+1); }
+    if (clean.includes('final do ano') || clean.includes('fim de ano')) { return new Date(year, 11, 31); }
+
+    // Apenas número (assume meses até 36, depois anos) - Menos preciso, deixar por último
+    match = clean.match(/^(\d{1,4})$/);
+    if (match) {
+      const n = parseInt(match[1],10);
+      if (n <= 36) { // Assume meses se for 36 ou menos
+          const d = new Date(); d.setMonth(d.getMonth() + n); return d;
+      } else if (n > 1900 && n < 2200) { // Parece ser um ano
+           // Retorna final do ano n?
+           return new Date(n, 11, 31);
+      }
+      return null; 
+    }
+
+    console.warn("Não foi possível interpretar o prazo:", prazoText);
+    return null; // Retorna null se nenhuma regra casar
+  }
+
+  // Utilitário clamp
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  // mergeAndFilterComponents (corrige duplicações e retira porções <10g)
+  function mergeAndFilterComponents(components){
+    const map = {};
+    if(!Array.isArray(components)) return [];
+    components.forEach(c=>{
+      if(!c || !c.food) return;
+      const grams = Number(c.grams) || 0;
+      if(grams < 10) return; // Filtra aqui
+      const key = normalizeName(c.food || ''); // Usa nome normalizado como chave
+      if(!map[key]) map[key] = { food: c.food, grams: 0, kcal: 0, role: c.role || '' };
+      map[key].grams += grams;
+      map[key].kcal += Number(c.kcal) || 0;
+      if(c.role && !map[key].role) map[key].role = c.role; // Pega o primeiro role encontrado
+    });
+    // Arredonda no final
+    return Object.values(map).map(m => ({ ...m, grams: Math.round(m.grams), kcal: Math.round(m.kcal) }));
+  }
+  // ============================================
+  // FIM BLOCO 1
+  // ============================================
+
+
+  /* ============================================
+      alimentosDB (Lista Completa Restaurada)
+      ============================================ */
+  const alimentosDB = [
+  "Abóbora, cabotián cozida",
+  "Abóbora, moranga refogada",
+  "Abobrinha, italiana cozida",
+  "Abobrinha, italiana crua",
+  "Abobrinha, italiana refogada",
+  "Abobrinha, paulista crua",
+  "Acelga crua",
+  "Agrião cru",
+  "Aipo cru",
+  "Alface, americana crua",
+  "Alface, crespa crua",
+  "Alface, lisa crua",
+  "Alface, roxa crua",
+  "Alfavaca crua",
+  "Alho cru (uso culinário cru possível — incluí)",
+  "Alho-poró cru",
+  "Almeirão cru",
+  "Almeirão refogado",
+  "Batata, baroa cozida",
+  "Batata, doce cozida",
+  "Batata frita, tipo chips industrializada",
+  "Batata, inglesa cozida",
+  "Batata, inglesa frita",
+  "Batata, inglesa sauté",
+  "Berinjela cozida",
+  "Beterraba cozida",
+  "Beterraba crua",
+  "Brócolis cozido",
+  "Brócolis cru",
+  "Cará cozido",
+  "Canru cru (entrada ambígua — mantive como \"cru\" mas revisar se for outro nome)",
+  "Catalonha crua",
+  "Catalonha refogada",
+  "Cebola crua",
+  "Cebolinha crua",
+  "Cenoura cozida",
+  "Cenoura crua",
+  "Chicória crua",
+  "Chuchu cozido",
+  "Chuchu cru",
+  "Coentro, folhas desidratadas",
+  "Couve, manteiga crua",
+  "Couve, manteiga refogada",
+  "Couve-flor cozida",
+  "Couve-flor crua",
+  "Espinafre, Nova Zelândia cru",
+  "Espinafre, Nova Zelândia refogado",
+  "Jiló cru (marcado cru na tabela — mantive, embora raro cru)",
+  "Mandioca cozida",
+  "Manjericão cru",
+  "Maxixe cru",
+  "Mostarda, folha crua",
+  "Nabo cru",
+  "Nhoque, batata cozido",
+  "Palmito, juçara em conserva",
+  "Palmito, pupunha em conserva",
+  "Pepino cru",
+  "Pimentão, amarelo cru",
+  "Pimentão, verde cru",
+  "Pimentão, vermelho cru",
+  "Quiabo cru (mantive cru; geralmente cozido, mas cru é consumido em algumas preparações)",
+  "Rabanete cru",
+  "Repolho, branco cru",
+  "Repolho, roxo cru",
+  "Repolho, roxo refogado",
+  "Rúcula crua",
+  "Salsa crua",
+  "Seleta de legumes enlatada",
+  "Serralha crua",
+  "Taioba crua",
+  "Tomate, com semente cru",
+  "Tomate extrato",
+  "Tomate molho industrializado",
+  "Tomate purê",
+  "Tomate salada",
+  "Vagem crua",
+  "Abacate cru",
+  "Abacaxi cru",
+  "Abiu cru",
+  "Açaí, polpa, com xarope (incluído; polpa com xarope)",
+  "Acerola crua",
+  "Ameixa, calda enlatada",
+  "Ameixa crua",
+  "Atemoia crua",
+  "Banana, da terra crua",
+  "Banana, doce em barra (processado)",
+  "Banana, figo crua",
+  "Banana, maçã crua",
+  "Banana, nanica crua",
+  "Banana, ouro crua",
+  "Banana, pacova crua",
+  "Banana, prata crua",
+  "Cacau cru",
+  "Cajá-Manga cru",
+  "Caju, suco concentrado, envasado",
+  "Cajuí, chocolate cru",
+  "Carambola crua",
+  "Ciriguela crua",
+  "Cupuaçu cru",
+  "Figo cru",
+  "Figo, enlatado em calda",
+  "Fruta-pão crua",
+  "Goiaba, branca, com casca crua",
+  "Goiaba, doce em pasta",
+  "Goiaba, doce, cascão",
+  "Goiaba, vermelha, com casca crua",
+  "Graviola crua",
+  "Jabuticaba crua",
+  "Jaca crua",
+  "Jambo cru",
+  "Jamelão cru",
+  "Kiwi cru",
+  "Laranja, baía crua",
+  "Laranja, baía suco",
+  "Laranja, da terra crua",
+  "Laranja, da terra suco",
+  "Laranja, lima crua",
+  "Laranja, lima suco",
+  "Laranja, pêra crua",
+  "Laranja, suco (suco genérico)",
+  "Laranja, valência crua",
+  "Laranja, valência suco",
+  "Limão, cravo suco",
+  "Limão, tahiti cru",
+  "Maçã, Argentina, com casca crua",
+  "Maçã, Fuji, com casca crua",
+  "Macaúba cru",
+  "Mamão, doce, em calda drenado (processado)",
+  "Mamão, formosa cru",
+  "Mamão, papaia cru",
+  "Mamão verde, doce em calda drenado (processado)",
+  "Manga, Haden crua",
+  "Manga, Palmer crua",
+  "Manga, Tommy Atkins crua",
+  "Mangarataia crua",
+  "Maracujá, suco concentrado",
+  "Melancia crua",
+  "Melão cru",
+  "Mexerica, Murcote crua",
+  "Mexerica, Rio crua",
+  "Morango cru",
+  "Nêspera cru",
+  "Pêra, Park crua",
+  "Pêra, Williams crua",
+  "Pêssego, Aurora cru",
+  "Pêssego, enlatado, em calda",
+  "Pinha crua",
+  "Pitanga crua",
+  "Romã crua",
+  "Tamarindo cru",
+  "Tangerina, Ponkan crua",
+  "Tangerina, Ponkan suco",
+  "Tucumã cru",
+  "Umbu cru",
+  "Uva, Itália crua",
+  "Uva, Rubi crua",
+  "Uva, suco concentrado, envasado",
+  "Azeite, de dendê (óleo/gordura)",
+  "Azeite, de oliva, extra virgem (óleo/gordura)",
+  "Manteiga, com sal (derivado)",
+  "Manteiga, sem sal (derivado)",
+  "Margarina, com óleo hidrogenado (derivado)",
+  "Óleo, de soja (óleo)",
+  "Abadejo, filé, congelado assado",
+  "Abadejo, filé, congelado cozido",
+  "Abadejo, filé, congelado grelhado",
+  "Atum, conserva em óleo (conserva)",
+  "Bacalhau, salgado refogado",
+  "Cação, posta, com farinha de trigo frita",
+  "Cação, posta cozida",
+  "Camarão, Rio Grande, grande cozido",
+  "Camarão, Sete Barbas, sem cabeça, com casca frito",
+  "Caranguejo cozido",
+  "Corimbatá assado",
+  "Corimbatá cozido",
+  "Corvina grande assada",
+  "Corvina grande cozida",
+  "Dourada de água doce fresca (incluí como fresco)",
+  "Lambari, congelado frito",
+  "Manjuba frita",
+  "Manjuba, com farinha de trigo frita",
+  "Manjuba frita (variante)",
+  "Merluza, filé assado",
+  "Merluza, filé cozido",
+  "Pescada, branca frita",
+  "Pescada, com farinha de trigo frita",
+  "Pescada, filé frita",
+  "Pescada, filé molho escabeche",
+  "Pintado assado",
+  "Pintado grelhado",
+  "Salmão, com pele, fresco grelhado",
+  "Salmão, sem pele, fresco grelhado",
+  "Sardinha assada",
+  "Sardinha, conserva em óleo (conserva)",
+  "Sardinha frita",
+  "Arroz, integral cozido",
+  "Arroz, tipo 1 cozido",
+  "Aveia, flocos crua (uso cru em mingaus / vitaminas — incluí)",
+  "Biscoito, doce, maisena (processado)",
+  "Biscoito, doce, recheado com chocolate (processado)",
+  "Biscoito, doce, recheado com morango (processado)",
+  "Biscoito, doce, wafer, recheado de chocolate (processado)",
+  "Biscoito, doce, wafer, recheado de morango (processado)",
+  "Biscoito, salgado, cream cracker (processado)",
+  "Biscoito, polvilho doce (processado)",
+  "Bolo, mistura para (processado)",
+  "Bolo, pronto, aipim (processado)",
+  "Bolo, pronto, chocolate (processado)",
+  "Bolo, pronto, coco (processado)",
+  "Canjica, com leite integral (preparado)",
+  "Cereais, milho, flocos, com sal (processado)",
+  "Cereais, milho, flocos, sem sal (processado)",
+  "Cereais, milho, infantil (processado)",
+  "Cereais, mistura para vitamina (processado)",
+  "Cereal matinal, milho (processado)",
+  "Cereal matinal, milho, açúcar (processado)",
+  "Creme de arroz, pó (processado)",
+  "Creme de milho, pó (processado)",
+  "Curau, milho verde (preparado)",
+  "Farinha, de arroz, enriquecida (derivado)",
+  "Farinha, de centeio, integral (derivado)",
+  "Farinha, de milho, amarela (derivado)",
+  "Farinha, de rosca (derivado)",
+  "Farinha, de trigo (derivado)",
+  "Farinha, láctea, de cereais (derivado)",
+  "Farinha, de mandioca, torrada (derivado)",
+  "Farinha, de puba (derivado)",
+  "Feijão, de mandioca (cozido)",
+  "Lasanha, massa fresca cozida",
+  "Macarrão, instantâneo (processado)",
+  "Milho, verde cru (incluí — milho verde é consumido cru/cozido)",
+  "Milho, verde, enlatado drenado",
+  "Mingau tradicional, pó (processado)",
+  "Pamonha, barra para cozimento (preparado)",
+  "Pão, aveia, forma (processado)",
+  "Pão, de glúten, forma (processado)",
+  "Pão, de glúten, forma (variante processado)",
+  "Pão, milho, forma (processado)",
+  "Pão, trigo, forma, integral (processado)",
+  "Pão, trigo, francês (processado)",
+  "Pão, trigo, sovado (processado)",
+  "Pastel, de queijo frito",
+  "Pastel, de queijo frito (variante)",
+  "Pastel, massa frita",
+  "Pastel, massa frita (variante com outro valor)",
+  "Pipoca, com óleo de soja sem sal (preparado)",
+  "Polenta, pré-cozida (processado)",
+  "Torrada, pão francês (processado)",
+  "Açúcar, mascavo (ingrediente)",
+  "Açúcar, refinado (ingrediente)",
+  "Chocolate, ao leite (processado)",
+  "Chocolate, ao leite, com castanha do Pará (processado)",
+  "Chocolate, ao leite, dietético (processado)",
+  "Chocolate, meio amargo (processado)",
+  "Cocada branca (doces)",
+  "Doce, de abóbora, cremoso (doces)",
+  "Doce, de leite, cremoso (doces)",
+  "Geleia, mocotó, natural (doces)",
+  "Glicose de milho (ingrediente)",
+  "Maria mole (doces)",
+  "Maria mole, coco queimado (doces)",
+  "Marmelada (doces)",
+  "Mel, de abelha (doces)",
+  "Melado (doces)",
+  "Quindim (doces)",
+  "Rapadura (doces)",
+  "Café, pó, torrado (bebida/ingrediente)",
+  "Capuccino, pó (bebida/ingrediente)",
+  "Fermento em pó, químico (ingrediente)",
+  "Fermento, biológico, levedura, tablete (ingrediente)",
+  "Gelatina, sabores variados, pó (ingrediente)",
+  "Sal, dietético (ingrediente)",
+  "Sal, grosso (ingrediente)",
+  "Shoyu (ingrediente/tempero)",
+  "Tempero à base de sal (tempero)",
+  "Azeitona, preta conserva",
+  "Azeitona, verde conserva",
+  "Chantilly, spray, com gordura vegetal (processado)",
+  "Leite, de coco (derivado)",
+  "Maionese, tradicional com ovos (condimento)",
+  "Bebida isotônica (processado)",
+  "Café, infusão 10% (bebida)",
+  "Cana, aguardente (álcool)",
+  "Cana, caldo de (bebida)",
+  "Cerveja, pilsen (bebida)",
+  "Chá, erva-doce infusão",
+  "Chá, mate infusão",
+  "Chá, preto infusão",
+  "Coco, água de (bebida)",
+  "Refrigerante, água tônica (bebida)",
+  "Refrigerante, tipo cola (bebida)",
+  "Refrigerante, tipo guaraná (bebida)",
+  "Refrigerante, tipo laranja (bebida)",
+  "Refrigerante, tipo limão (bebida)",
+  "Achocolatado, pó (bebida)",
+  "Tacacá (prato)",
+  "Tapioca, com manteiga (prato)",
+  "Tucupi, com pimenta-de-cheiro (prato/molho)",
+  "Vaca atolada (prato)",
+  "Vatapá (prato)",
+  "Virado à paulista (prato)",
+  "Yakisoba (prato)",
+  "Acarajé (prato)",
+  "Arroz carreteiro (prato)",
+  "Baião de dois, arroz e feijão-de-corda (prato)",
+  "Barreado (prato)",
+  "Bife à cavalo, com contra filé (prato)",
+  "Bolinho de arroz (prato)",
+  "Camarão à baiana (prato)",
+  "Charuto, de repolho (prato)",
+  "Cuscuz, de milho, cozido com sal (prato)",
+  "Cuscuz, paulista (prato)",
+  "Cuxá, molho (prato/molho)",
+  "Dobradinha (prato)",
+  "Estrogonofe de carne (prato)",
+  "Estrogonofe de frango (prato)",
+  "Feijoada tropeiro mineiro (prato)",
+  "Feijoada (prato)",
+  "Frango, com açafrão (prato)",
+  "Macarrão, molho bolonhesa (prato)",
+  "Maniçoba (prato)",
+  "Quibebe (prato)",
+  "Salada, de legumes, com maionese (prato)",
+  "Salada, de legumes, cozida no vapor (prato)",
+  "Salpicão, de frango (prato)",
+  "Sarapatel (prato)",
+  "Tabule (prato)",
+  "Amendoim, grão cru (incluí)",
+  "Amendoim, torrado, salgado (torrado/salgado)",
+  "Ervilha, em vagem (crua/cozida — mantive)",
+  "Ervilha, enlatada drenada",
+  "Feijão, carioca cozido",
+  "Feijão, fradinho cozido",
+  "Feijão, jalo cozido",
+  "Feijão, preto cozido",
+  "Feijão, rajado cozido",
+  "Feijão, rosinha cozido",
+  "Feijão, roxo cozido",
+  "Lentilha cozida",
+  "Paçoca, amendoim (processado)",
+  "Pé-de-moleque, amendoim (doces)",
+  "Soja, farinha (derivado)",
+  "Soja, extrato solúvel, natural, fluido (produto)",
+  "Soja, extrato solúvel, pó (produto)",
+  "Soja, queijo (tofu) (produto)",
+  "Tremoço em conserva (conserva)",
+  "Amêndoa, torrada, salgada (oleaginosa)",
+  "Castanha-de-caju, torrada, salgada (oleaginosa)",
+  "Castanha-do-Brasil crua (incluí)",
+  "Coco cru (incluí)",
+  "Gergelim, semente (semente)",
+  "Linhaça, semente (semente)",
+  "Pinhão cozido",
+  "Pupunha cozida",
+  "Noz crua (incluí)",
+  "Presunto, com capa de gordura (processado)",
+  "Presunto, sem capa de gordura (processado)",
+  "Quibe assado",
+  "Quibe frito",
+  "Salame (processado)",
+  "Toucinho frito",
+  "Apresentado (linha ambígua — mantive nome)",
+  "Caldo de carne, tablete (ingrediente)",
+  "Caldo de galinha, tablete (ingrediente)",
+  "Carne, bovina, acém, moído, cozido",
+  "Carne, bovina, acém, sem gordura, cozido",
+  "Carne, bovina, almôndegas, fritas",
+  "Carne, bovina, bucho, cozido",
+  "Carne, bovina, capa de contra-filé, com gordura grelhada",
+  "Carne, bovina, capa de contra-filé, sem gordura grelhada",
+  "Carne, bovina, charque, cozido",
+  "Carne, bovina, filé à milanesa frita/assada (preparado)",
+  "Carne, bovina, contra-filé de costela, grelhado",
+  "Carne, bovina, contra-filé, com gordura, grelhado",
+  "Carne, bovina, contra-filé, sem gordura, grelhada",
+  "Carne, bovina, costela assada",
+  "Carne, bovina, coxão duro, sem gordura, cozido",
+  "Carne, bovina, coxão mole, sem gordura, cozido",
+  "Carne, bovina, cupim assado",
+  "Carne, bovina, filé mignon, sem gordura, cozido",
+  "Carne, bovina, flanco, sem gordura, cozido",
+  "Carne, bovina, fraldinha, com gordura, cozida",
+  "Carne, bovina, lagarto, cozido",
+  "Carne, bovina, língua cozida",
+  "Carne, bovina, maminha grelhada",
+  "Carne, bovina, miolo de alcatra, sem gordura, grelhado",
+  "Carne, bovina, músculo, sem gordura, cozido",
+  "Carne, bovina, paleta, sem gordura, cozida",
+  "Carne, bovina, patinho, sem gordura, cozido",
+  "Carne, bovina, patinho, sem gordura, grelhado",
+  "Carne, bovina, peito, sem gordura, cozido",
+  "Carne, bovina, picanha, com gordura, grelhada",
+  "Carne, bovina, picanha, sem gordura, grelhada",
+  "Carne, bovina, seca cozida",
+  "Coxinha de frango frita",
+  "Croquete, de carne frito",
+  "Empada de frango, pré-cozida assada",
+  "Empada de frango, pré-cozida (preparado)",
+  "Frango, caipira, inteiro, com pele cozido",
+  "Frango, caipira, inteiro, sem pele cozido",
+  "Frango, coração grelhado",
+  "Frango, coxa, com pele, assada",
+  "Frango, coxa, com pele, cozida",
+  "Frango, coxa, sem pele, cozida",
+  "Frango, filé, à milanesa (preparado)",
+  "Frango, inteiro, sem pele, assado",
+  "Frango, inteiro, sem pele, cozido",
+  "Frango, peito, com pele, assado",
+  "Frango, peito, sem pele, cozido",
+  "Frango, peito, sem pele, grelhado",
+  "Frango, sobrecoxa, com pele, assada",
+  "Frango, sobrecoxa, sem pele, assada",
+  "Hambúrguer, bovino frito",
+  "Hambúrguer, bovino grelhado",
+  "Linguiça, frango frita",
+  "Linguiça, frango grelhada",
+  "Linguiça, porco frita",
+  "Linguiça, porco frita (variante)",
+  "Linguiça, porco grelhada",
+  "Mortadela (processado)",
+  "Peru, congelado assado",
+  "Porco, bisteca frita",
+  "Porco, bisteca grelhada",
+  "Porco, costela assada",
+  "Porco, lombo assado",
+  "Porco, pernil assado",
+  "Bebida láctea, pêssego (produto)",
+  "Creme de Leite (derivado)",
+  "Iogurte, natural (derivado)",
+  "Iogurte, natural, desnatado (derivado)",
+  "Iogurte, sabor abacaxi (derivado)",
+  "Iogurte, sabor morango (derivado)",
+  "Iogurte, sabor pêssego (derivado)",
+  "Leite, condensado (derivado)",
+  "Leite, de cabra (derivado)",
+  "Leite, de vaca, achocolatado (derivado)",
+  "Leite, de vaca, desnatado, pó (derivado)",
+  "Leite, de vaca, desnatado, UHT (derivado)",
+  "Leite, de vaca, integral (derivado)",
+  "Leite, de vaca, integral, pó (derivado)",
+  "Leite, fermentado (derivado)",
+  "Queijo, minas, frescal (derivado)",
+  "Queijo, minas, meia cura (derivado)",
+  "Queijo, mozarela (derivado)",
+  "Queijo, parmesão (derivado)",
+  "Queijo, pasteurizado (derivado)",
+  "Queijo, petit suisse, morango (derivado)",
+  "Queijo, prato (derivado)",
+  "Queijo, requeijão, cremoso (derivado)",
+  "Queijo, ricota (derivado)",
+  "Omelete, de queijo (preparado)",
+  "Ovo, de galinha, clara cozida/10minutos",
+  "Ovo, de galinha, gema cozida/10minutos",
+  "Ovo, de galinha, inteiro cozido/10minutos",
+  "Ovo, de galinha, inteiro frito"
+];
+
+/* ============================================
+    Índice glicêmico (listas de referência)
+    ============================================ */
+const IG_LOW = new Set(['maçã','maca','pera','ameixa','cereja','abacate','abacaxi','morango','pêssego','lentilha','amendoim','iogurte natural desnatado','leite desnatado', /* Add more normalized names */]);
+const IG_MODERATE = new Set(['arroz integral','batata doce','abacaxi','melão','banana','aveia','pão integral']);
+const IG_HIGH = new Set(['pão branco','arroz branco','melancia','batata inglesa','açúcar','mel', 'tapioca']);
+
+/* ============================================
+    SuperDietEngine v5.1 (TAF + Swap + Fixes)
+    ============================================ */
+const SuperDietEngine = (function(){
+
+  // ============================================
+  // Helpers Internos (movidos para cá)
+  // ============================================
+  function levenshtein(a, b) { if(!a || !b) return (a||'') === (b||'') ? 0 : Infinity; a = a.toString(); b = b.toString(); const al = a.length, bl = b.length; const dp = Array.from({length: al+1}, () => new Array(bl+1).fill(0)); for(let i=0;i<=al;i++) dp[i][0]=i; for(let j=0;j<=bl;j++) dp[0][j]=j; for(let i=1;i<=al;i++){ for(let j=1;j<=bl;j++){ const cost = a[i-1] === b[j-1] ? 0 : 1; dp[i][j] = Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost); } } return dp[al][bl]; }
+  
+  function detectGoalType(text){ const s = (text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); const loseKeywords = ['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer']; const gainKeywords = ['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho']; let foundLose = false, foundGain = false; const words = s.split(/[\s,.;:!?()]+/).filter(Boolean); const checkList = (kwList) => { for(const kw of kwList){ if (s.includes(kw)) return true; for(const w of words){ if (w === kw) return true; if (levenshtein(w, kw) <= 1) return true; } } return false; }; foundLose = checkList(loseKeywords); foundGain = checkList(gainKeywords); if(foundLose && !foundGain) return 'emagrecer'; if(foundGain && !foundLose) return 'musculo'; if(foundLose && foundGain) return 'ambos'; return 'ambos'; } 
+  
+  function extractKgFromGoalText(text){ const s = (text||'').toLowerCase().replace(',', '.'); let match = s.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|kilos|quilos|quilo|kilos?)/); if (match) return parseFloat(match[1].replace(',', '.')); match = s.match(/(perder|ganhar)\s+(-?\d+(?:[.,]\d+)?)/); if (match) return parseFloat(match[2].replace(',', '.')) * (match[1].startsWith('perder') ? -1 : 1); return null; }
+  
+  function computeAggressiveness(kgChange, months, goalType){ if(kgChange === null || typeof kgChange === 'undefined') return 'moderado'; const absKg = Math.abs(kgChange); const m = Math.max(1, months || 3); const kgPerMonth = absKg / m; if (goalType === 'musculo') { if (kgPerMonth <= 0.4) return 'baixo'; if (kgPerMonth <= 0.8) return 'moderado'; return 'agressivo'; } else { /* emagrecer ou ambos */ if (kgPerMonth <= 1.5) return 'baixo'; if (kgPerMonth <= 3.0) return 'moderado'; return 'agressivo'; } }
+  // ============================================
+
+  // utilitários
+  function _round(n,d=2){ return Math.round((Number(n) + Number.EPSILON) * Math.pow(10,d)) / Math.pow(10,d); }
+  function _safeNum(v,f=0){ const n = Number(v); return isNaN(n) ? f : n; }
+  // normalizeName está no escopo global
+  function nowISO(){ return (new Date()).toISOString(); }
+  // clamp está no escopo global
+
+  // Seed inicial (base) - Adicionando placeholders GI/GL
+  const v5_FoodDatabase = {
       // Proteínas (principais)
       'frango_peito': { 
         name:'Frango, Peito sem pele cozido', 
@@ -647,6 +1253,12 @@
         price_per_kg: 40.0, category:'gordura_boa', sub_category:'oleaginosa', ig: 14,
         portion: { name: 'colher(es)', grams: 15 }, max_portions: 3
       },
+      'acai_puro_congelado': {
+        name:'Açaí, polpa pura congelada (sem açúcar)',
+        nutrition:{ kcal:58, protein_g:0.8, carb_g:6.2, fat_g:3.9, fiber_g:2.9 },
+        price_per_kg: 20.0, category:'gordura_boa', sub_category:'fruta_gordura', ig: 10,
+        portion: { name: 'porção(ões)', grams: 100 }, max_portions: 2
+      },
 
       // frutas
       'banana_nanica_crua': { 
@@ -806,9 +1418,42 @@
           max_portions: (typeof s.max_portions !== 'undefined') ? s.max_portions : null
         };
       });
-      _lookup = buildLookup(masterDB);
+      // Adiciona alimentos da lista externa (alimentosDB) que não estão no seed (v5_FoodDatabase)
+      if (typeof alimentosDB !== 'undefined' && Array.isArray(alimentosDB)) {
+        const existingNormalizedNames = new Set(Object.values(masterDB).map(f => normalizeName(f.name)));
+        alimentosDB.forEach(foodName => {
+          if (typeof foodName !== 'string' || foodName.trim() === '') return;
+          const normalized = normalizeName(foodName);
+          if (!existingNormalizedNames.has(normalized)) {
+            let category = 'other';
+            if (/frango|carne|bovina|porco|peixe|atum|sardinha|camarão|ovo|queijo|iogurte|leite|whey/.test(normalized)) category = 'proteina_main';
+            if (/arroz|aveia|pão|macarrão|cereal|tapioca|cuscuz|milho|batata|mandioca/.test(normalized)) category = 'cereal_main';
+            if (/feijão|lentilha|grão-de-bico|ervilha|soja/.test(normalized)) category = 'leguminosa';
+            if (/alface|brócolis|couve|espinafre|tomate|cenoura|abobrinha/.test(normalized)) category = 'verdura';
+            if (/banana|maçã|maca|pera|laranja|mamão|uva|abacaxi|morango|cereja|ameixa/.test(normalized)) category = 'fruta';
+            if (/azeite|óleo|manteiga|castanha|amendoim|abacate/.test(normalized)) category = 'gordura_boa';
+            
+            const id = 'ext_' + normalized.replace(/\s+/g,'_').slice(0,50);
+            masterDB[id] = { 
+                id: id,
+                name: foodName, 
+                nutrition: { kcal: 150, protein_g: 8, carb_g: 20, fat_g: 4, fiber_g: 2 }, // Nutrição genérica
+                price_per_kg: 12.0, // Preço genérico
+                category: category,
+                sub_category: null,
+                preps: ['cozida', 'assada', 'grelhada', 'crua'],
+                glycemic_index: null,
+                glycemic_load: null,
+                portion: { name: 'porção(ões)', grams: 100 },
+                max_portions: 3
+            };
+            existingNormalizedNames.add(normalized);
+          }
+        });
+      }
+      _lookup = buildLookup(masterDB); // Reconstrói o lookup com a DB combinada
     }
-    function normalizeName(n){ return (n||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
+    
     function stripParenthesis(name){ if(!name) return name; return name.replace(/\s*\(.*?\)\s*/g,'').trim(); }
 
     function buildLookup(db){
@@ -821,7 +1466,7 @@
       });
       return { byName, byId };
     }
-    rebuildMasterDB();
+    rebuildMasterDB(); // Popula o masterDB e _lookup pela primeira vez
 
     let _lookup = buildLookup(masterDB);
 
@@ -874,47 +1519,6 @@
       return 1.55;
     }
 
-    /* Levenshtein & helpers */
-    function levenshtein(a,b){
-      if(!a||!b) return (a||'') === (b||'') ? 0 : Infinity;
-      a = a.toString(); b = b.toString();
-      const al=a.length, bl=b.length;
-      const dp = Array.from({length:al+1},()=>new Array(bl+1).fill(0));
-      for(let i=0;i<=al;i++) dp[i][0]=i;
-      for(let j=0;j<=bl;j++) dp[0][j]=j;
-      for(let i=1;i<=al;i++){
-        for(let j=1;j<=bl;j++){
-          const cost = a[i-1] === b[j-1] ? 0 : 1;
-          dp[i][j] = Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost);
-        }
-      }
-      return dp[al][bl];
-    }
-
-    function detectGoalType(text){
-      const s = (text||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-
-      const loseKeywords = ['emagrec','perder','secar','definicao','definir','perder gordura','emagrecer','magrecer'];
-      const gainKeywords = ['ganhar','massa','hipertrof','musculo','crescer','engordar','ganho'];
-      const words = s.split(/[\s,.;:!?()]+/).filter(Boolean);
-      const checkList = (arr) => {
-        for(const kw of arr){
-          if(s.includes(kw)) return true;
-          for(const w of words){
-            if(w===kw) return true;
-            if(levenshtein(w,kw) <= 1) return true;
-          }
-        }
-        return false;
-      };
-      const foundLose = checkList(loseKeywords);
-      const foundGain = checkList(gainKeywords);
-      if(foundLose && !foundGain) return 'emagrecer';
-      if(foundGain && !foundLose) return 'musculo';
-      if(foundLose && foundGain) return 'ambos';
-      return 'ambos';
-    }
-
     /* ========== NEW: extractRestrictions ========== */
     function extractRestrictions(profile){
       const text = (profile.grande_meta || profile.goal_prompt || profile.quais_suplementos || '').toString().toLowerCase();
@@ -957,36 +1561,7 @@
       }
       return Array.from(restrictions);
     }
-
-    /* computeAggressiveness */
-    function computeAggressiveness(kgChange, months, goalType){
-      const goal = (goalType || '').toString().toLowerCase();
-      const isMuscle = goal.includes('muscl') || goal.includes('musculo') || goal.includes('muscle');
-      const isFat = goal.includes('fat') || goal.includes('loss') || goal.includes('perd') || goal.includes('emagrec');
-
-      if(kgChange === null || typeof kgChange === 'undefined') return 'moderado';
-      const absKg = Math.abs(kgChange);
-      const m = Math.max(1, months || 3);
-      const kgPerMonth = absKg / m;
-      if(isMuscle){
-        if(kgPerMonth <= 0.4) return 'baixo';
-        if(kgPerMonth <= 0.8) return 'moderado';
-        return 'agressivo';
-      } else {
-        if(kgPerMonth <= 0.5) return 'baixo';
-        if(kgPerMonth <= 1.0) return 'moderado';
-        return 'agressivo';
-      }
-    }
-
-    /* ========== helper to extract numeric kg change from a text like "perder 10kg" (MOVED INSIDE ENGINE) ========== */
-    function extractKgFromGoalText(text){
-      if(!text) return null;
-      const match = (text||'').toString().match(/(-?\d+(?:[\.,]\d+)?)\s*(kg|kgs|quilos|kilos)/i);
-      if(match){ return parseFloat(match[1].toString().replace(',', '.')) * (text.toLowerCase().includes('perder') || text.toLowerCase().includes('emagrec') ? -1 : 1); }
-      return null;
-    }
-
+    
     /* ========== KEYWORDS & helpers ========== */
     const KEYWORDS_COMPOSITION = ['perder peso','gordura','kg','quilos','hipertrofia','massa muscular','recomposicao','definir','definicao','estetica','percentual de gordura','recomposição'];
     const KEYWORDS_PERFORMANCE = ['maratona','correr','corrida','triatlo','ironman','endurance','resistencia','forca','powerlifting','supino','agachamento','levantamento terra','lpo','muscle-up','calistenia','bandeira humana','handstand','futebol','trilha','competir','crossfit','performance','desempenho','taf'];
@@ -1422,7 +1997,7 @@
       const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null })); 
       const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 }; 
       if(selectedDaysArr && selectedDaysArr.length>0){
-        selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }}); 
+        selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined && week[idx]) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }}); 
       } else {
         const dt = Math.max(0, _safeNum(diasTreinoCount,3));
         if(dt>0){
@@ -1450,7 +2025,7 @@
       const excess = newTotal - baseTotal;
       if(excess <= 0) return weekArr;
       const nonCheat = weekArr.filter(d=>!d.isCheatDay);
-      if(nonCheat.length === 0) return weekArr;
+      if (nonCheat.length === 0) return weekArr; 
       const perDayReduction = Math.ceil(excess / nonCheat.length);
       for(const d of nonCheat){ const minAllowed = Math.round(d.baseCalories * 0.6); d.baseCalories = Math.max(minAllowed, d.baseCalories - perDayReduction); d.adjustedForCheat = true; }
       return weekArr;
@@ -1478,12 +2053,10 @@
       let numProtPortions = (protInOnePortion > 0) ? ( (_safeNum(mealMacroTargets.prot_g,0)) / protInOnePortion ) : 0;
       let numCarbPortions = (carbInOnePortion > 0) ? ( (_safeNum(mealMacroTargets.carbs_g,0)) / carbInOnePortion ) : 0;
 
-      // --- INÍCIO DA CORREÇÃO (max_portions) ---
       const protMax = _safeNum(protRec?.max_portions, 99);
       const carbMax = _safeNum(carbRec?.max_portions, 99);
       numProtPortions = Math.min(numProtPortions, protMax);
       numCarbPortions = Math.min(numCarbPortions, carbMax);
-      // --- FIM DA CORREÇÃO ---
 
       const quantize = (v) => Math.max(0.25, Math.round(v * 4) / 4);
 
@@ -1518,50 +2091,16 @@
       return out;
     }
 
-    function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
-
-    function calculateEndDate(prazoText){
-      if(!prazoText) return null;
-      const now = new Date();
-      const text = prazoText.toString().toLowerCase().trim();
-      const clean = text.replace(/[,]/g,'.').replace(/\s+/g,' ');
-      let match;
-      match = clean.match(/(\d+(?:[.,]\d+)?)\s*(anos|ano)/);
-      if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const monthsToAdd = Math.round(value*12); const d=new Date(); d.setMonth(d.getMonth() + monthsToAdd); return d; } }
-      match = clean.match(/(\d+)\s*ano(?:s)?\s*e\s*meio/);
-      if(match){ const d=new Date(); d.setMonth(d.getMonth() + (parseInt(match[1],10)*12) + 6); return d; }
-      match = clean.match(/(\d+(?:[.,]\d+)?)\s*(meses|m[eê]s|mes)/);
-      if(match){ const value = parseFloat(match[1].replace(',', '.')); if(!isNaN(value)){ const d=new Date(); d.setMonth(d.getMonth() + Math.round(value)); return d; } }
-      match = clean.match(/(\d+(?:[.,]\d+)?)\s*(year|years)/);
-      if(match){ const value = parseFloat(match[1].replace(',', '.')); const d=new Date(); d.setMonth(d.getMonth() + Math.round(value * 12)); return d; }
-      match = clean.match(/^(\d{1,3})$/);
-      if(match){ const n = parseInt(match[1],10); if(n <= 36){ const d=new Date(); d.setMonth(d.getMonth() + n); return d; } }
-      if(clean.includes('meio ano') || clean.includes('1/2 ano')) { const d=new Date(); d.setMonth(d.getMonth()+6); return d; }
-      const year = now.getFullYear();
-      if(clean.includes('final do ano') || clean.includes('fim de ano')) return new Date(year,11,31);
-      if(clean.includes('verao')||clean.includes('verão')){ const s=new Date(year,11,21); return now<s?s:new Date(year+1,11,21); }
-      if(clean.includes('natal')){ const c=new Date(year,11,25); return now<c?c:new Date(year+1,11,25); }
-      if(clean.includes('ano novo')) return new Date(year+1,0,1);
-      if(clean.includes('pascoa')||clean.includes('páscoa')){ const e=getEaster(year); return now<e?e:getEaster(year+1); }
-      return null;
-    }
-
-    function userHasSupplement(profile, keyword){
-      if(!profile) return false;
-      if((profile.uso_suplemento||'').toString().toLowerCase() !== 'sim') return false;
-      const q = normalizeForSearch(profile.quais_suplementos || '');
-      if(!q) return false;
-      return q.includes(keyword);
-    }
-
     /* ========== planLongTerm (v10.0) with blueprints & portion logic ========== */
     async function planLongTerm(profile, options = {}) {
       const start = options.startDate ? new Date(options.startDate) : new Date();
-      const months = Math.max(1, _safeNum(options.months, 3));
 
       // strategy: use provided option or analyze
       const strategy = options.strategy || analyzeMasterGoal(profile);
       const targets = deriveTargets(profile, strategy);
+      
+      const months = targets.monthsTarget || Math.max(1, _safeNum(options.months, 3));
+      
       const profileWithTargets = {...profile, targets};
       const dailyTargetCalories = targets.targetCalories;
       const weeklyBudget = options.weeklyBudgetOverride || weeklyBudgetFromMonthly(profile.orcamento_mes_R$ || profile.orcamento || 0);
@@ -1628,10 +2167,9 @@
       const getFirst = (list) => (list && list.length ? list[0] : null);
       const pickModulo = (list, idx) => { if(!list || list.length===0) return null; const i = Math.abs(idx) % list.length; return list[i]; };
 
-     for(let w=0; w<totalWeeks; w++){
-        const monthIndex = Math.floor(w / 4.345); // used to compute long-term penalizations
+      for(let w=0; w<totalWeeks; w++){
+        const monthIndex = Math.floor(w / 4.345);
 
-        // short-term memory lists (reiniciam por semana)
         let recentProteinPicks = [];
         let recentCarbPicks = [];
 
@@ -1639,7 +2177,6 @@
         weekTemplate = compensateCheatWeek(weekTemplate);
         const daysData = [];
 
-        // prepare long-term penalize lists based on monthIndex
         const longTermPenalize = {};
         cats.forEach(cat => {
           const arr = fullRotation[cat] || [];
@@ -1663,35 +2200,33 @@
           }
           const mealsCount = mealNames.length;
 
-          // meal weights & nutrient timing
           let mealWeights = mealNames.map(m => /almoço|jantar/i.test(m) ? 1.8 : (/café/i.test(m) ? 1.2 : 0.6));
           if(isTraining){
             mealWeights = mealWeights.map((wgt,idx) => {
               const name = mealNames[idx].toLowerCase();
-              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6; // more carbs around training
+              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6;
               return wgt;
             });
           } else {
             mealWeights = mealWeights.map((wgt,idx) => {
               const name = mealNames[idx].toLowerCase();
-              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8; // less carbs rest days
+              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8;
               return wgt;
             });
           }
           const totalW = mealWeights.reduce((a,b)=>a+b,0);
           const meals = [];
 
-          // daily pick lists to add to recent memory at end of day
           const dayProteinPicks = [];
           const dayCarbPicks = [];
 
-          // --- Vegetal/Fruta rotation (Falha 5) ---
+          // --- Vegetal/Fruta rotation ---
           const vegSubgroupIndex = d % 4;
           let vegSubgroupToUse;
           if (vegSubgroupIndex === 0) vegSubgroupToUse = 'verde_escuro';
           else if (vegSubgroupIndex === 1) vegSubgroupToUse = 'laranja_vermelho';
           else if (vegSubgroupIndex === 2) vegSubgroupToUse = 'folhoso';
-          else vegSubgroupToUse = 'crucifero'; // if not present can fall back
+          else vegSubgroupToUse = 'crucifero';
           const fruitSubgroupToUse = (d % 2 === 0) ? 'fruta_comum' : 'fruta_vermelha';
 
           // candidate pools
@@ -1703,7 +2238,6 @@
                                             .concat(_rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions));
           const snackCarbsCandidates = _rankFoodsByCategory(['cereal_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['cereal_snack'], restrictions)
                                           .concat(_rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions));
-          // for veg/fruits we will filter by sub_category after ranking
           const commonVegCandidatesAll = _rankFoodsByCategory(['verdura'], profileWithTargets, [], longTermPenalize['verdura'], restrictions);
           const commonFruitCandidatesAll = _rankFoodsByCategory(['fruta'], profileWithTargets, [], longTermPenalize['fruta'], restrictions);
           const commonVegCandidates = commonVegCandidatesAll.filter(id => (v5_FoodDatabase[id]?.sub_category || '') === vegSubgroupToUse);
@@ -1839,12 +2373,16 @@
             }
 
             let groupKcal = 0;
-            const finalComponents = components.map(cItem => {
+            let finalComponents = components.map(cItem => {
               const rec = findFood(cItem.source_id || cItem.food);
               const kcal = rec?.nutrition ? _round((rec.nutrition.kcal || 0) * cItem.grams / 100, 0) : 0;
-              groupKcal += kcal;
+              // groupKcal += kcal; // Será recalculado
               return { ...cItem, kcal };
             });
+
+            // Aplica merge/filter global
+            finalComponents = mergeAndFilterComponents(finalComponents);
+            groupKcal = finalComponents.reduce((acc, comp) => acc + (comp.kcal || 0), 0); // Recalcula Kcal total
 
             finalComponents.forEach(fc=>{
               if(fc.source_id){
@@ -1903,41 +2441,55 @@
         });
       } // end weeks loop
 
-      const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s + (w.estimatedWeeklyCost || 0),0) / timeline_weeks.length, 2);
-      const budgetAdherence = 0.9;
-      const budgetWarn = weeklyBudget > 0 && avgWeeklyCost > weeklyBudget ? true : false;
-      const budgetDiff = budgetWarn ? _round(avgWeeklyCost - weeklyBudget, 2) : 0;
-      const meta = { adherenceToCaloriesPct: 0.95, adherenceToBudgetPct: budgetAdherence, practicalityPct: 0.92, varietyScore: 0.9, feasibilityPct:0.9, budgetWarn, budgetDiff };
-      const credibilityScore = 90;
+       // Rotação Mensal (aplica a rotação usando alternatesByCategory)
+       timeline_weeks.forEach((week,wIdx) => {
+        const monthIndex = Math.floor(wIdx / 4.345); // Índice do mês aproximado
+        if (monthIndex > 0) { // Não rotaciona no primeiro mês
+          week.days.forEach(day => {
+            day.meals.forEach(meal => {
+              // Passa a lista de alternativas para a função de rotação
+              meal.components = rotateAlternativesForMonth(meal.components, monthIndex, alternatesByCategory);
+              // Após rotacionar, faz merge/filter novamente para limpar possíveis duplicatas ou porções < 10g resultantes da rotação
+              meal.components = mergeAndFilterComponents(meal.components || []); // <<< Usa a função global
+               // Recalcula Kcal total da refeição após rotação e merge/filter
+               meal.mealKcalTotal = meal.components.reduce((acc, comp) => acc + (comp.kcal || 0), 0);
+            });
+          });
+        }
+      });
 
-      const payload = {
-        version: 'super-algo-v10.0-portion-blueprints-fixed',
-        created_at: nowISO(),
-        profile_snapshot: profile,
-        targets,
-        timeline_weeks,
-        estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
-        credibility: { score: credibilityScore, breakdown: meta },
-        provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v10.0' }
-      };
-      if(options.debug) payload._internal = { fullRotation, weekTemplateUsed: timeline_weeks[0]?.days.map(d=>({ dow:d.dayOfWeekIndex, train:d.isTrainingDay, cheat:d.isCheatDay })) };
-      return payload;
-    }
+    const avgWeeklyCost = _round(timeline_weeks.reduce((s,w)=>s + (w.estimatedWeeklyCost || 0),0) / timeline_weeks.length, 2);
+    const budgetAdherence = (() => { const ratio = weeklyBudget > 0 ? avgWeeklyCost / weeklyBudget : 1; return clamp(1 - Math.abs(ratio - 1), 0, 1); })(); // Adere melhor se <= 1
+    const meta = { adherenceToCaloriesPct: 0.95, adherenceToBudgetPct: _round(budgetAdherence, 2), practicalityPct: 0.92, varietyScore: clamp(0.5 + Object.keys(_lookup).length / 800, 0.5, 0.95), feasibilityPct: 0.9 }; // Variety score usa tamanho do lookup
+    const credibilityScore = computeCredibility(meta);
 
-    /* Persistence helpers inside engine (uses _supabase) */
-    let _supabase = null;
-    function initModule({ sup } = {}){ if(!sup) throw new Error('supabase client required'); _supabase = sup; }
 
-    async function savePlan(userId, planPayload, options = {}){ 
+    const payload = {
+      version: 'super-algo-v10.1-rotation-fix', // Nova versão
+      created_at: nowISO(),
+      profile_snapshot: profile,
+      targets,
+      timeline_weeks,
+      estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
+      credibility: { score: credibilityScore, breakdown: meta },
+      provenance: { food_db_version: 'v5_FoodDatabase_user_portions', built_with: 'super-diet-engine-v10.1' }
+    };
+     if(options.debug) payload._internal = { lookupSize: Object.keys(_lookup).length, alternatesGenerated: alternatesByCategory, weekTemplateUsed: timeline_weeks[0]?.days.map(d => ({ dow: d.dayOfWeekIndex, train: d.isTrainingDay, cheat: d.isCheatDay })) };
+    return payload;
+  }
+
+  // Funções de persistência (init, savePlan, loadPlans, loadLatestPlan) mantidas
+   let _supabase = null;
+  function initModule({ sup } = {}){ if(!sup) throw new Error('supabase client required'); _supabase = sup; }
+  async function savePlan(userId, planPayload, options = {}){
       if(!_supabase) throw new Error('Supabase client not initialized.');
-      const title = options.title || `Plano - ${planPayload.targets ? planPayload.targets.targetCalories + ' kCal' : nowISO()}`;
+      const title = options.title || `Plano - ${planPayload.targets?.targetCalories || '?'} kCal`;
       const row = { user_id: userId, title, payload: planPayload };
       const { data, error } = await _supabase.from('user_diets').insert([row]).select().single();
       if(error) { console.error('Erro ao salvar plano:', error); throw error; }
       return data;
-    }
-
-    async function loadPlans(userId){
+  }
+  async function loadPlans(userId){
       if(!_supabase) throw new Error('Supabase client not initialized.');
       if (!userId || typeof userId !== 'string') {
          console.error('loadPlans: userId inválido:', userId);
@@ -1946,16 +2498,15 @@
       const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', userId).order('created_at', { ascending:false });
       if(error) { console.error('Erro ao carregar planos:', error); throw error; }
       return data || [];
-    }
-
-    async function loadLatestPlan(userId){
+  }
+  async function loadLatestPlan(userId){
        if (!userId || typeof userId !== 'string') {
          console.error('loadLatestPlan: userId inválido:', userId);
          return null; 
        }
        const plans = await loadPlans(userId);
        return plans?.[0]; 
-    }
+  }
 
     /* ========== Merge food DB from Supabase (Falha 4) ========== */
     function mergeFoodDBFromRows(rows){
@@ -1985,23 +2536,25 @@
       rebuildMasterDB();
     }
 
-    /* ========== PUBLIC API ========== */
-    return {
-      init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
-      generatePlan: planLongTerm,
-      savePlan, loadPlans, loadLatestPlan, findFood,
-      
-      // Funções de análise (do seu código)
-      analyzeMasterGoal,
-      deriveTargets,
-      detectGoalType,
-      
-      // NOVAS FUNÇÕES DE TROCA (para a UI usar)
-      getFoodCategory,
-      getFoodsByCategory,
-      swapFoodInPlan,
-      mergeFoodDBFromRows
-    };
+
+  /* ========== PUBLIC API ========== */
+  return {
+    init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
+    generatePlan: planLongTerm,
+    savePlan, loadPlans, loadLatestPlan, findFood,
+    
+    // Funções de análise (do seu código)
+    analyzeMasterGoal,
+    deriveTargets,
+    detectGoalType,
+    
+    // NOVAS FUNÇÕES DE TROCA (para a UI usar)
+    getFoodCategory,
+    getFoodsByCategory,
+    swapFoodInPlan,
+    mergeFoodDBFromRows
+    // calculateEndDate NÃO é exportado daqui, pois está global
+  };
 
   })(); // end SuperDietEngine IIFE
 
@@ -2529,7 +3082,7 @@
        =========================================== */
 
 
-    async function initializePageData(){
+   async function initializePageData(){
       // load alimentos_db from Supabase (Falha 4)
       try{
         const { data: foodsRows, error: foodsError } = await supabase.from('alimentos_db').select('*').limit(1000);
