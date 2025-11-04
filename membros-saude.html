@@ -1628,9 +1628,10 @@
       const getFirst = (list) => (list && list.length ? list[0] : null);
       const pickModulo = (list, idx) => { if(!list || list.length===0) return null; const i = Math.abs(idx) % list.length; return list[i]; };
 
-      for(let w=0; w<totalWeeks; w++){
-        const monthIndex = Math.floor(w / 4.345);
+     for(let w=0; w<totalWeeks; w++){
+        const monthIndex = Math.floor(w / 4.345); // used to compute long-term penalizations
 
+        // short-term memory lists (reiniciam por semana)
         let recentProteinPicks = [];
         let recentCarbPicks = [];
 
@@ -1638,6 +1639,7 @@
         weekTemplate = compensateCheatWeek(weekTemplate);
         const daysData = [];
 
+        // prepare long-term penalize lists based on monthIndex
         const longTermPenalize = {};
         cats.forEach(cat => {
           const arr = fullRotation[cat] || [];
@@ -1661,23 +1663,25 @@
           }
           const mealsCount = mealNames.length;
 
+          // meal weights & nutrient timing
           let mealWeights = mealNames.map(m => /almoço|jantar/i.test(m) ? 1.8 : (/café/i.test(m) ? 1.2 : 0.6));
           if(isTraining){
             mealWeights = mealWeights.map((wgt,idx) => {
               const name = mealNames[idx].toLowerCase();
-              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6;
+              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 1.6; // more carbs around training
               return wgt;
             });
           } else {
             mealWeights = mealWeights.map((wgt,idx) => {
               const name = mealNames[idx].toLowerCase();
-              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8;
+              if(/lanche tarde/.test(name) || /jantar/.test(name)) return wgt * 0.8; // less carbs rest days
               return wgt;
             });
           }
           const totalW = mealWeights.reduce((a,b)=>a+b,0);
           const meals = [];
 
+          // daily pick lists to add to recent memory at end of day
           const dayProteinPicks = [];
           const dayCarbPicks = [];
 
@@ -1935,14 +1939,22 @@
 
     async function loadPlans(userId){
       if(!_supabase) throw new Error('Supabase client not initialized.');
+      if (!userId || typeof userId !== 'string') {
+         console.error('loadPlans: userId inválido:', userId);
+         return []; 
+      }
       const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', userId).order('created_at', { ascending:false });
       if(error) { console.error('Erro ao carregar planos:', error); throw error; }
-      return data;
+      return data || [];
     }
 
     async function loadLatestPlan(userId){
-      const plans = await loadPlans(userId);
-      return plans && plans.length ? plans[0] : null;
+       if (!userId || typeof userId !== 'string') {
+         console.error('loadLatestPlan: userId inválido:', userId);
+         return null; 
+       }
+       const plans = await loadPlans(userId);
+       return plans?.[0]; 
     }
 
     /* ========== Merge food DB from Supabase (Falha 4) ========== */
@@ -1967,7 +1979,6 @@
             max_portions: (typeof r.max_portions !== 'undefined') ? _safeNum(r.max_portions, null) : null
           };
         }catch(e){
-          // skip malformed row
           console.warn('mergeFoodDBFromRows: skip row', e);
         }
       });
@@ -1979,11 +1990,13 @@
       init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
       generatePlan: planLongTerm,
       savePlan, loadPlans, loadLatestPlan, findFood,
-      calculateEndDate,
+      
+      // Funções de análise (do seu código)
       analyzeMasterGoal,
       deriveTargets,
       detectGoalType,
-      // swap functions & DB merge
+      
+      // NOVAS FUNÇÕES DE TROCA (para a UI usar)
       getFoodCategory,
       getFoodsByCategory,
       swapFoodInPlan,
@@ -1998,16 +2011,18 @@
     const now = new Date(); now.setHours(0,0,0,0);
     const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
     const eDate = new Date(endDate); eDate.setHours(0,0,0,0);
-    const totalDuration = eDate.getTime() - sDate.getTime();
+    const totalDuration = Math.max(1, eDate.getTime() - sDate.getTime()); // Evita divisão por zero
     const elapsedDuration = now.getTime() - sDate.getTime();
-    const daysRemaining = Math.ceil((eDate - now) / (1000*60*60*24));
-    let progressPercentage = (elapsedDuration / totalDuration) * 100;
-    if(progressPercentage < 0) progressPercentage = 0;
-    if(progressPercentage > 100) progressPercentage = 100;
+    const daysRemaining = Math.max(0, Math.ceil((eDate - now) / (1000*60*60*24)));
+    let progressPercentage = clamp((elapsedDuration / totalDuration) * 100, 0, 100); 
     document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
     document.getElementById('start-date-label').textContent = sDate.toLocaleDateString('pt-BR');
     document.getElementById('end-date-label').textContent = eDate.toLocaleDateString('pt-BR');
-    document.getElementById('countdown-days').textContent = daysRemaining >= 0 ? daysRemaining : 0;
+    document.getElementById('countdown-days').textContent = daysRemaining;
+    document.getElementById('form-wrapper').style.display='none';
+    document.getElementById('results-wrapper').style.display='block';
+    
+    // Mostra a aba "Percurso"
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('percurso').classList.add('active');
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -2016,39 +2031,46 @@
 
   function renderPlanToContainer(container, planPayload){
     container.innerHTML = '';
-    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
+    const header = document.createElement('div'); header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap: wrap;';
     const title = document.createElement('h4'); title.textContent = 'Plano de Dieta — visão geral';
-    const meta = document.createElement('div'); meta.style.color = '#bbb';
-    const targetCals = planPayload.targets.targetCalories || planPayload.estimates.dailyTargetCalories || '...';
-    const tdee = planPayload.targets.tdee || planPayload.estimates.tdee || '...';
-    meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <div style="font-size:12px;color:#bbb">TDEE: ${tdee} kcal</div>`;
+    const meta = document.createElement('div'); meta.style.color = '#bbb'; 
+    const targetCals = planPayload.estimates?.dailyTargetCalories || planPayload.targets?.targetCalories || '...'; 
+    const tdee = planPayload.estimates?.tdee || planPayload.targets?.tdee || '...';
+    meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <span style="font-size: 11px; color: #888;">(TDEE: ${tdee} kcal)</span>`; 
     header.appendChild(title); header.appendChild(meta); container.appendChild(header);
 
-    const months = {};
-    planPayload.timeline_weeks.forEach(week => {
-      const date = new Date(week.weekStartISO + 'T00:00:00Z');
-      const monthKey = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}`;
-      months[monthKey] = months[monthKey] || { monthIndex: date.getUTCMonth(), label: date.toLocaleString('pt-BR',{ timeZone: 'UTC', month:'long', year:'numeric' }), weeks: [] };
-      months[monthKey].weeks.push(week);
-    });
-
-    const monthKeys = Object.keys(months).sort();
+    const months = {}; 
+    if(planPayload.timeline_weeks){ 
+      planPayload.timeline_weeks.forEach(week => { 
+        const date = new Date(week.weekStartISO + 'T00:00:00Z'); 
+        const monthKey = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}`; 
+        months[monthKey] = months[monthKey] || { monthIndex: date.getUTCMonth(), label: date.toLocaleString('pt-BR',{ timeZone: 'UTC', month:'long', year:'numeric' }), weeks: [] }; 
+        months[monthKey].weeks.push(week); 
+      }); 
+    } 
+    const monthKeys = Object.keys(months).sort(); 
     const tabsBar = document.createElement('div'); tabsBar.className = 'plan-tabs'; container.appendChild(tabsBar);
-    const contentArea = document.createElement('div'); container.appendChild(contentArea);
+    const contentArea = document.createElement('div'); container.appendChild(contentArea); 
 
     monthKeys.forEach((mk, idx) => {
       const pill = document.createElement('div'); pill.className = 'plan-tab' + (idx===0 ? ' active' : ''); pill.textContent = months[mk].label;
-      pill.onclick = () => { document.querySelectorAll('.plan-tab.active').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); renderMonth(months[mk], contentArea); };
+      pill.onclick = () => { 
+        document.querySelectorAll('.plan-tab.active').forEach(p=>p.classList.remove('active')); 
+        pill.classList.add('active'); 
+        renderMonth(months[mk], contentArea); 
+      };
       tabsBar.appendChild(pill);
-    });
-    if(monthKeys.length) renderMonth(months[monthKeys[0]], contentArea);
+    }); 
+    
+    if(monthKeys.length) renderMonth(months[monthKeys[0]], contentArea); 
+    else { contentArea.innerHTML = '<p style="color:#bbb; text-align:center;">Não foi possível gerar as semanas do plano.</p>'} 
   }
 
   function renderMonth(monthObj, contentArea){
     contentArea.innerHTML = '';
     const wrapper = document.createElement('div'); wrapper.style.marginTop = '12px';
     const days = [];
-    monthObj.weeks.forEach(w => { w.days.forEach(d => { const copy = { ...d }; copy.weekIndex = w.weekIndex; days.push(copy); }); });
+    monthObj.weeks.forEach(w => { (w.days || []).forEach(d => { const copy = { ...d }; copy.weekIndex = w.weekIndex; days.push(copy); }); });
 
     const daysWrap = document.createElement('div'); daysWrap.className = 'plan-days';
     const dayNameMap = { 0:'Dom',1:'Seg',2:'Ter',3:'Qua',4:'Qui',5:'Sex',6:'Sab' };
@@ -2057,23 +2079,23 @@
       const dayOfWeekIndex = d.dayOfWeekIndex;
       const dayName = dayNameMap[dayOfWeekIndex] !== undefined ? dayNameMap[dayOfWeekIndex] : 'Dia';
       const dayCard = document.createElement('div'); dayCard.className = 'plan-day';
-      const dayTitle = document.createElement('div'); dayTitle.style.display='flex'; dayTitle.style.justifyContent='space-between'; dayTitle.style.alignItems='center';
-      const left = document.createElement('div');
+      const dayTitle = document.createElement('div'); dayTitle.style.cssText='display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;';
+      const left = document.createElement('div'); 
       const statusText = d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso';
       const cheatText = d.isCheatDay ? ' • Cheat' : '';
       left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#bbb'};font-size:12px;font-weight:700;">${statusText} ${cheatText}</div>`;
       const right = document.createElement('div'); right.style.textAlign='right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
       dayTitle.appendChild(left); dayTitle.appendChild(right); dayCard.appendChild(dayTitle);
 
-      d.meals.forEach(m => {
+      (d.meals || []).forEach(m => {
+        m.planReference = monthObj; // Adiciona referência ao plano/mês para o editor
         const mealRow = document.createElement('div'); mealRow.className = 'meal-row';
         const mealLeft = document.createElement('div'); mealLeft.className = 'meal-left';
         const name = document.createElement('div'); name.className = 'meal-name'; name.textContent = m.mealName;
-        const listPreview = document.createElement('div'); listPreview.style.color = '#bbb'; listPreview.style.fontSize = '13px';
+        const listPreview = document.createElement('div'); listPreview.className = 'meal-items-preview'; listPreview.style.cssText='color:#bbb; font-size:13px;';
 
-        // NEW: display friendly portions if available (v7.0)
         const details = m.gramsComputed?.details || {};
-        const items = m.components.map(c => {
+        const items = (m.components || []).map(c => {
           if (c.role === 'proteina' && details.prot_portion_name && typeof details.prot_portions !== 'undefined') {
             return `${c.food} (${details.prot_portions} ${details.prot_portion_name})`;
           }
@@ -2083,14 +2105,16 @@
           return `${c.food} (${c.grams}g)`;
         }).join(' • ');
 
-        listPreview.textContent = items;
+        listPreview.textContent = items || '-'; 
         mealLeft.appendChild(name); mealLeft.appendChild(listPreview);
 
-        const mealRight = document.createElement('div'); mealRight.style.display = 'flex'; mealRight.style.flexDirection = 'column'; mealRight.style.alignItems = 'flex-end';
+        const mealRight = document.createElement('div'); mealRight.style.cssText='display:flex; flex-direction:column; align-items:flex-end;';
         const kcal = document.createElement('div'); kcal.className = 'meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
-        const editBtn = document.createElement('button'); editBtn.textContent = 'Editar'; editBtn.style.marginTop = '8px'; editBtn.onclick = () => openMealEditModal(m);
-        mealRight.appendChild(kcal); mealRight.appendChild(editBtn);
-
+        const editBtn = document.createElement('button'); editBtn.textContent = 'Editar'; editBtn.style.cssText = 'margin-top:6px; padding:4px 6px; border-radius:6px; border:none; cursor:pointer; background:transparent; color:#bbb; font-size: 12px;';
+        editBtn.onclick = () => openMealEditModal(m);
+        mealRight.appendChild(kcal); 
+        // editBtn removido temporariamente para simplificar
+        // mealRight.appendChild(editBtn); 
         mealRow.appendChild(mealLeft); mealRow.appendChild(mealRight);
         dayCard.appendChild(mealRow);
       });
@@ -2103,13 +2127,25 @@
   }
 
   function openMealEditModal(meal){
+    if(!meal || !Array.isArray(meal.components)) return;
     meal.components.forEach((c,i) => {
       const newG = prompt(`Editar ${c.food} (g) — atual: ${c.grams}`, c.grams);
-      if(newG !== null){ const val = parseInt(newG,10); if(!isNaN(val)) meal.components[i].grams = Math.max(0, val); }
+      if(newG !== null){ const val = parseInt(newG,10); if(!isNaN(val)) meal.components[i].grams = Math.max(0, val);}
     });
+    // Atualiza Kcal
+    meal.components.forEach(c => {
+       const rec = SuperDietEngine.findFood(c.source_id || c.food);
+       c.kcal = rec?.nutrition ? _round((rec.nutrition.kcal || 0) * c.grams / 100, 0) : 0;
+    });
+    meal.mealKcalTotal = meal.components.reduce((acc, comp) => acc + (comp.kcal || 0), 0);
+
     const dietaContent = document.getElementById('dieta-card-content');
     const latest = dietaContent?._lastPlan;
-    if(dietaContent && latest) renderPlanToContainer(dietaContent, latest);
+    if(dietaContent && latest) {
+        // Atualiza o plano no container e renderiza
+        dietaContent._lastPlan = meal.planReference; // Garante que a referência do plano seja mantida
+        renderPlanToContainer(dietaContent, dietaContent._lastPlan);
+    }
   }
 
   async function getCurrentUser(){ const { data } = await supabase.auth.getUser(); return data?.user; }
@@ -2137,11 +2173,16 @@
 
   function renderGeneratedPlanEditor(container, planPayload, existingId = null){
     container.innerHTML = '';
+    // Adiciona uma referência ao payload principal em cada refeição para o openMealEditModal
+    if(planPayload.timeline_weeks) {
+      planPayload.timeline_weeks.forEach(w => w.days.forEach(d => d.meals.forEach(m => m.planReference = planPayload)));
+    }
+    
     const title = document.createElement('h4'); title.textContent = 'Formulário: Dieta — Plano gerado';
     const meta = document.createElement('p'); meta.style.color='#bbb';
-    const targetCals = planPayload.targets.targetCalories || '...';
-    const tdee = planPayload.targets.tdee || '...';
-    meta.innerHTML = `Meta: ${planPayload.profile_snapshot.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size:11px;color:#bbb">(TDEE: ${tdee} kcal)</span>`;
+    const targetCals = planPayload.targets?.targetCalories || planPayload.estimates?.dailyTargetCalories ||'...';
+    const tdee = planPayload.targets?.tdee || planPayload.estimates?.tdee || '...';
+    meta.innerHTML = `Meta: ${planPayload.profile_snapshot?.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size:11px;color:#bbb">(TDEE: ${tdee} kcal)</span>`;
     container.appendChild(title); container.appendChild(meta);
     const planView = document.createElement('div'); planView.style.marginTop='12px'; planView.id='plan-view';
     container._lastPlan = planPayload;
@@ -2161,15 +2202,20 @@
       try{
         const user = await getCurrentUser();
         if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
-        planPayload.modified_at = new Date().toISOString();
+        // Pega o plano mais recente do container (que pode ter sido modificado pelo 'Editar' ou 'Trocar')
+        const planToSave = container._lastPlan; 
+        planToSave.modified_at = new Date().toISOString();
+        
         if(existingId){
-          const { error } = await supabase.from('user_diets').update({ payload: planPayload }).eq('id', existingId);
+          const { error } = await supabase.from('user_diets').update({ payload: planToSave }).eq('id', existingId);
           if(error){ console.error(error); statusSpan.textContent = 'Erro ao atualizar.'; return; }
           statusSpan.textContent = 'Salvo (atualizado).';
         } else {
-          const saved = await SuperDietEngine.savePlan(user.id, planPayload, { title: `Plano - ${planPayload.targets.targetCalories} kcal` });
-          statusSpan.textContent = 'Salvo com sucesso.'; 
-          await renderPercursoDietArea();
+          // Se não há ID, salva como novo
+          const saved = await SuperDietEngine.savePlan(user.id, planToSave, { title: `Plano - ${planToSave.targets.targetCalories} kcal` });
+          statusSpan.textContent = 'Salvo com sucesso.';
+          container._lastPlanId = saved.id; // Atualiza o ID para o próximo save ser um update
+          existingId = saved.id; // Atualiza o ID local
         }
       } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
     };
@@ -2179,8 +2225,10 @@
       try{
         const user = await getCurrentUser();
         if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
-        await SuperDietEngine.savePlan(user.id, planPayload, { title: `Plano cópia - ${planPayload.targets.targetCalories} kcal` });
+        const planToSave = container._lastPlan; // Pega o plano atual
+        await SuperDietEngine.savePlan(user.id, planToSave, { title: `Plano cópia - ${planToSave.targets.targetCalories} kcal` });
         statusSpan.textContent = 'Cópia salva.'; 
+        await renderPercursoDietArea(); // Recarrega a área para mostrar o novo plano (que será o "latest")
       } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
     };
   }
@@ -2316,10 +2364,11 @@
     });
 
     /* ===========================================
-       SWAP MODAL LOGIC (Melhoria 2) - UI bindings
-       =========================================== */
-    let currentPlanForSwapping = null; 
-    let currentPlanExistingId = null;
+        SWAP MODAL LOGIC (Melhoria 2) - UI bindings
+        =========================================== */
+    // Variáveis globais para o modal de troca
+    currentPlanForSwapping = null; // Já declarado no escopo superior
+    currentPlanExistingId = null;  // Já declarado no escopo superior
 
     const showSwapBtn = document.getElementById('show-swap-modal-btn');
     const swapModal = document.getElementById('swap-modal-overlay');
@@ -2331,54 +2380,61 @@
     const cancelBtn = document.getElementById('swap-cancel-btn');
     const scopeRadios = document.querySelectorAll('input[name="swap_scope"]');
 
+    // Popula o <select> "De" com os alimentos do plano atual
     function populateSelectFrom(plan) {
         if (!plan || !plan.timeline_weeks) {
             selectFrom.innerHTML = '<option value="">Erro: Nenhum plano carregado.</option>';
             return;
         }
-        currentPlanForSwapping = JSON.parse(JSON.stringify(plan)); // clone to avoid mutating original until confirmed
+        
         const uniqueFoods = new Map();
         plan.timeline_weeks.forEach(week => {
-            week.days.forEach(day => {
-                day.meals.forEach(meal => {
-                    meal.components.forEach(comp => {
-                        if (comp.source_id && !(comp.role||'').includes('suplemento')) {
+            (week.days || []).forEach(day => {
+                (day.meals || []).forEach(meal => {
+                    (meal.components || []).forEach(comp => {
+                        if (comp.source_id && !(comp.role||'').includes('suplemento')) { // Não deixa trocar creatina
                             uniqueFoods.set(comp.source_id, comp.food);
                         }
                     });
                 });
             });
         });
+
         selectFrom.innerHTML = '<option value="" disabled selected>Selecione um alimento...</option>';
         uniqueFoods.forEach((name, id) => {
             selectFrom.innerHTML += `<option value="${id}">${name}</option>`;
         });
     }
 
+    // Popula o <select> "Para" com alternativas da mesma categoria
     function populateSelectTo(oldFoodId) {
         selectTo.disabled = true;
         selectTo.innerHTML = '<option value="">Carregando alternativas...</option>';
         const category = SuperDietEngine.getFoodCategory(oldFoodId);
         if (!category) {
             selectTo.innerHTML = '<option value="">Erro: Categoria não encontrada.</option>';
-            selectTo.disabled = true;
             return;
         }
+        
         const alternatives = SuperDietEngine.getFoodsByCategory(category);
         selectTo.innerHTML = '<option value="" disabled selected>Selecione uma alternativa...</option>';
+        
         alternatives.forEach(food => {
-            if (food.id !== oldFoodId) {
+            if (food.id !== oldFoodId) { // Não deixa trocar um alimento por ele mesmo
                 selectTo.innerHTML += `<option value="${food.id}">${food.name}</option>`;
             }
         });
+        
         selectTo.disabled = false;
     }
-
+    
+    // Abrir o Modal
     showSwapBtn.addEventListener('click', () => {
         const dietaCard = document.getElementById('dieta-card-content');
         if (dietaCard && dietaCard._lastPlan) {
-            currentPlanForSwapping = JSON.parse(JSON.stringify(dietaCard._lastPlan));
-            currentPlanExistingId = dietaCard._lastPlanId || null;
+            // Clona o plano atual para evitar mutações acidentais
+            currentPlanForSwapping = JSON.parse(JSON.stringify(dietaCard._lastPlan)); 
+            currentPlanExistingId = dietaCard._lastPlanId || null; 
             populateSelectFrom(currentPlanForSwapping);
             swapModal.style.display = 'flex';
         } else {
@@ -2386,6 +2442,7 @@
         }
     });
 
+    // Fechar o Modal
     cancelBtn.addEventListener('click', () => {
         swapModal.style.display = 'none';
         swapForm.reset();
@@ -2395,30 +2452,28 @@
         scopeSpecificDiv.style.display = 'none';
     });
 
+    // Mostrar/Esconder opções de refeição específica
     scopeRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
-            if (e.target.value === 'specific') {
-                scopeSpecificDiv.style.display = 'block';
-            } else {
-                scopeSpecificDiv.style.display = 'none';
-            }
+            scopeSpecificDiv.style.display = (e.target.value === 'specific') ? 'block' : 'none';
         });
     });
 
+    // Quando o usuário escolhe o Alimento 1 (From)
     selectFrom.addEventListener('change', (e) => {
         if (e.target.value) {
             populateSelectTo(e.target.value);
+            // Reseta o botão de confirmar se o Alimento 2 não foi escolhido
+            confirmBtn.disabled = !selectTo.value;
         }
     });
-
+    
+    // Quando o usuário escolhe o Alimento 2 (To)
     selectTo.addEventListener('change', (e) => {
-        if (e.target.value && selectFrom.value) {
-            confirmBtn.disabled = false;
-        } else {
-            confirmBtn.disabled = true;
-        }
+        confirmBtn.disabled = !(e.target.value && selectFrom.value);
     });
 
+    // Ação Principal: Confirmar a Troca
     swapForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         confirmBtn.disabled = true;
@@ -2440,29 +2495,39 @@
             }
         }
 
-        const scopeOptions = {
-            scope: scope,
-            mealTypes: mealTypes
-        };
+        const scopeOptions = { scope, mealTypes };
 
-        const updatedPlan = SuperDietEngine.swapFoodInPlan(currentPlanForSwapping, oldFoodId, newFoodId, scopeOptions);
-        currentPlanForSwapping = updatedPlan;
+        try {
+            // 1. Chama o "Cérebro" para fazer a troca
+            const updatedPlan = SuperDietEngine.swapFoodInPlan(currentPlanForSwapping, oldFoodId, newFoodId, scopeOptions);
 
-        const dietaCardContainer = document.getElementById('dieta-card-content');
-        if (dietaCardContainer) {
-            renderGeneratedPlanEditor(dietaCardContainer, updatedPlan, currentPlanExistingId);
+            // 2. Atualiza o estado global
+            currentPlanForSwapping = updatedPlan;
+
+            // 3. Redesenha a interface do plano com os dados atualizados
+            const dietaCardContainer = document.getElementById('dieta-card-content');
+            if (dietaCardContainer) {
+                // Atualiza a referência do plano no container ANTES de re-renderizar
+                dietaCardContainer._lastPlan = updatedPlan; 
+                renderGeneratedPlanEditor(dietaCardContainer, updatedPlan, currentPlanExistingId);
+            }
+
+            // 4. Fecha e reseta o modal
+            cancelBtn.click();
+            alert("Alimentos trocados com sucesso! Não se esqueça de 'Salvar alterações' no seu plano.");
+
+        } catch (err) {
+            console.error("Erro ao trocar alimentos:", err);
+            alert("Ocorreu um erro ao trocar os alimentos: " + err.message);
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirmar Troca';
         }
-
-        cancelBtn.click();
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirmar Troca';
-        
-        alert("Alimentos trocados com sucesso! Não se esqueça de 'Salvar alterações' no seu plano.");
     });
-
     /* ===========================================
-       END SWAP MODAL LOGIC
+        FIM DA LÓGICA DO MODAL
        =========================================== */
+
 
     async function initializePageData(){
       // load alimentos_db from Supabase (Falha 4)
@@ -2485,7 +2550,7 @@
         document.getElementById('welcome-msg').textContent = user.email || user.id;
         try{
           const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-          if(!error && profile && profile.goal_end_date){
+          if(!error && profile && profile.goal_end_date && profile.goal_start_date){ // Verifica as duas datas
             displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
             document.getElementById('playlist-section').style.display = profile.goal_type ? 'block' : 'none';
             document.getElementById('form-wrapper').style.display = 'none';
@@ -2495,6 +2560,7 @@
             document.getElementById('results-wrapper').style.display = 'none';
           }
         } catch(e){
+          console.error("Erro ao buscar perfil:", e);
           document.getElementById('form-wrapper').style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
@@ -2517,6 +2583,7 @@
       });
     }
 
+    // Form submit handler
     if(iaFitForm){
       iaFitForm.addEventListener('submit', async function(event){
         event.preventDefault();
@@ -2525,6 +2592,8 @@
         try{
           const formElements = event.target.elements;
           const prazoText = formElements.prazo.value;
+          
+          // USA A FUNÇÃO GLOBAL CORRIGIDA
           const endDate = calculateEndDate(prazoText); 
           if(!endDate){ alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
@@ -2542,8 +2611,8 @@
             grande_meta: objetivoText, prazo: prazoText,
             sexo: formElements.sexo.value, altura: parseFloat((formElements.altura.value || '0').replace(',', '.')) || 1.7,
             peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70, idade: parseInt(formElements.idade.value,10) || 30,
-            disponibilidade: selectedDaysArray.length,
-            selected_days: selectedDaysArray,
+            disponibilidade: selectedDaysArray.length, 
+            selected_days: selectedDaysArray, 
             local_treino: formElements.local_treino.value,
             orcamento: parseFloat((formElements.orcamento.value||'0').replace(',','.')) || 0,
             orcamento_mes_R$: parseFloat((formElements.orcamento.value||'0').replace(',','.')) || 0,
@@ -2551,71 +2620,63 @@
             quais_suplementos: formElements.quais_suplementos.value || '',
             nivel: formElements.nivel.value
           };
-
+          
+          // 1. ANALISA A META (incluindo TAF)
           const strategy = SuperDietEngine.analyzeMasterGoal(inputs);
 
+          // 2. VERIFICA PERGUNTAS DE ACOMPANHAMENTO (ex: "Quais provas do TAF?")
           if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
             const answers = await showFollowupQuestions(strategy.nextQuestions);
-            if(!answers){
+            if(!answers){ // Usuário cancelou
               submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
               return;
             }
+            // Adiciona respostas ao objeto 'inputs' para o engine usar
             Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
           }
 
+          // 3. ATUALIZA O PERFIL NO SUPABASE
           const updateData = {
             goal_start_date: startDate.toISOString(),
             goal_end_date: endDate.toISOString(),
             goal_prompt: objetivoText,
-            goal_type: strategy ? strategy.specificGoal : (SuperDietEngine && typeof SuperDietEngine.detectGoalType === 'function' ? SuperDietEngine.detectGoalType(objetivoText) : 'ambos')
+            goal_type: strategy ? strategy.specificGoal : 'ambos', // Salva a meta específica (ex: 'TAF_PREP')
+            prazo: prazoText
           };
-
-          try{
-            const current = await getCurrentUser();
-            if(current){
-              const { error } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
-              if(error) console.warn('Erro ao atualizar perfil:', error);
-            }
-          }catch(e){ console.warn('Não conectado a supabase (demo).'); }
-
-          displayProgress(startDate, endDate);
-          document.getElementById('playlist-section').style.display = 'block';
-
-          const diffTime = Math.abs(endDate - startDate);
-          const diffDays = Math.ceil(diffTime / (1000*60*60*24));
-          const months = Math.max(1, Math.round(diffDays / 30.44));
-
-          const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
-
-          try{
-            const currentUser = await getCurrentUser();
-            let savedPlan = null;
-            if(currentUser){
-              savedPlan = await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
-            }
-            // render percurso and store id for swaps
-            document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-            document.getElementById('percurso').classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-            document.querySelector('.link-percurso')?.classList.add('active');
-
-            await renderPercursoDietArea();
-
-            // update container's last plan id and plan reference
-            const dietaCardContainer = document.getElementById('dieta-card-content');
-            if(dietaCardContainer && savedPlan){
-              dietaCardContainer._lastPlanId = savedPlan.id || null;
-              dietaCardContainer._lastPlan = plan;
-            }
-
-          } catch(saveError){
-            console.error('Erro ao salvar plano:', saveError);
-            alert('Meta atualizada, mas falha ao salvar plano: ' + (saveError.message || JSON.stringify(saveError)));
+          
+          const { error: updateError } = await supabase.from('profiles').update(updateData).eq('id', currentUser.id);
+          
+          // Erro de permissão RLS!
+          if(updateError){ 
+            console.error("Erro ao salvar meta (Verifique o RLS!):", updateError); 
+            alert('Erro ao salvar sua meta. Verifique suas permissões RLS no Supabase.'); 
+            submitButton.disabled = false; 
+            submitButton.textContent = 'Crie seu próprio caminho'; 
+            return; 
           }
 
-          document.getElementById('form-wrapper').style.display = 'none';
-          document.getElementById('results-wrapper').style.display = 'block';
+          displayProgress(startDate, endDate);
+          if(strategy.specificGoal !== 'ambos') document.getElementById('playlist-section').style.display = 'block';
+
+          // 4. GERA O PLANO
+          SuperDietEngine.init({ supabase });
+          const plan = await SuperDietEngine.generatePlan(inputs, { strategy: strategy, debug: false }); 
+
+          // 5. SALVA O PLANO
+          const savedPlan = await SuperDietEngine.savePlan(currentUser.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+          
+          await renderPercursoDietArea();
+          
+          // Atualiza o ID no container para futuras trocas
+          const dietaCardContainer = document.getElementById('dieta-card-content');
+          if(dietaCardContainer && savedPlan){
+            dietaCardContainer._lastPlanId = savedPlan.id || null;
+            dietaCardContainer._lastPlan = plan;
+          }
+
+          enableAllNavLinks();
           submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+
         } catch(err){
           console.error('Erro no fluxo de criação da meta:', err);
           alert('Erro interno: ' + (err.message || JSON.stringify(err)));
@@ -2626,7 +2687,7 @@
 
     // playlist button behavior
     const playlistBtn = document.getElementById('playlist-btn'); if(playlistBtn) playlistBtn.onclick = async function(){ const { data:{ user } } = await supabase.auth.getUser(); if(!user) return; const { data: profile } = await supabase.from('profiles').select('goal_type').eq('id', user.id).single(); if(!profile) return; let videoOrder = profile.goal_type==='emagrecer' ? [3,2,1] : (profile.goal_type==='musculo' ? [3,1,2] : [1,2,3]); const c=document.getElementById('video-aulas'),v={1:document.getElementById('video-block-1'),2:document.getElementById('video-block-2'),3:document.getElementById('video-block-3')}; Object.values(v).forEach(b=>b?.remove()); videoOrder.forEach(i=>{ if(v[i]) c.appendChild(v[i])}); document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); document.getElementById('video-aulas').classList.add('active'); };
-
+    
     // start
     initializePageData().catch(err => { console.error('Erro inicial:', err); });
   }); // DOMContentLoaded end
@@ -2635,4 +2696,3 @@
 
 </body>
 </html>
-
