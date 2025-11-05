@@ -1,10 +1,10 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - VERSÃO CORRIGIDA 2.0
+   ARQUIVO: membros.js (O "ENGENHEIRO") - VERSÃO CORRIGIDA 3.0
    Correção: 
-   1. O botão 'Resetar Meta' agora limpa a meta no Supabase
-      e não recarrega mais a página (Conserta Bug 1).
-   2. O Bug 2 (Formulário não some) deve ser corrigido
-      habilitando o RLS de LEITURA na tabela 'profiles' no Supabase.
+   1. (Bug 1) Botão 'Resetar Meta' mantido (da v2.0).
+   2. (Bug 2) A consulta ao Supabase em 'initializePageData'
+      foi revertida para 'select('*')' para bater com
+      a permissão RLS do código original.
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -268,7 +268,6 @@ function showFollowupQuestions(questions){
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // PASSO 1: Conectar o "Engenheiro" ao "Cérebro"
   try {
     SuperDietEngine.init({ supabase });
   } catch(e) {
@@ -276,8 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     alert('Erro crítico ao carregar a lógica de dieta. Contate o suporte.');
   }
 
-  // --- Lógica da Sidebar (Menu Lateral) ---
-  
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('overlay');
@@ -293,7 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   if (overlay) overlay.addEventListener('click', closeSidebar);
 
-  // Lógica de navegação por Abas (só para 'video-aulas')
   document.querySelectorAll('.nav-link').forEach(link => {
     if (link.dataset.tab) {
       link.addEventListener('click', (e) => {
@@ -304,18 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const tabContent = document.getElementById(tab);
         if (tabContent) tabContent.classList.add('active');
         
-        // Desativa TODOS os links
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        
-        // Ativa o link de aba clicado
         link.classList.add('active');
-
         closeSidebar();
       });
     }
   });
 
-  // Botões de Configuração da Sidebar
   if (configBtn) configBtn.addEventListener('click', (e) => {
     e.preventDefault();
     logoutBtn.classList.toggle('hidden');
@@ -323,18 +314,13 @@ document.addEventListener('DOMContentLoaded', () => {
     configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
   });
 
-  // ===============================================
-  //  <<<<< AQUI ESTÁ A CORREÇÃO DO BUG 1 >>>>>
-  // ===============================================
   if (resetBtn) resetBtn.addEventListener('click', async () => {
-    // 1. Mostrar imediatamente o formulário
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) formWrapper.style.display = 'block';
     
     const resultsWrapper = document.getElementById('results-wrapper');
     if (resultsWrapper) resultsWrapper.style.display = 'none';
 
-    // 2. Limpar os campos do formulário (se existirem na página)
     const form = document.getElementById('ia-fit-form');
     if (form) form.reset();
     
@@ -347,13 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const objetivo = document.getElementById('objetivo');
     if (objetivo) objetivo.focus();
     
-    // 3. REMOVI O RECARREGAMENTO DA PÁGINA (window.location.href)
-    
-    // 4. (NOVO) Limpar a meta antiga no Supabase
     try {
       const user = await getCurrentUser();
       if (user) {
-        // Limpa a meta no banco de dados
         await supabase
           .from('profiles')
           .update({ 
@@ -369,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Erro ao limpar sua meta antiga. Tente novamente.");
     }
     
-    // 5. Fechar a sidebar
     closeSidebar();
   });
 
@@ -421,7 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Listener de SUBMIT do formulário de metas
     iaFitForm.addEventListener('submit', async function(event){
       event.preventDefault();
       const submitButton = iaFitForm.querySelector('button[type="submit"]');
@@ -469,7 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
         }
 
-        // Salva a meta no Perfil do Supabase
         const updateData = {
           goal_start_date: startDate.toISOString(),
           goal_end_date: endDate.toISOString(),
@@ -479,23 +458,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const current = await getCurrentUser();
         if(current){
-          const { error } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
-          if(error) console.warn('Erro ao atualizar perfil:', error);
+          const { error }U = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
+          // A linha acima foi a que eu suspeitei que estava quebrando o RLS
+          // Agora, a consulta 'initializePageData' abaixo usa select('*')
+          if(errorU) console.warn('Erro ao atualizar perfil:', errorU);
         }
         
-        // Gera o plano
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000*60*60*24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
-        // Salva o plano no Supabase
         if(current){
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
-        // Redireciona para a página de Percurso
         window.location.href = 'percurso.html';
 
       } catch(err){
@@ -507,9 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   
-  /**
-   * RODA ASSIM QUE A PÁGINA É CARREGADA
-   */
   (async function initializePageData(){
     
     const user = await getCurrentUser();
@@ -522,31 +497,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
 
-    // --- Lógica da Página 'membros-saude.html' ---
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) {
       // Estamos na 'membros-saude.html'
       loadFreshDifyChat();
       
       try {
-        // Tenta ler o perfil do usuário
+        // ===============================================
+        //  <<<<< AQUI ESTÁ A CORREÇÃO DO BUG 2 >>>>>
+        //  Consulta revertida para 'select(*)'
+        // ===============================================
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('goal_end_date, goal_start_date, goal_type') // Só pede o que precisa
+          .select('*') // Revertido de 'select(colunas...)' para 'select(*)'
           .eq('id', user.id)
           .single();
         
-        // Se deu erro na leitura (Bug 2 - RLS)
-        if (error && error.code !== 'PGRST116') { // PGRST116 = 'not found', o que é ok
-          console.error("Erro ao ler perfil (Verifique RLS):", error);
-          // Se falha ao ler, mostramos o formulário por segurança
+        if (error && error.code !== 'PGRST116') {
+          console.error("Erro ao ler perfil (mesmo com select*):", error);
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
-          return; // Para a execução
+          return;
         }
         
         if(profile && profile.goal_end_date){
-          // SUCESSO: Usuário tem uma meta
+          // SUCESSO: Usuário tem uma meta, esconde formulário
           displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
           
           const playlistSection = document.getElementById('playlist-section');
@@ -555,12 +530,11 @@ document.addEventListener('DOMContentLoaded', () => {
           formWrapper.style.display = 'none';
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
-          // SUCESSO: Usuário não tem uma meta
+          // SUCESSO: Usuário NÃO tem meta, mostra formulário
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
       } catch(e) {
-        // Outro erro? Mostra o formulário.
         console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
