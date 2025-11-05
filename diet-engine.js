@@ -1,16 +1,17 @@
 /* ===================================================================
-   ARQUIVO: diet-engine.js (O "CÉREBRO") - v2.0 COMPLETO
-   Este arquivo contém o banco de dados de alimentos completo
-   E a nova função 'deleteLatestPlan' para corrigir o bug de reset.
+   ARQUIVO: diet-engine.js (O "CÉREBRO")
+   Este arquivo contém APENAS o SuperDietEngine.
+   Ele não mexe na página, ele apenas calcula o plano.
+   Note a linha "export default" no final.
 =================================================================== */
 
 const SuperDietEngine = (function(){
-  /* ========== FOOD DB (v5) COMPLETO ========== */
+  /* ========== FOOD DB (v5) with 'portion' added for each item ========== */
   const v5_FoodDatabase = {
     // Proteínas (principais)
-    'frango_peito': { 
-      name:'Frango, Peito sem pele cozido', 
-      nutrition:{ kcal:165, protein_g:31, carb_g:0, fat_g:3.6, fiber_g:0 }, 
+    'frango_peito': {
+      name:'Frango, Peito sem pele cozido',
+      nutrition:{ kcal:165, protein_g:31, carb_g:0, fat_g:3.6, fiber_g:0 },
       price_per_kg: 22.0, category:'proteina_main', ig: 0,
       portion: { name: 'filé(s)', grams: 125 }
     },
@@ -20,9 +21,9 @@ const SuperDietEngine = (function(){
       price_per_kg: 18.0, category:'proteina_main', ig: 0,
       portion: { name: 'porção(ões)', grams: 120 }
     },
-    'carne_patinho_moido': { 
-      name:'Carne, Patinho moído 90/10 cozido', 
-      nutrition:{ kcal:185, protein_g:28, carb_g:0, fat_g:7.5, fiber_g:0 }, 
+    'carne_patinho_moido': {
+      name:'Carne, Patinho moído 90/10 cozido',
+      nutrition:{ kcal:185, protein_g:28, carb_g:0, fat_g:7.5, fiber_g:0 },
       price_per_kg: 40.0, category:'proteina_main', ig: 0,
       portion: { name: 'porção(ões)', grams: 100 }
     },
@@ -46,9 +47,9 @@ const SuperDietEngine = (function(){
     },
 
     // peixes
-    'peixe_tilapia_grelhada': { 
-      name:'Peixe, Tilápia grelhada', 
-      nutrition:{ kcal:128, protein_g:26, carb_g:0, fat_g:2.7, fiber_g:0 }, 
+    'peixe_tilapia_grelhada': {
+      name:'Peixe, Tilápia grelhada',
+      nutrition:{ kcal:128, protein_g:26, carb_g:0, fat_g:2.7, fiber_g:0 },
       price_per_kg: 40.0, category:'peixe', ig: 0,
       portion: { name: 'filé(s)', grams: 120 }
     },
@@ -72,9 +73,9 @@ const SuperDietEngine = (function(){
     },
 
     // snacks / laticinios
-    'ovo_cozido': { 
-      name:'Ovo, de galinha inteiro cozido', 
-      nutrition:{ kcal:155, protein_g:13, carb_g:1.1, fat_g:11, fiber_g:0 }, 
+    'ovo_cozido': {
+      name:'Ovo, de galinha inteiro cozido',
+      nutrition:{ kcal:155, protein_g:13, carb_g:1.1, fat_g:11, fiber_g:0 },
       price_per_kg: 16.0, category:'proteina_snack', ig: 0,
       portion: { name: 'unidade(s)', grams: 50 }
     },
@@ -122,17 +123,17 @@ const SuperDietEngine = (function(){
     },
 
     // suplementos
-    'whey_protein_concentrado': { 
-      name:'Whey Protein (padrão 80%)', 
-      nutrition:{ kcal:390, protein_g:80, carb_g:9, fat_g:3.5, fiber_g:1 }, 
+    'whey_protein_concentrado': {
+      name:'Whey Protein (padrão 80%)',
+      nutrition:{ kcal:390, protein_g:80, carb_g:9, fat_g:3.5, fiber_g:1 },
       price_per_kg: 110.0, category:'suplemento', ig: 15,
       portion: { name: 'scoop(s)', grams: 30 }
     },
 
     // carbo principais
-    'arroz_branco_cozido': { 
-      name:'Arroz, Branco tipo 1 cozido', 
-      nutrition:{ kcal:130, protein_g:2.7, carb_g:28, fat_g:0.2, fiber_g:0.4 }, 
+    'arroz_branco_cozido': {
+      name:'Arroz, Branco tipo 1 cozido',
+      nutrition:{ kcal:130, protein_g:2.7, carb_g:28, fat_g:0.2, fiber_g:0.4 },
       price_per_kg: 6.0, category:'cereal_main', ig: 73,
       portion: { name: 'colher(es) de servir', grams: 50 }
     },
@@ -186,9 +187,9 @@ const SuperDietEngine = (function(){
     },
 
     // snacks carbo
-    'aveia_flocos': { 
-      name:'Aveia, em flocos crus', 
-      nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 }, 
+    'aveia_flocos': {
+      name:'Aveia, em flocos crus',
+      nutrition:{ kcal:389, protein_g:16.9, carb_g:66.3, fat_g:6.9, fiber_g:10.6 },
       price_per_kg: 12.0, category:'cereal_snack', ig: 55,
       portion: { name: 'colher(es)', grams: 30 }
     },
@@ -230,9 +231,9 @@ const SuperDietEngine = (function(){
     },
 
     // leguminosas
-    'feijao_carioca_cozido': { 
-      name:'Feijão, Carioca cozido (com caldo)', 
-      nutrition:{ kcal:76, protein_g:4.8, carb_g:13.6, fat_g:0.5, fiber_g:5.5 }, 
+    'feijao_carioca_cozido': {
+      name:'Feijão, Carioca cozido (com caldo)',
+      nutrition:{ kcal:76, protein_g:4.8, carb_g:13.6, fat_g:0.5, fiber_g:5.5 },
       price_per_kg: 8.5, category:'leguminosa', ig: 29,
       portion: { name: 'concha(s)', grams: 60 }
     },
@@ -256,9 +257,9 @@ const SuperDietEngine = (function(){
     },
 
     // gorduras boas
-    'azeite_oliva_extravirgem': { 
-      name:'Azeite, de Oliva Extra Virgem', 
-      nutrition:{ kcal:884, protein_g:0, carb_g:0, fat_g:100, fiber_g:0 }, 
+    'azeite_oliva_extravirgem': {
+      name:'Azeite, de Oliva Extra Virgem',
+      nutrition:{ kcal:884, protein_g:0, carb_g:0, fat_g:100, fiber_g:0 },
       price_per_kg: 45.0, category:'gordura_boa', ig: 0,
       portion: { name: 'colher(es) de sopa', grams: 10 }
     },
@@ -294,9 +295,9 @@ const SuperDietEngine = (function(){
     },
 
     // frutas
-    'banana_nanica_crua': { 
-      name:'Banana, nanica crua', 
-      nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 }, 
+    'banana_nanica_crua': {
+      name:'Banana, nanica crua',
+      nutrition:{ kcal:89, protein_g:1.1, carb_g:22.8, fat_g:0.3, fiber_g:2.6 },
       price_per_kg: 4.5, category:'fruta', ig: 51,
       portion: { name: 'unidade(s)', grams: 100 }
     },
@@ -356,9 +357,9 @@ const SuperDietEngine = (function(){
     },
 
     // verduras
-    'alface_crespa_crua': { 
-      name:'Alface, Crespa crua', 
-      nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 }, 
+    'alface_crespa_crua': {
+      name:'Alface, Crespa crua',
+      nutrition:{ kcal:15, protein_g:1.4, carb_g:2.9, fat_g:0.2, fiber_g:1.0 },
       price_per_kg: 8.0, category:'verdura', ig: 15,
       portion: { name: 'prato(s)', grams: 50 }
     },
@@ -890,11 +891,11 @@ const SuperDietEngine = (function(){
   /* Utilities for weekly template, rotation */
   function weeklyBudgetFromMonthly(monthly){ return _safeNum(monthly,0) / 4.345; }
 
-  function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){ 
-    const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null })); 
-    const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 }; 
+  function buildWeekTemplate(dailyTargetCalories, diasTreinoCount, cheatPolicy, selectedDaysArr = []){
+    const week = Array.from({length:7}).map((_,i)=>({ dayOfWeekIndex:i, baseCalories: dailyTargetCalories, isTrainingDay:false, isCheatDay:false, cheatLimit:null }));
+    const dayMap = { 'dom':0,'seg':1,'ter':2,'qua':3,'qui':4,'sex':5,'sab':6 };
     if(selectedDaysArr && selectedDaysArr.length>0){
-      selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }}); 
+      selectedDaysArr.forEach(k => { const idx = dayMap[k]; if(idx !== undefined) { week[idx].isTrainingDay = true; week[idx].baseCalories = Math.round(dailyTargetCalories * 1.08); }});
     } else {
       const dt = Math.max(0, _safeNum(diasTreinoCount,3));
       if(dt>0){
@@ -1220,7 +1221,7 @@ const SuperDietEngine = (function(){
               blueprintPool = [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]]; // Padrão ou Repetir Almoço
             } else {
               blueprintPool = isTraining
-                ? [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]] 
+                ? [BLUEPRINTS.jantar[0], BLUEPRINTS.jantar[2]]
                 : [BLUEPRINTS.jantar[1], BLUEPRINTS.jantar[0]];
             }
           }
@@ -1267,7 +1268,7 @@ const SuperDietEngine = (function(){
             if (isCereal) {
               // Verifica se a proteína selecionada NÃO é um laticínio
               const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado' || protPick === 'queijo_cottage' || protPick === 'queijo_minas_frescal' || protPick === 'queijo_mussarela');
-               
+
               if (!protIsLaticinio) {
                 // O blueprint selecionou "Aveia" com "Ovos" (ruim).
                 const laticinioCandidates = _rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions);
@@ -1276,7 +1277,7 @@ const SuperDietEngine = (function(){
                 } else {
                   // Sem laticínios (ex: "sem lactose"), troca 'Aveia' por 'Pão'
                   const paoCandidates = _rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions);
-                  carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma'; 
+                  carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma';
                 }
               }
             }
@@ -1400,7 +1401,7 @@ const SuperDietEngine = (function(){
     const payload = {
       version: 'super-algo-v10.0-portion-blueprints-fixed',
       created_at: nowISO(),
-      profile_snapshot: profile, // Salva os 'inputs' (incluindo datas da meta) AQUI
+      profile_snapshot: profile,
       targets,
       timeline_weeks,
       estimates: { avgWeeklyCost, weeklyBudget, dailyTargetCalories, tdee: targets.tdee, bmr: targets.bmr },
@@ -1415,7 +1416,7 @@ const SuperDietEngine = (function(){
   let _supabase = null;
   function initModule({ sup } = {}){ if(!sup) throw new Error('supabase client required'); _supabase = sup; }
 
-  async function savePlan(userId, planPayload, options = {}){ 
+  async function savePlan(userId, planPayload, options = {}){
     if(!_supabase) throw new Error('Supabase client not initialized.');
     const title = options.title || `Plano - ${planPayload.targets ? planPayload.targets.targetCalories + ' kCal' : nowISO()}`;
     const row = { user_id: userId, title, payload: planPayload };
@@ -1423,64 +1424,24 @@ const SuperDietEngine = (function(){
     if(error) { console.error('Erro ao salvar plano:', error); throw error; }
     return data;
   }
+
   async function loadPlans(userId){
     if(!_supabase) throw new Error('Supabase client not initialized.');
     const { data, error } = await _supabase.from('user_diets').select('*').eq('user_id', userId).order('created_at', { ascending:false });
     if(error) { console.error('Erro ao carregar planos:', error); throw error; }
     return data;
   }
+
   async function loadLatestPlan(userId){
     const plans = await loadPlans(userId);
     return plans && plans.length ? plans[0] : null;
   }
 
-  /* ==========================================================
-     NOVA FUNÇÃO PARA CORRIGIR O BUG DO RESET
-     ========================================================== */
-  /**
-   * Encontra o plano mais recente do usuário e o deleta.
-   */
-  async function deleteLatestPlan(userId) {
-    if(!_supabase) throw new Error('Supabase client not initialized.');
-    
-    // 1. Encontrar o ID do plano mais recente
-    const { data, error } = await _supabase
-      .from('user_diets')
-      .select('id') // Pega só o ID
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error || !data) {
-      console.warn('Nenhum plano para deletar.', error);
-      return; // Não faz nada se não houver plano
-    }
-
-    // 2. Deletar o plano usando o ID
-    const { error: deleteError } = await _supabase
-      .from('user_diets')
-      .delete()
-      .eq('id', data.id);
-      
-    if (deleteError) {
-      console.error('Erro ao deletar o plano:', deleteError);
-      throw deleteError; // Joga o erro para o 'catch' do botão
-    }
-    
-    console.log('Plano anterior deletado com sucesso.');
-  }
-
-
   /* ========== PUBLIC API ========== */
   return {
     init: ({ supabase } = {}) => { initModule({ sup: supabase }); },
     generatePlan: planLongTerm,
-    savePlan, 
-    loadPlans, 
-    loadLatestPlan, 
-    deleteLatestPlan, // <-- Exporta a nova função
-    findFood,
+    savePlan, loadPlans, loadLatestPlan, findFood,
     calculateEndDate,
     analyzeMasterGoal,
     deriveTargets,
@@ -1489,4 +1450,10 @@ const SuperDietEngine = (function(){
 
 })(); // end SuperDietEngine IIFE
 
+
+/*
+  Esta é a linha mais importante!
+  Isso "exporta" o SuperDietEngine para que outros arquivos (como o membros.js)
+  possam importá-lo e usá-lo.
+*/
 export default SuperDietEngine;
