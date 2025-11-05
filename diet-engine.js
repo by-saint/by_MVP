@@ -1,7 +1,10 @@
 /* ===================================================================
-   ARQUIVO: diet-engine.js (O "CÉREBRO") - v2.0 COMPLETO
-   Este arquivo contém o banco de dados de alimentos completo
-   E a nova função 'deleteLatestPlan' para corrigir o bug de reset.
+   ARQUIVO: diet-engine.js (O "CÉREBRO") - v3.0 COMPLETO
+   Correção: 
+   1. Adicionada a função 'deleteLatestPlan' (Bug do Reset).
+   2. Adicionadas palavras-chave 'musculoso' e 'forte' na
+      função 'analyzeMasterGoal' para calcular calorias
+      de ganho de massa corretamente (Bug das Calorias).
 =================================================================== */
 
 const SuperDietEngine = (function(){
@@ -624,7 +627,12 @@ const SuperDietEngine = (function(){
   }
 
   /* ========== KEYWORDS & helpers ========== */
-  const KEYWORDS_COMPOSITION = ['perder peso','gordura','kg','quilos','hipertrofia','massa muscular','recomposicao','definir','definicao','estetica','percentual de gordura','recomposição'];
+
+  // ===============================================
+  //  <<<<< CORREÇÃO DO BUG DAS CALORIAS (1/2) >>>>>
+  //  Adicionadas 'musculoso' e 'forte'
+  // ===============================================
+  const KEYWORDS_COMPOSITION = ['perder peso','gordura','kg','quilos','hipertrofia','massa muscular','recomposicao','definir','definicao','estetica','percentual de gordura','recomposição', 'musculoso', 'forte'];
   const KEYWORDS_PERFORMANCE = ['maratona','correr','corrida','triatlo','ironman','endurance','resistencia','forca','powerlifting','supino','agachamento','levantamento terra','lpo','muscle-up','calistenia','bandeira humana','handstand','futebol','trilha','competir','crossfit','performance','desempenho'];
   const KEYWORDS_HEALTH = ['lesao','recuperar','joelho','ombro','saude','exame de sangue','colesterol','glicose','hipertensao','diabetes','estresse','ansiedade','cognitiva','longevidade'];
 
@@ -645,8 +653,8 @@ const SuperDietEngine = (function(){
 
     let strategy = {
       primaryGoal: 'COMPOSITION',
-      specificGoal: 'FAT_LOSS',
-      dietStrategy: 'MODERATE_DEFICIT',
+      specificGoal: 'FAT_LOSS', // <-- Este era o default problemático
+      dietStrategy: 'MODERATE_DEFICIT', // <-- Este era o default problemático
       proteinProfile: 'HIGH',
       workoutFocus: 'HYPERTROPHY',
       nextQuestions: []
@@ -676,7 +684,7 @@ const SuperDietEngine = (function(){
       strategy.primaryGoal = 'HYBRID';
       strategy.proteinProfile = 'HIGH';
       const isFatLoss = text.includes('perder') || text.includes('emagrecer') || text.includes('secar') || text.includes('definir');
-      const isMuscleGain = text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular');
+      const isMuscleGain = text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular') || text.includes('musculoso') || text.includes('forte'); // <-- CORRIGIDO AQUI
       const isResistance = text.includes('resistencia') || text.includes('correr') || text.includes('futebol') || text.includes('maratona');
       const isStrength = text.includes('forca') || text.includes('powerlifting') || text.includes('calistenia') || text.includes('muscle-up');
 
@@ -717,10 +725,16 @@ const SuperDietEngine = (function(){
       }
     }
     else {
+      // Este é o bloco padrão para 'COMPOSITION'
       strategy.primaryGoal = 'COMPOSITION';
       strategy.proteinProfile = 'HIGH';
       strategy.workoutFocus = 'HYPERTROPHY';
-      if(text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular')){
+
+      // ===============================================
+      //  <<<<< CORREÇÃO DO BUG DAS CALORIAS (2/2) >>>>>
+      //  Adicionadas 'musculoso' e 'forte'
+      // ===============================================
+      if(text.includes('ganhar') || text.includes('hipertrofia') || text.includes('massa muscular') || text.includes('musculoso') || text.includes('forte')){
         strategy.specificGoal = 'MUSCLE_GAIN';
         strategy.dietStrategy = 'MODERATE_SURPLUS';
       } else if(text.includes('perder') || text.includes('emagrecer') || text.includes('secar') || text.includes('definir')){
@@ -731,6 +745,13 @@ const SuperDietEngine = (function(){
           strategy.specificGoal = 'SIGNIFICANT_FAT_LOSS';
           strategy.dietStrategy = 'AGGRESSIVE_DEFICIT';
         }
+      }
+      // Se não cair em nenhum (ex: "manter o peso"), os defaults problemáticos
+      // de 'FAT_LOSS' e 'MODERATE_DEFICIT' seriam usados.
+      // Vamos adicionar um 'else' final para garantir 'MAINTENANCE'.
+      else {
+        strategy.specificGoal = 'RECOMPOSITION'; // Default mais seguro
+        strategy.dietStrategy = 'MAINTENANCE';   // Default mais seguro
       }
     }
 
@@ -782,7 +803,7 @@ const SuperDietEngine = (function(){
       case 'MODERATE_SURPLUS': targetCalories = tdee * 1.15; break;
       case 'AGGRESSIVE_SURPLUS': targetCalories = tdee * 1.22; break;
       case 'PERFORMANCE_CARB_FOCUS': targetCalories = tdee; break;
-      default: targetCalories = tdee; break;
+      default: targetCalories = tdee; break; // Default para manutenção se a estratégia for desconhecida
     }
     targetCalories = Math.max(ABS_MIN_CALORIES, Math.min(ABS_MAX_CALORIES, Math.round(targetCalories)));
 
@@ -863,23 +884,17 @@ const SuperDietEngine = (function(){
         const copy = { id, name: rec.name, nutrition: rec.nutrition || {}, price_per_kg: rec.price_per_kg || 0, ig: rec.ig };
         let rank = computeCBrank(copy, profile);
 
-        // zero-out restricted items
         if(Array.isArray(restrictionList) && restrictionList.includes(id)){
           rank = 0;
         }
-
-        // short-term penalize high
         if(Array.isArray(shortTermAvoidList) && shortTermAvoidList.includes(id)){
           rank = rank * 0.25;
         }
-
-        // long-term penalize medium
         if(Array.isArray(longTermPenalizeList) && longTermPenalizeList.includes(id)){
           if(!(Array.isArray(shortTermAvoidList) && shortTermAvoidList.includes(id))){
             rank = rank * 0.65;
           }
         }
-
         recs.push({ ...copy, rank });
       }
     }
@@ -931,7 +946,6 @@ const SuperDietEngine = (function(){
   /* computePortionAmountsForMeal */
   function computePortionAmountsForMeal(foodDBFindFn, mealMacroTargets = {}, components = {}) {
     const finder = typeof foodDBFindFn === 'function' ? foodDBFindFn : findFood;
-
     const protRec = components.protein ? finder(components.protein) : null;
     const carbRec = components.carb ? finder(components.carb) : null;
     const vegRec  = components.veg ? finder(components.veg) : null;
@@ -979,12 +993,10 @@ const SuperDietEngine = (function(){
       carb_portion_name: carbRec?.portion?.name || 'porção',
       veg_portion_name: vegRec?.portion?.name || 'porção'
     };
-
     return out;
   }
 
   /* Utilities for weekly template, rotation (continued) */
-
   function getEaster(year) { const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1; return new Date(year, month - 1, day); }
 
   function calculateEndDate(prazoText){
@@ -1261,20 +1273,16 @@ const SuperDietEngine = (function(){
           }
 
           // --- INÍCIO: PASSO DE COESÃO (v10.0 - Localização Corrigida) ---
-          // AFTER fixing mapping, this cohesion step will detect cereal+non-dairy and swap to laticínio when appropriate
           if (lname.includes('café') || lname.includes('lanche')) {
             const isCereal = (carbPick === 'aveia_flocos' || carbPick === 'granola_tradicional');
             if (isCereal) {
-              // Verifica se a proteína selecionada NÃO é um laticínio
               const protIsLaticinio = (protPick === 'iogurte_nat_desnatado' || protPick === 'leite_desnatado' || protPick === 'queijo_cottage' || protPick === 'queijo_minas_frescal' || protPick === 'queijo_mussarela');
                
               if (!protIsLaticinio) {
-                // O blueprint selecionou "Aveia" com "Ovos" (ruim).
                 const laticinioCandidates = _rankFoodsByCategory(['laticinio_snack'], profileWithTargets, recentProteinPicks, longTermPenalize['laticinio_snack'], restrictions);
                 if (laticinioCandidates.length > 0) {
-                  protPick = get(laticinioCandidates, pickIdx); // Troca 'Ovo' por 'Iogurte' preferencialmente
+                  protPick = get(laticinioCandidates, pickIdx); 
                 } else {
-                  // Sem laticínios (ex: "sem lactose"), troca 'Aveia' por 'Pão'
                   const paoCandidates = _rankFoodsByCategory(['pao_snack'], profileWithTargets, recentCarbPicks, longTermPenalize['pao_snack'], restrictions);
                   carbPick = get(paoCandidates, pickIdx + 1) || 'pao_integral_forma'; 
                 }
@@ -1283,11 +1291,9 @@ const SuperDietEngine = (function(){
           }
           // --- FIM: PASSO DE COESÃO ---
 
-          // Agora definimos componentsToCalc e extraComponents (posição corrigida)
           let componentsToCalc = { protein: protPick || null, carb: carbPick || null, veg: vegPick || null };
           const extraComponents = [];
 
-          // Mover lógica de suplemento e extra para DEPOIS da coesão (override de whey/creatina)
           const wantsWhey = userHasSupplement(profile, 'whey') || userHasSupplement(profile, 'whey protein') || userHasSupplement(profile, 'whey concentrado') || userHasSupplement(profile, 'wheyprotein');
           const wantsCreatine = userHasSupplement(profile, 'creat') || userHasSupplement(profile, 'creatina') || userHasSupplement(profile, 'creatine');
 
@@ -1303,10 +1309,8 @@ const SuperDietEngine = (function(){
             extraComponents.push({ food: 'creatina_monohidratada', grams: 3, role:'suplemento' });
           }
 
-          // Calcular Porções (v7.0 improved)
           const grams = computePortionAmountsForMeal(findFood, { prot_g: protForMeal, carbs_g: carbsForMeal, fat_g: fatForMeal, calories: mealCalories }, componentsToCalc);
 
-          // Build components for UI (use friendly portion info where available)
           const toDisplay = (idOrName) => {
             if(!idOrName) return null;
             const rec = findFood(idOrName);
@@ -1355,7 +1359,6 @@ const SuperDietEngine = (function(){
           });
         } // end meals loop
 
-        // end of day: append day picks to recent lists and cap memory
         recentProteinPicks = [...recentProteinPicks, ...dayProteinPicks];
         recentCarbPicks = [...recentCarbPicks, ...dayCarbPicks];
         if (recentProteinPicks.length > MEMORY_CAP) recentProteinPicks = recentProteinPicks.slice(recentProteinPicks.length - MEMORY_CAP);
@@ -1366,7 +1369,6 @@ const SuperDietEngine = (function(){
         });
       } // end days loop
 
-      // calcular custo estimado da semana
       let weekCost = 0;
       for(const dayObj of daysData){
         for(const meal of dayObj.meals){
@@ -1435,18 +1437,14 @@ const SuperDietEngine = (function(){
   }
 
   /* ==========================================================
-     NOVA FUNÇÃO PARA CORRIGIR O BUG DO RESET
+     FUNÇÃO 'deleteLatestPlan' (para o bug do Reset)
      ========================================================== */
-  /**
-   * Encontra o plano mais recente do usuário e o deleta.
-   */
   async function deleteLatestPlan(userId) {
     if(!_supabase) throw new Error('Supabase client not initialized.');
     
-    // 1. Encontrar o ID do plano mais recente
     const { data, error } = await _supabase
       .from('user_diets')
-      .select('id') // Pega só o ID
+      .select('id') 
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -1454,10 +1452,9 @@ const SuperDietEngine = (function(){
 
     if (error || !data) {
       console.warn('Nenhum plano para deletar.', error);
-      return; // Não faz nada se não houver plano
+      return; 
     }
 
-    // 2. Deletar o plano usando o ID
     const { error: deleteError } = await _supabase
       .from('user_diets')
       .delete()
@@ -1465,7 +1462,7 @@ const SuperDietEngine = (function(){
       
     if (deleteError) {
       console.error('Erro ao deletar o plano:', deleteError);
-      throw deleteError; // Joga o erro para o 'catch' do botão
+      throw deleteError; 
     }
     
     console.log('Plano anterior deletado com sucesso.');
@@ -1489,4 +1486,8 @@ const SuperDietEngine = (function(){
 
 })(); // end SuperDietEngine IIFE
 
+/* Esta é a linha mais importante!
+  Isso "exporta" o SuperDietEngine para que outros arquivos (como o membros.js)
+  possam importá-lo e usá-lo.
+*/
 export default SuperDietEngine;
