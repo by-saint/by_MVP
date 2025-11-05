@@ -1,10 +1,11 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - v3.0 (Correta)
-   Este código está correto. O erro de "A carregar..." é
-   causado pelo navegador bloqueando os 'import' quando
-   o arquivo é aberto diretamente (file:///).
-   
-   SOLUÇÃO: Use a extensão "Live Server" do VS Code.
+   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.0 FINAL
+   Correção: 
+   1. (Bug 1) Botão Reset agora chama 'deleteLatestPlan'
+      em vez de 'profiles.update'.
+   2. (Bug 2) 'initializePageData' agora checa 'user_diets' 
+      (via 'fetchLatestUserDiet') em vez de 'profiles'.
+   3. (Bug 2) Formulário de submit não tenta mais salvar em 'profiles'.
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -124,6 +125,7 @@ function renderMonth(monthObj, contentArea){
   contentArea.appendChild(wrapper);
 }
 
+// Funções de ajuda do Supabase (agora só leem de 'user_diets')
 async function getCurrentUser(){ const { data } = await supabase.auth.getUser(); return data?.user; }
 
 async function fetchLatestUserDiet(){
@@ -134,6 +136,7 @@ async function fetchLatestUserDiet(){
   return data;
 }
 
+// Chamado pela página 'percurso.html'
 async function renderPercursoDietArea(){
   const dietaCard = document.getElementById('dieta-card');
   if (!dietaCard) return; 
@@ -152,6 +155,7 @@ async function renderPercursoDietArea(){
   }
 }
 
+// Desenha o editor do plano
 function renderGeneratedPlanEditor(container, planPayload, existingId = null){
   container.innerHTML = '';
   
@@ -208,6 +212,7 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null){
   };
 }
 
+// Carrega o chat Dify
 function loadFreshDifyChat(){
   const iframe = document.getElementById('dify-iframe');
   if(!iframe) return; 
@@ -216,6 +221,7 @@ function loadFreshDifyChat(){
   iframe.src = difyUrl;
 }
 
+// Mostra o modal de perguntas
 function showFollowupQuestions(questions){
   return new Promise((resolve) => {
     const root = document.getElementById('followup-root');
@@ -314,6 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
     configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
   });
 
+  // ===============================================
+  //  <<<<< CORREÇÃO DO BUG 1 (Reset) >>>>>
+  //  Agora chama 'deleteLatestPlan' da tabela 'user_diets'
+  // ===============================================
   if (resetBtn) resetBtn.addEventListener('click', async () => {
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) formWrapper.style.display = 'block';
@@ -333,21 +343,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const objetivo = document.getElementById('objetivo');
     if (objetivo) objetivo.focus();
     
+    // ATUALIZA O BANCO DE DADOS (usando a tabela 'user_diets')
     try {
       const user = await getCurrentUser();
       if (user) {
-        await supabase
-          .from('profiles')
-          .update({ 
-            goal_end_date: null, 
-            goal_start_date: null, 
-            goal_prompt: null, 
-            goal_type: null 
-          })
-          .eq('id', user.id);
+        // Chama a nova função do "Cérebro" para deletar o plano
+        await SuperDietEngine.deleteLatestPlan(user.id);
       }
     } catch (err) {
-      console.error("Erro ao resetar a meta no banco:", err);
+      console.error("Erro ao resetar a meta (deletar plano):", err);
       alert("Erro ao limpar sua meta antiga. Tente novamente.");
     }
     
@@ -402,6 +406,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // ===============================================
+    //  <<<<< CORREÇÃO DO BUG 2 (Submit) >>>>>
+    //  Remove a tentativa de salvar em 'profiles'
+    // ===============================================
     iaFitForm.addEventListener('submit', async function(event){
       event.preventDefault();
       const submitButton = iaFitForm.querySelector('button[type="submit"]');
@@ -421,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
         if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
+        // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
         const inputs = {
           grande_meta: objetivoText,
           prazo: prazoText,
@@ -435,10 +444,15 @@ document.addEventListener('DOMContentLoaded', () => {
           orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
           uso_suplemento: formElements.uso_suplemento.value,
           quais_suplementos: formElements.quais_suplementos.value || '',
-          nivel: formElements.nivel.value
+          nivel: formElements.nivel.value,
+          // Adiciona as datas da meta ao snapshot
+          goal_start_date: startDate.toISOString(),
+          goal_end_date: endDate.toISOString(),
+          goal_prompt: objetivoText
         };
 
         const strategy = SuperDietEngine.analyzeMasterGoal(inputs);
+        inputs.goal_type = strategy ? strategy.specificGoal : SuperDietEngine.detectGoalType(objetivoText);
 
         if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
           const answers = await showFollowupQuestions(strategy.nextQuestions);
@@ -449,34 +463,28 @@ document.addEventListener('DOMContentLoaded', () => {
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
         }
 
-        const updateData = {
-          goal_start_date: startDate.toISOString(),
-          goal_end_date: endDate.toISOString(),
-          goal_prompt: objetivoText,
-          goal_type: strategy ? strategy.specificGoal : SuperDietEngine.detectGoalType(objetivoText)
-        };
+        // REMOVIDA A TENTATIVA DE SALVAR EM 'PROFILES'
+        // const { error: errorU } = await supabase.from('profiles')...
 
-        const current = await getCurrentUser();
-        if(current){
-          const { error: errorU } = await supabase.from('profiles').upsert({ id: current.id, ...updateData }, { onConflict: 'id' });
-          if(errorU) console.warn('Erro ao atualizar perfil:', errorU);
-        }
-        
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000*60*60*24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
+        // O 'inputs' é passado aqui e salvo como 'profile_snapshot' dentro do plano
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
+        const current = await getCurrentUser();
         if(current){
+          // Salva o plano na tabela 'user_diets' (o que já funciona)
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
+        // Redireciona para a página de Percurso
         window.location.href = 'percurso.html';
 
       } catch(err){
         console.error('Erro no fluxo de criação da meta:', err);
-        alert('Erro interno: ' + (err.message || JSON.stringify(err)));
+        alert('Erro ao salvar sua meta: ' + (err.message || JSON.stringify(err)));
         submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
       }
     });
@@ -495,39 +503,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
 
+    // --- Lógica da Página 'membros-saude.html' ---
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) {
       // Estamos na 'membros-saude.html'
       loadFreshDifyChat();
       
       try {
-        // CORREÇÃO DO BUG 2: Revertido para 'select(*)'
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*') // Era 'select('colunas...')'
-          .eq('id', user.id)
-          .single();
+        // ===============================================
+        //  <<<<< CORREÇÃO DO BUG 2 (Carregamento) >>>>>
+        //  Agora checa 'user_diets' em vez de 'profiles'
+        // ===============================================
+        const latestPlan = await fetchLatestUserDiet(); 
         
-        if (error && error.code !== 'PGRST116') {
-          console.error("Erro ao ler perfil (mesmo com select*):", error);
-          formWrapper.style.display = 'block';
-          document.getElementById('results-wrapper').style.display = 'none';
-          return;
-        }
-        
-        if(profile && profile.goal_end_date){
-          displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
+        if (latestPlan && latestPlan.payload) {
+          // SUCESSO: Usuário TEM um plano, esconde formulário
+          
+          // Pega os dados de progresso do snapshot salvo DENTRO do plano
+          const profileData = latestPlan.payload.profile_snapshot;
+          
+          if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
+            displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
+          }
           
           const playlistSection = document.getElementById('playlist-section');
-          if (playlistSection) playlistSection.style.display = profile.goal_type ? 'block' : 'none';
+          if (playlistSection && profileData) {
+             playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
+          }
           
           formWrapper.style.display = 'none';
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
+          // SUCESSO: Usuário NÃO tem plano, mostra formulário
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
       } catch(e) {
+        // Erro? Mostra o formulário por segurança.
         console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
