@@ -1,7 +1,10 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - VERSÃO CORRIGIDA
-   Correção: Removida linha de código em 'renderGeneratedPlanEditor'
-   que estava destruindo o container do plano de dieta.
+   ARQUIVO: membros.js (O "ENGENHEIRO") - VERSÃO CORRIGIDA 2.0
+   Correção: 
+   1. O botão 'Resetar Meta' agora limpa a meta no Supabase
+      e não recarrega mais a página (Conserta Bug 1).
+   2. O Bug 2 (Formulário não some) deve ser corrigido
+      habilitando o RLS de LEITURA na tabela 'profiles' no Supabase.
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -12,9 +15,6 @@ import SuperDietEngine from './diet-engine.js';
     Funções de UI (Interface)
    ========================= */
 
-/**
- * Atualiza a barra de progresso e o contador de dias.
- */
 function displayProgress(startDate, endDate){
   const now = new Date(); now.setHours(0,0,0,0);
   const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
@@ -37,9 +37,6 @@ function displayProgress(startDate, endDate){
   if (countdownDays) countdownDays.textContent = daysRemaining >= 0 ? daysRemaining : 0;
 }
 
-/**
- * Desenha o plano de dieta vindo do Supabase dentro de um container HTML.
- */
 function renderPlanToContainer(container, planPayload){
   container.innerHTML = '';
   const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
@@ -70,9 +67,6 @@ function renderPlanToContainer(container, planPayload){
   if(monthKeys.length) renderMonth(months[monthKeys[0]], contentArea);
 }
 
-/**
- * Função interna para desenhar um mês do plano
- */
 function renderMonth(monthObj, contentArea){
   contentArea.innerHTML = '';
   const wrapper = document.createElement('div'); wrapper.style.marginTop = '12px';
@@ -130,9 +124,6 @@ function renderMonth(monthObj, contentArea){
   contentArea.appendChild(wrapper);
 }
 
-/**
- * Funções de ajuda do Supabase
- */
 async function getCurrentUser(){ const { data } = await supabase.auth.getUser(); return data?.user; }
 
 async function fetchLatestUserDiet(){
@@ -143,10 +134,6 @@ async function fetchLatestUserDiet(){
   return data;
 }
 
-/**
- * Esta função é chamada pela PÁGINA 'percurso.html'.
- * Ela busca o plano do Supabase e o desenha na tela.
- */
 async function renderPercursoDietArea(){
   const dietaCard = document.getElementById('dieta-card');
   if (!dietaCard) return; 
@@ -165,13 +152,7 @@ async function renderPercursoDietArea(){
   }
 }
 
-/**
- * Desenha o editor do plano (com botões de salvar)
- */
 function renderGeneratedPlanEditor(container, planPayload, existingId = null){
-  // AQUI ESTAVA O BUG! A linha que limpava o 'dietaCard' foi REMOVIDA.
-  
-  // Limpa o container (dieta-card-content) para desenhar o plano
   container.innerHTML = '';
   
   const title = document.createElement('h4'); 
@@ -187,11 +168,10 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null){
   container.appendChild(meta);
   
   const planView = document.createElement('div'); planView.style.marginTop='12px'; planView.id='plan-view';
-  container._lastPlan = planPayload; // Salva uma referência
+  container._lastPlan = planPayload;
   renderPlanToContainer(planView, planPayload);
   container.appendChild(planView);
 
-  // Botões de Salvar
   const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.gap='8px'; btnWrap.style.marginTop='12px';
   const saveBtn = document.createElement('button'); saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário'; saveBtn.className = 'playlist-btn';
   const saveNewBtn = document.createElement('button'); saveNewBtn.textContent = 'Salvar como novo'; saveNewBtn.style.background = '#444'; saveNewBtn.style.color = '#fff'; saveNewBtn.style.border = 'none'; saveNewBtn.style.padding = '10px 14px'; saveNewBtn.style.borderRadius='8px';
@@ -228,9 +208,6 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null){
   };
 }
 
-/**
- * Carrega o Iframe do Chat Dify (só na página 'membros-saude.html')
- */
 function loadFreshDifyChat(){
   const iframe = document.getElementById('dify-iframe');
   if(!iframe) return; 
@@ -239,9 +216,6 @@ function loadFreshDifyChat(){
   iframe.src = difyUrl;
 }
 
-/**
- * Mostra o modal de perguntas adicionais
- */
 function showFollowupQuestions(questions){
   return new Promise((resolve) => {
     const root = document.getElementById('followup-root');
@@ -330,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tabContent = document.getElementById(tab);
         if (tabContent) tabContent.classList.add('active');
         
+        // Desativa TODOS os links
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         
         // Ativa o link de aba clicado
@@ -348,7 +323,18 @@ document.addEventListener('DOMContentLoaded', () => {
     configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
   });
 
-  if (resetBtn) resetBtn.addEventListener('click', () => {
+  // ===============================================
+  //  <<<<< AQUI ESTÁ A CORREÇÃO DO BUG 1 >>>>>
+  // ===============================================
+  if (resetBtn) resetBtn.addEventListener('click', async () => {
+    // 1. Mostrar imediatamente o formulário
+    const formWrapper = document.getElementById('form-wrapper');
+    if (formWrapper) formWrapper.style.display = 'block';
+    
+    const resultsWrapper = document.getElementById('results-wrapper');
+    if (resultsWrapper) resultsWrapper.style.display = 'none';
+
+    // 2. Limpar os campos do formulário (se existirem na página)
     const form = document.getElementById('ia-fit-form');
     if (form) form.reset();
     
@@ -361,13 +347,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const objetivo = document.getElementById('objetivo');
     if (objetivo) objetivo.focus();
     
-    const formWrapper = document.getElementById('form-wrapper');
-    if (formWrapper) formWrapper.style.display = 'block';
+    // 3. REMOVI O RECARREGAMENTO DA PÁGINA (window.location.href)
     
-    const resultsWrapper = document.getElementById('results-wrapper');
-    if (resultsWrapper) resultsWrapper.style.display = 'none';
+    // 4. (NOVO) Limpar a meta antiga no Supabase
+    try {
+      const user = await getCurrentUser();
+      if (user) {
+        // Limpa a meta no banco de dados
+        await supabase
+          .from('profiles')
+          .update({ 
+            goal_end_date: null, 
+            goal_start_date: null, 
+            goal_prompt: null, 
+            goal_type: null 
+          })
+          .eq('id', user.id);
+      }
+    } catch (err) {
+      console.error("Erro ao resetar a meta no banco:", err);
+      alert("Erro ao limpar sua meta antiga. Tente novamente.");
+    }
     
-    window.location.href = 'membros-saude.html'; 
+    // 5. Fechar a sidebar
     closeSidebar();
   });
 
@@ -379,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Falha ao sair: ' + (err.message || err));
     }
   });
-
 
   // --- Lógica da Página (Formulários) ---
 
@@ -528,9 +529,24 @@ document.addEventListener('DOMContentLoaded', () => {
       loadFreshDifyChat();
       
       try {
-        const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        // Tenta ler o perfil do usuário
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('goal_end_date, goal_start_date, goal_type') // Só pede o que precisa
+          .eq('id', user.id)
+          .single();
         
-        if(!error && profile && profile.goal_end_date){
+        // Se deu erro na leitura (Bug 2 - RLS)
+        if (error && error.code !== 'PGRST116') { // PGRST116 = 'not found', o que é ok
+          console.error("Erro ao ler perfil (Verifique RLS):", error);
+          // Se falha ao ler, mostramos o formulário por segurança
+          formWrapper.style.display = 'block';
+          document.getElementById('results-wrapper').style.display = 'none';
+          return; // Para a execução
+        }
+        
+        if(profile && profile.goal_end_date){
+          // SUCESSO: Usuário tem uma meta
           displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
           
           const playlistSection = document.getElementById('playlist-section');
@@ -539,17 +555,19 @@ document.addEventListener('DOMContentLoaded', () => {
           formWrapper.style.display = 'none';
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
+          // SUCESSO: Usuário não tem uma meta
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
       } catch(e) {
+        // Outro erro? Mostra o formulário.
+        console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
       }
     }
 
     // --- Lógica da Página 'percurso.html' ---
-    // Esta é a verificação mais simples. Se 'dieta-card' existe, estamos na página de percurso.
     const dietaCard = document.getElementById('dieta-card');
     if (dietaCard) {
       // Estamos na 'percurso.html'
