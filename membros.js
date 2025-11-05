@@ -1,26 +1,19 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO")
-   Este arquivo controla toda a interatividade, botões, formulários
-   e a comunicação com o Supabase e o Dify.
-   Ele é carregado pelas páginas 'membros-saude.html' e 'percurso.html'.
+   ARQUIVO: membros.js (O "ENGENHEIRO") - VERSÃO CORRIGIDA
+   Correção: Removida linha de código em 'renderGeneratedPlanEditor'
+   que estava destruindo o container do plano de dieta.
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
 import { supabase, DIFY_APP_TOKEN } from './supabase-client.js';
 import SuperDietEngine from './diet-engine.js';
 
-// As chaves e o DIFY_APP_TOKEN que estavam aqui foram REMOVIDOS.
-// O SuperDietEngine gigante que estava aqui foi REMOVIDO.
-
-
 /* =========================
     Funções de UI (Interface)
-    (A lógica de mostrar e esconder coisas)
    ========================= */
 
 /**
  * Atualiza a barra de progresso e o contador de dias.
- * (MODIFICADA: Não mexe mais nas abas, só preenche os dados).
  */
 function displayProgress(startDate, endDate){
   const now = new Date(); now.setHours(0,0,0,0);
@@ -33,7 +26,6 @@ function displayProgress(startDate, endDate){
   if(progressPercentage < 0) progressPercentage = 0;
   if(progressPercentage > 100) progressPercentage = 100;
   
-  // Apenas preenche os elementos que devem existir na página
   const progressBar = document.getElementById('progress-bar');
   const startDateLabel = document.getElementById('start-date-label');
   const endDateLabel = document.getElementById('end-date-label');
@@ -108,7 +100,6 @@ function renderMonth(monthObj, contentArea){
       const name = document.createElement('div'); name.className = 'meal-name'; name.textContent = m.mealName;
       const listPreview = document.createElement('div'); listPreview.style.color = '#bbb'; listPreview.style.fontSize = '13px';
 
-      // NEW: display friendly portions if available (v7.0)
       const details = m.gramsComputed?.details || {};
       const items = m.components.map(c => {
         if (c.role === 'proteina' && details.prot_portion_name && typeof details.prot_portions !== 'undefined') {
@@ -126,11 +117,6 @@ function renderMonth(monthObj, contentArea){
       const mealRight = document.createElement('div'); mealRight.style.display = 'flex'; mealRight.style.flexDirection = 'column'; mealRight.style.alignItems = 'flex-end';
       const kcal = document.createElement('div'); kcal.className = 'meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
       
-      // Botão de editar (simplificado, você pode expandir depois)
-      // const editBtn = document.createElement('button'); editBtn.textContent = 'Editar'; editBtn.style.marginTop = '8px'; 
-      // editBtn.onclick = () => openMealEditModal(m);
-      // mealRight.appendChild(editBtn);
-      
       mealRight.appendChild(kcal);
 
       mealRow.appendChild(mealLeft); mealRow.appendChild(mealRight);
@@ -143,17 +129,6 @@ function renderMonth(monthObj, contentArea){
   wrapper.appendChild(daysWrap);
   contentArea.appendChild(wrapper);
 }
-
-// (Função de editar refeição, mantida para o futuro)
-// function openMealEditModal(meal){
-//   meal.components.forEach((c,i) => {
-//     const newG = prompt(`Editar ${c.food} (g) — atual: ${c.grams}`, c.grams);
-//     if(newG !== null){ const val = parseInt(newG,10); if(!isNaN(val)) meal.components[i].grams = Math.max(0, val); }
-//   });
-//   const dietaContent = document.getElementById('dieta-card-content');
-//   const latest = dietaContent?._lastPlan;
-//   if(dietaContent && latest) renderPlanToContainer(dietaContent, latest);
-// }
 
 /**
  * Funções de ajuda do Supabase
@@ -174,7 +149,6 @@ async function fetchLatestUserDiet(){
  */
 async function renderPercursoDietArea(){
   const dietaCard = document.getElementById('dieta-card');
-  // Se não estamos na página Percurso, não faz nada
   if (!dietaCard) return; 
   
   const targetContainer = document.getElementById('dieta-card-content');
@@ -185,10 +159,8 @@ async function renderPercursoDietArea(){
   const latest = await fetchLatestUserDiet();
   
   if(latest && latest.payload){
-    // Encontrou um plano, vamos renderizá-lo
-    renderGeneratedPlanEditor(dietaCard, targetContainer, latest.payload, latest.id);
+    renderGeneratedPlanEditor(targetContainer, latest.payload, latest.id);
   } else {
-    // Nenhum plano encontrado
     targetContainer.innerHTML = '<p style="color:#bbb;">Você ainda não gerou um plano. Vá à aba "IA Especialista" para criar sua meta.</p>';
   }
 }
@@ -196,10 +168,11 @@ async function renderPercursoDietArea(){
 /**
  * Desenha o editor do plano (com botões de salvar)
  */
-function renderGeneratedPlanEditor(dietaCard, container, planPayload, existingId = null){
-  // Limpa o container para desenhar o plano
-  dietaCard.innerHTML = '<h4>Formulário: Dieta</h4>';
-  container.innerHTML = ''; // Limpa o "Carregando..."
+function renderGeneratedPlanEditor(container, planPayload, existingId = null){
+  // AQUI ESTAVA O BUG! A linha que limpava o 'dietaCard' foi REMOVIDA.
+  
+  // Limpa o container (dieta-card-content) para desenhar o plano
+  container.innerHTML = '';
   
   const title = document.createElement('h4'); 
   title.textContent = 'Plano de Dieta — Plano gerado';
@@ -218,7 +191,7 @@ function renderGeneratedPlanEditor(dietaCard, container, planPayload, existingId
   renderPlanToContainer(planView, planPayload);
   container.appendChild(planView);
 
-  // Botões de Salvar (A lógica de salvar ainda funciona)
+  // Botões de Salvar
   const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.gap='8px'; btnWrap.style.marginTop='12px';
   const saveBtn = document.createElement('button'); saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário'; saveBtn.className = 'playlist-btn';
   const saveNewBtn = document.createElement('button'); saveNewBtn.textContent = 'Salvar como novo'; saveNewBtn.style.background = '#444'; saveNewBtn.style.color = '#fff'; saveNewBtn.style.border = 'none'; saveNewBtn.style.padding = '10px 14px'; saveNewBtn.style.borderRadius='8px';
@@ -260,7 +233,7 @@ function renderGeneratedPlanEditor(dietaCard, container, planPayload, existingId
  */
 function loadFreshDifyChat(){
   const iframe = document.getElementById('dify-iframe');
-  if(!iframe) return; // Se não está na página certa, não faz nada
+  if(!iframe) return; 
   const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
   const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
   iframe.src = difyUrl;
@@ -273,7 +246,7 @@ function showFollowupQuestions(questions){
   return new Promise((resolve) => {
     const root = document.getElementById('followup-root');
     if (!root) {
-      resolve(null); // Elemento não existe nesta página
+      resolve(null); 
       return;
     }
     root.style.display = 'block';
@@ -317,13 +290,11 @@ function showFollowupQuestions(questions){
 
 /* ===================================================================
    INICIALIZAÇÃO DO SCRIPT
-   Este é o ponto de entrada principal quando a página carrega.
 =================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // PASSO 1: Conectar o "Engenheiro" ao "Cérebro"
-  // Damos ao SuperDietEngine a conexão do Supabase para que ele possa salvar planos
   try {
     SuperDietEngine.init({ supabase });
   } catch(e) {
@@ -332,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Lógica da Sidebar (Menu Lateral) ---
-  // (Funciona em ambas as páginas, 'membros-saude.html' e 'percurso.html')
   
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
@@ -351,23 +321,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Lógica de navegação por Abas (só para 'video-aulas')
   document.querySelectorAll('.nav-link').forEach(link => {
-    // Só adiciona o listener de 'clique' se for um link de 'data-tab'
     if (link.dataset.tab) {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const tab = link.dataset.tab;
         
-        // Esconde todas as abas
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        // Mostra a aba clicada
         const tabContent = document.getElementById(tab);
         if (tabContent) tabContent.classList.add('active');
         
-        // Atualiza o menu
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        // Adiciona 'active' ao link correto (seja ele de página ou de aba)
-        const currentLink = document.querySelector(`.nav-link[data-tab="${tab}"]`) || document.querySelector('.nav-link.active');
-        if (currentLink) currentLink.classList.add('active');
+        
+        // Ativa o link de aba clicado
+        link.classList.add('active');
 
         closeSidebar();
       });
@@ -383,7 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (resetBtn) resetBtn.addEventListener('click', () => {
-    // Esta ação só funciona na 'membros-saude.html'
     const form = document.getElementById('ia-fit-form');
     if (form) form.reset();
     
@@ -402,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsWrapper = document.getElementById('results-wrapper');
     if (resultsWrapper) resultsWrapper.style.display = 'none';
     
-    // Volta para a página principal se o usuário resetar
     window.location.href = 'membros-saude.html'; 
     closeSidebar();
   });
@@ -410,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (logoutBtn) logoutBtn.addEventListener('click', async () => {
     try{
       await supabase.auth.signOut();
-      window.location.replace('/login.html'); // Manda para o login
+      window.location.replace('/login.html');
     } catch(err){
       alert('Falha ao sair: ' + (err.message || err));
     }
@@ -418,7 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // --- Lógica da Página (Formulários) ---
-  // (Esta lógica só roda nos elementos que existem em 'membros-saude.html')
 
   const objetivoInput = document.getElementById('objetivo');
   if (objetivoInput) objetivoInput.addEventListener('input', function(){ 
@@ -441,14 +404,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('video-aulas').classList.add('active');
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    // Encontra o link de 'video-aulas' e ativa ele
     const aulasLink = document.querySelector('.link-aulas');
     if (aulasLink) aulasLink.classList.add('active');
   });
 
   const iaFitForm = document.getElementById('ia-fit-form');
   if (iaFitForm) {
-    // Trava para impedir 'Enter' de submeter o formulário
     iaFitForm.addEventListener('keydown', function(e){
       if(e.key === 'Enter'){
         const active = document.activeElement;
@@ -496,10 +457,8 @@ document.addEventListener('DOMContentLoaded', () => {
           nivel: formElements.nivel.value
         };
 
-        // 1. O "Engenheiro" pergunta ao "Cérebro" a estratégia
         const strategy = SuperDietEngine.analyzeMasterGoal(inputs);
 
-        // 2. Verifica se o "Cérebro" precisa de mais perguntas
         if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
           const answers = await showFollowupQuestions(strategy.nextQuestions);
           if(!answers){
@@ -509,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
         }
 
-        // 3. Salva a meta no Perfil do Supabase
+        // Salva a meta no Perfil do Supabase
         const updateData = {
           goal_start_date: startDate.toISOString(),
           goal_end_date: endDate.toISOString(),
@@ -523,19 +482,19 @@ document.addEventListener('DOMContentLoaded', () => {
           if(error) console.warn('Erro ao atualizar perfil:', error);
         }
         
-        // 4. Calcula o tempo e gera o plano chamando o "Cérebro"
+        // Gera o plano
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000*60*60*24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
-        // 5. Salva o plano no Supabase usando o "Cérebro"
+        // Salva o plano no Supabase
         if(current){
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
-        // 6. Navega o usuário para a página de Percurso
+        // Redireciona para a página de Percurso
         window.location.href = 'percurso.html';
 
       } catch(err){
@@ -549,8 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
   /**
    * RODA ASSIM QUE A PÁGINA É CARREGADA
-   * Esta função "inteligente" decide o que fazer
-   * dependendo de qual página o usuário está.
    */
   (async function initializePageData(){
     
@@ -558,52 +515,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeMsg = document.getElementById('welcome-msg');
     
     if (!user) {
-      // Se não tem usuário, chuta para o login
       window.location.replace('/login.html');
       return;
     }
     
-    // Se tem usuário, mostra o email
     if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
 
     // --- Lógica da Página 'membros-saude.html' ---
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) {
       // Estamos na 'membros-saude.html'
-      
-      // 1. Carrega o Chat Dify
       loadFreshDifyChat();
       
-      // 2. Verifica se o usuário já tem uma meta ativa
       try {
         const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         
         if(!error && profile && profile.goal_end_date){
-          // SIM, tem meta ativa. Mostra o progresso e o chat.
           displayProgress(new Date(profile.goal_start_date), new Date(profile.goal_end_date));
           
           const playlistSection = document.getElementById('playlist-section');
-      if (playlistSection) playlistSection.style.display = profile.goal_type ? 'block' : 'none';
+          if (playlistSection) playlistSection.style.display = profile.goal_type ? 'block' : 'none';
           
           formWrapper.style.display = 'none';
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
-          // NÃO, não tem meta. Mostra o formulário.
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
       } catch(e) {
-        // Erro ou perfil não existe? Mostra o formulário.
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
       }
     }
 
     // --- Lógica da Página 'percurso.html' ---
-    const percursoDiv = document.getElementById('percurso');
-    if (percursoDiv && percursoDiv.classList.contains('active')) {
+    // Esta é a verificação mais simples. Se 'dieta-card' existe, estamos na página de percurso.
+    const dietaCard = document.getElementById('dieta-card');
+    if (dietaCard) {
       // Estamos na 'percurso.html'
-      // 1. Carrega o plano de dieta do Supabase e desenha na tela
       await renderPercursoDietArea();
     }
     
