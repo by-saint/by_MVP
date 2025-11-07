@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family/Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   
   <!-- CORREÇÃO 1: Mantido o nome original "membros.css" (plural) -->
   <link rel="stylesheet" href="membros.css">
@@ -51,7 +51,7 @@
 
               <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
                 <label for="prazo">Qual o prazo para esta meta?</label>
-                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required aria-label="Prazo da meta">
+              _ <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required aria-label="Prazo da meta">
               </div>
             </div>
 
@@ -85,7 +85,7 @@
             <div class="form-group"><label for="local_treino">Onde vai treinar?</label>
               <select id="local_treino" name="local_treino" required>
                 <option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option>
-          _     </select>
+              </select>
             </div>
 
             <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="number" step="0.01" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4500.50" required></div>
@@ -99,7 +99,7 @@
             <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
 
             <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label>
-        t     <select id="nivel" name="nivel" required>
+              <select id="nivel" name="nivel" required>
                 <option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option>
               </select>
             </div>
@@ -115,20 +115,18 @@
           <div id="dify-container" class="iframe-container" aria-hidden="false">
             <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
             <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
-f           <div class="dify-bottom-mask"></div>
+            <div class="dify-bottom-mask"></div>
           </div>
 
           <div class="playlist-section" id="playlist-section" style="display:none;">
             <h4>Roteiro de Aulas Sugerido</h4>
             <p style="color:#bbb; margin-top:-10px;">Com base na sua meta, preparamos um roteiro para acelerar os seus resultados.</p>
-section in `ia-fit-form`'s submit handler (around line 430).
             <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
           </div>
 
           <div class="progress-section">
             <h3>Sua Jornada</h3>
             <div class="progress-bar-container"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
-section in `ia-fit-form`'s submit handler (around line 520).
             <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
             <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
           </div>
