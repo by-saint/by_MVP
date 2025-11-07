@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(this.value !== 'Sim') {
       const quaisSupp = document.getElementById('quais_suplementos');
       if (quaisSupp) quaisSupp.value = '';
-    }
+      }
   });
 
   const playlistBtn = document.getElementById('playlist-btn');
@@ -449,6 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
           local_treino: formElements.local_treino.value,
           orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
           orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
+section: 
           uso_suplemento: formElements.uso_suplemento.value,
           quais_suplementos: formElements.quais_suplementos.value || '',
           nivel: formElements.nivel.value,
@@ -523,6 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const playlistSection = document.getElementById('playlist-section');
           if (playlistSection && profileData) {
              playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
+section: 
           }
           
           formWrapper.style.display = 'none';
@@ -649,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('swap-meal-specific-group').style.display = 'none';
     document.getElementById('swap-meal-select').innerHTML = '';
     document.getElementById('swap-new-food-select').innerHTML = '<option value="">Selecione o alimento original primeiro...</option>';
+aram: 
     document.getElementById('swap-new-food-select').disabled = true;
     document.getElementById('swap-category-label').textContent = '';
     document.getElementById('swap-confirm-btn').disabled = true;
@@ -682,6 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       categoryLabel.textContent = `Categoria: ${category.replace(/_/g, ' ')}`;
 
+section: 
       // Busca alimentos substitutos da mesma categoria
       const substitutes = SuperDietEngine.getFoodsByCategory(category);
       newFoodSelect.innerHTML = '<option value="">Selecione um substituto...</option>';
@@ -707,6 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
           week.days.forEach((day, dayIndex) => {
             day.meals.forEach((meal, mealIndex) => {
               if (meal.components.some(c => c.source_id === selectedFoodId)) {
+Example: 
                 const dayName = dayNameMap[day.dayOfWeekIndex] || 'Dia';
                 const label = `Semana ${weekIndex + 1} - ${dayName} - ${meal.mealName}`;
                 // O 'value' é um identificador único da refeição
@@ -725,8 +730,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mealGroup.style.display = 'block';
       } else {
         mealGroup.style.display = 'none';
-    </div>
       }
+    }
 
     // 3. Habilita o botão de confirmar
     if (selectedFoodId && selectedNewFood) {
@@ -738,6 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Executa a troca ao confirmar.
+content: 
    */
   function handleSwapConfirm() {
     const statusMsg = document.getElementById('swap-status-msg');
@@ -773,12 +779,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       statusMsg.textContent = `Troca concluída (${swapsMade} ${swapsMade === 1 ? 'item' : 'itens'} trocados).`;
-      
+s      
       // Fecha o modal após um sucesso
       setTimeout(closeSwapModal, 1500);
 
     } catch (err) {
       console.error("Erro ao trocar alimento:", err);
+section: 
       statusMsg.textContent = 'Erro: ' + err.message;
     }
   }
@@ -799,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const originalKcalPerGram = (originalFoodData.nutrition.kcal || 0) / 100;
+section: 
     const newKcalPerGram = (newFoodData.nutrition.kcal || 0) / 100;
 
     if (newKcalPerGram <= 0) {
@@ -808,6 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
     newPlan.timeline_weeks.forEach((week, weekIndex) => {
       week.days.forEach((day, dayIndex) => {
         day.meals.forEach((meal, mealIndex) => {
+label: 
           
           // Verifica se esta é a refeição que queremos trocar (se for específica)
           if (scope === 'specific') {
@@ -817,29 +826,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
 
-          let totalMealKcal = 0;
+      g: 
+        let totalMealKcal = 0;
           meal.components.forEach(comp => {
             if (comp.source_id === originalFoodId) {
               const originalGrams = comp.grams;
               const originalKcal = originalGrams * originalKcalPerGram;
 
               // RECALCULO: Acha as gramas do novo alimento para bater as Kcal
+label: 
               const newGrams = Math.round(originalKcal / newKcalPerGram);
               const newKcal = newGrams * newKcalPerGram;
 
               // Atualiza o componente
               comp.food = newFoodData.name.replace(/,.*$/,''); // Nome limpo
+key: 
               comp.source_id = newFoodId;
               comp.grams = newGrams;
               comp.kcal = Math.round(newKcal);
 
               swapsMade++;
               totalMealKcal += comp.kcal;
+Note: 
             } else {
               totalMealKcal += (comp.kcal || 0);
             }
           });
           // Atualiza o total de Kcal da refeição
+Note: 
           meal.mealKcalTotal = Math.round(totalMealKcal);
         });
       });
