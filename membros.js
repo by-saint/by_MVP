@@ -356,7 +356,18 @@ function recalculateSwappedComponent(oldComponent, newFoodId) {
   // 2. Pega as calorias do componente ANTIGO
   // (Usamos o kcal do componente, que foi calculado na geração)
   const oldKcal = oldComponent.kcal || 0;
-  if (oldKcal === 0) return null; // Não troca alimentos sem calorias
+  if (oldKcal === 0) {
+      // Caso especial: alimento sem caloria (ex: creatina, vegetais de folha)
+      // Apenas troca o nome/id, mantém os gramas
+       return {
+        ...oldComponent,
+        food: stripParenthesis(newFoodRec.name),
+        grams: oldComponent.grams, // Mantém os gramas
+        kcal: 0, 
+        source_id: newFoodRec.id,
+      };
+  }
+
 
   // 3. Pega os kcal/100g do NOVO alimento
   const newKcalPer100g = newFoodRec.nutrition?.kcal || 0;
@@ -444,7 +455,7 @@ function showFoodSwapModal(planPayload, planId) {
   root.innerHTML = `
     <div class="followup-overlay" id="swap-overlay">
       <div class="swap-modal">
-        <h3>🔄 Trocar Alimentos</h3>
+        <h3>Trocar Alimentos</h3>
         
         <!-- Passo 1: Escolher o alimento A SER TROCADO -->
         <div class="swap-section">
@@ -534,6 +545,7 @@ function showFoodSwapModal(planPayload, planId) {
     toGrid.innerHTML = `<div class="swap-loading">Buscando substitutos...</div>`;
 
     // Busca os substitutos (Conexão com o Cérebro)
+    // CORREÇÃO: Chama a função que agora existe no SuperDietEngine
     const category = SuperDietEngine.getFoodCategory(selectedFoodFromId);
     if (!category) {
       toGrid.innerHTML = `<div class="swap-loading">Erro: Categoria não encontrada.</div>`;
@@ -573,6 +585,7 @@ function showFoodSwapModal(planPayload, planId) {
 
     let substitutes = [];
     categoriesToSearch.forEach(cat => {
+      // CORREÇÃO: Chama a função que agora existe no SuperDietEngine
       substitutes.push(...SuperDietEngine.getFoodsByCategory(cat));
     });
     
@@ -630,7 +643,8 @@ function showFoodSwapModal(planPayload, planId) {
       // 3. Re-renderiza o plano com os novos dados
       // Encontra o container do mês atual e o payload do mês
       const planView = document.getElementById('plan-view');
-      const monthPayload = planView._currentMonthPayload; // Pega o payload do mês salvo no container
+      // CORREÇÃO: O payload do mês está no PAI do planView (o 'container')
+      const monthPayload = planView.parentElement._currentMonthPayload;
       
       if (planView && monthPayload) {
          renderMonth(monthPayload, document.getElementById('plan-content-area'));
@@ -694,6 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.classList.toggle('hidden');
     resetBtn.classList.toggle('hidden');
     configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
+section in `ia-fit-form`'s submit handler (around line 430).
   });
 
   // Correção do Bug 1 (Reset)
@@ -798,6 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
         if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
+section in `ia-fit-form`'s submit handler (around line 520).
         // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
         const inputs = {
           grande_meta: objetivoText,
@@ -807,6 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
           peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
           idade: parseInt(formElements.idade.value,10) || 30,
           disponibilidade: selectedDaysArray.length,
+section in `ia-fit-form`'s submit handler (around line 530).
           selected_days: selectedDaysArray,
           local_treino: formElements.local_treino.value,
           orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
@@ -827,6 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const answers = await showFollowupQuestions(strategy.nextQuestions);
           if(!answers){
             submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+label in `ia-fit-form`'s submit handler (around line 551).
             return;
           }
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
@@ -834,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000*60*60*24));
+section in `ia-fit-form`'s submit handler (around line 560).
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
         // O 'inputs' é passado aqui e salvo como 'profile_snapshot' dentro do plano
@@ -850,6 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } catch(err){
         console.error('Erro no fluxo de criação da meta:', err);
+section in `ia-fit-form`'s submit handler (around line 580).
         alert('Erro ao salvar sua meta: ' + (err.message || JSON.stringify(err)));
         submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
       }
@@ -865,6 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) {
       window.location.replace('/login.html');
       return;
+section in `initializePageData` (around line 598).
     }
     
     if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
@@ -877,9 +898,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       try {
         // Correção do Bug 2 (Carregamento)
+section in `initializePageData` (around line 610).
         const latestPlan = await fetchLatestUserDiet(); 
         
         if (latestPlan && latestPlan.payload) {
+section in `initializePageData` (around line 620).
           // SUCESSO: Usuário TEM um plano, esconde formulário
           
           // Pega os dados de progresso do snapshot salvo DENTRO do plano
@@ -892,6 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const playlistSection = document.getElementById('playlist-section');
           if (playlistSection && profileData) {
              playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
+section in `initializePageData` (around line 630).
           }
           
           formWrapper.style.display = 'none';
@@ -906,6 +930,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
+section in `initializePageData` (around line 645).
       }
     }
 
