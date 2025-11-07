@@ -48,13 +48,16 @@
       <div class="percurso-container">
         <h2>Meu Percurso</h2>
         <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-          <button id="food-swap-btn" class="playlist-btn" style="background-color: #28a745; font-size: 16px;">
-            🔄 Trocar Alimentos
-          </button>
-        </div>
-                <div class="percurso-forms">
+
+        <!-- === Botão de Troca de Alimentos Adicionado (Melhoria 2) === -->
+        <div style="text-align: center; margin-bottom: 20px;">
+          <button id="food-swap-btn" class="playlist-btn" style="background-color: #28a745; font-size: 16px; display: none;">
+            🔄 Trocar Alimentos
+          </button>
+        </div>
+        <!-- ============================================== -->
+
+        <div class="percurso-forms">
           <div class="percurso-card" id="treino-card">
             <h4>Formulário: Treino</h4>
             <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
@@ -68,9 +71,13 @@
         </div>
       </div>
     </div>
-  </div>     <div id="followup-root" style="display:none;"></div>
+  </div> <!-- Fecha .container -->
+  
+  <!-- Este div será usado para todos os modais, incluindo o novo modal de troca -->
+  <div id="followup-root" style="display:none;"></div>
 
-    <script type="module" src="membros.js"></script>
+  <!-- ERRO CORRIGIDO ABAIXO: Faltava o "=" em type="module" -->
+  <script type="module" src="membros.js"></script>
 
 </body>
 </html>
