@@ -1,13 +1,13 @@
 :root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
+  --color-ia-specialist: #007BFF;
+  --color-video-lessons: #8A2BE2;
+  --color-journey: #DC143C;
+  --journey-red-1: #ff2646;
+  --journey-red-2: #be123c;
+  --journey-dark: #2a0a12;
+  --bg: #121212;
+  --card: #1E1E1E;
+  --muted: #bbb;
 }
 html { scroll-behavior: smooth; }
 body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
@@ -108,11 +108,11 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+  .percurso-forms{ grid-template-columns:1fr; }
+  .plan-days{ grid-template-columns:1fr; }
+  body{ padding:20px 12px; }
+  .day-circle-label{ width:36px; height:36px; font-size:13px; }
+  .iframe-container{ height:48vh; min-height:220px; }
 }
 
 /* modal for follow-up questions */
@@ -123,128 +123,3 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
-
-/* ======================================= */
-/* === NOVOS ESTILOS: MELHORIA TROCA DE ALIMENTO === */
-/* ======================================= */
-
-.card-header-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.card-header-actions h4 {
-  margin: 0;
-}
-.swap-food-btn {
-  background: var(--color-ia-specialist);
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-size: 0.9em;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.swap-food-btn:hover {
-  background: #0056b3;
-}
-
-/* Modal de Troca */
-.swap-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
-}
-.swap-modal {
-  width: 600px;
-  max-width: 94%;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  color: #fff;
-  border: 1px solid #333;
-}
-.swap-modal h3 {
-  margin-top: 0;
-  text-align: left;
-}
-.swap-note {
-  font-size: 0.9em;
-  color: var(--muted);
-  margin-top: -10px;
-  margin-bottom: 20px;
-}
-.swap-field {
-  margin-bottom: 16px;
-}
-.swap-field label {
-  font-size: 0.95em;
-  font-weight: 600;
-  color: #ccc;
-  display: block;
-  margin-bottom: 6px;
-}
-.swap-select {
-  width: 100%;
-  padding: 12px;
-  background-color: #2C2C2C;
-  border: 1px solid #444;
-  border-radius: 8px;
-  color: #E0E0E0;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-.swap-select:disabled {
-  background: #222;
-  color: #777;
-}
-.swap-category-label {
-  font-size: 0.85em;
-  color: var(--muted);
-  margin-top: 4px;
-  display: block;
-}
-.swap-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 24px;
-}
-.swap-status {
-  font-size: 0.9em;
-  color: var(--color-ia-specialist);
-  margin-right: auto;
-}
-.swap-btn {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1em;
-}
-.swap-btn-cancel {
-  background: #444;
-  color: #fff;
-}
-.swap-btn-cancel:hover {
-  background: #555;
-}
-.swap-btn-confirm {
-  background: var(--color-ia-specialist);
-  color: #fff;
-}
-.swap-btn-confirm:disabled {
-  background: #333;
-  color: #777;
-  cursor: not-allowed;
-}
