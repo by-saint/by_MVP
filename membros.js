@@ -1,14 +1,18 @@
 /* ===================================================================
- * ARQUIVO: membros.js (O "ENGENHEIRO") - v4.1 (com Troca de Alimentos)
+ * ARQUIVO: membros.js (O "ENGENHEIRO") - v4.2 (com Troca de Alimentos)
  *
  * MUDANÇAS:
- * 1. (Melhoria 2) Adicionada a função showFoodSwapModal().
- * 2. (Melhoria 2) Adicionada a função performFoodSwap()
+ * 1. (Melhoria 2) Importa as novas funções do SuperDietEngine
+ * (getFoodCategory, getFoodsByCategory).
+ * 2. (Melhoria 2) Adicionada a função showFoodSwapModal().
+ * 3. (Melhoria 2) Adicionada a função performFoodSwap()
  * e suas auxiliares (recalculateSwappedComponent).
- * 3. (Melhoria 2) Adicionado o event listener para
+ * 4. (Melhoria 2) Adicionado o event listener para
  * o botão #food-swap-btn na página de percurso.
- * 4. (Melhoria 2) Atualizada a renderMonth() para recalcular
+ * 5. (Melhoria 2) Atualizada a renderMonth() para recalcular
  * porções e totais de kcal dinamicamente.
+ * 6. (Falhas Corrigidas) Contém toda a lógica de UI
+ * correta que depende do diet-engine v4.2.
  * =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -73,6 +77,8 @@ function renderPlanToContainer(container, planPayload){
     pill.onclick = () => { 
       document.querySelectorAll('.plan-tab.active').forEach(p=>p.classList.remove('active')); 
       pill.classList.add('active'); 
+      // Salva o payload do mês atual no elemento pai (para re-renderizar após a troca)
+      container._currentMonthPayload = months[mk];
       renderMonth(months[mk], contentArea); 
     };
     tabsBar.appendChild(pill);
@@ -137,7 +143,15 @@ function renderMonth(monthObj, contentArea){
       const kcal = document.createElement('div'); kcal.className = 'meal-kcal';
       
       // ATUALIZADO: Recalcula o Kcal total da refeição com base nos componentes
-      const mealKcalTotal = m.components.reduce((sum, comp) => sum + (comp.kcal || 0), 0);
+      const mealKcalTotal = m.components.reduce((sum, comp) => {
+        // Recalcula o kcal do componente (caso tenha sido trocado)
+        const foodRec = SuperDietEngine.findFood(comp.source_id);
+        const kcalPer100g = foodRec?.nutrition?.kcal || 0;
+        const compKcal = Math.round((comp.grams / 100) * kcalPer100g);
+        comp.kcal = compKcal; // Atualiza o kcal no componente
+        return sum + (compKcal || 0);
+      }, 0);
+
       m.mealKcalTotal = mealKcalTotal; // Atualiza o payload da refeição
       dayKcalTotal += mealKcalTotal; // Adiciona ao total do dia
 
@@ -188,6 +202,8 @@ async function renderPercursoDietArea(){
   
   if(latest && latest.payload){
     if (foodSwapBtn) foodSwapBtn.style.display = 'block'; // Mostra o botão se o plano existe
+    // (MELHORIA 2) Armazena o registro do DB no elemento para o botão de troca usar
+    targetContainer._latestDBRecord = latest; 
     renderGeneratedPlanEditor(targetContainer, latest.payload, latest.id);
   } else {
     targetContainer.innerHTML = '<p style="color:#bbb;">Você ainda não gerou um plano. Vá à aba "IA Especialista" para criar sua meta.</p>';
@@ -238,9 +254,14 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null){
         if(error){ console.error(error); statusSpan.textContent = 'Erro ao atualizar.'; return; }
         statusSpan.textContent = 'Salvo (atualizado).';
       } else {
-        await SuperDietEngine.savePlan(user.id, currentPlanPayload, { title: `Plano - ${currentPlanPayload.targets.targetCalories} kcal` });
+        const { data, error } = await SuperDietEngine.savePlan(user.id, currentPlanPayload, { title: `Plano - ${currentPlanPayload.targets.targetCalories} kcal` });
+        if (error) throw error;
+        // (MELHORIA 2) Atualiza o ID do registro para o novo plano salvo
+        const newRecord = data[0];
+        existingId = newRecord.id;
+        container._latestDBRecord = newRecord; 
         statusSpan.textContent = 'Salvo com sucesso.';
-        await renderPercursoDietArea();
+        // Não precisa recarregar tudo, apenas atualiza o ID
       }
     } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
   };
@@ -251,8 +272,13 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null){
       const user = await getCurrentUser();
       if(!user){ statusSpan.textContent = 'Usuário não autenticado.'; return; }
       const currentPlanPayload = container._lastPlan; 
-      await SuperDietEngine.savePlan(user.id, currentPlanPayload, { title: `Plano cópia - ${currentPlanPayload.targets.targetCalories} kcal` });
-      statusSpan.textContent = 'Cópia salva.';
+      // Cria uma cópia "limpa" para salvar como novo, sem o ID antigo
+      const newPlanPayload = { ...currentPlanPayload };
+      newPlanPayload.created_at = new Date().toISOString();
+      delete newPlanPayload.modified_at;
+
+      await SuperDietEngine.savePlan(user.id, newPlanPayload, { title: `Plano cópia - ${newPlanPayload.targets.targetCalories} kcal` });
+      statusSpan.textContent = 'Cópia salva. Recarregue a página para vê-la.';
     } catch(err){ console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
   };
 }
@@ -323,18 +349,24 @@ function showFollowupQuestions(questions){
  * Troca um alimento antigo por um novo, mantendo as calorias.
  */
 function recalculateSwappedComponent(oldComponent, newFoodId) {
-  const oldKcal = oldComponent.kcal || 0;
+  // 1. Encontra o registro do NOVO alimento no "Cérebro"
   const newFoodRec = SuperDietEngine.findFood(newFoodId);
   if (!newFoodRec) return null; // Não encontrou o novo alimento
 
+  // 2. Pega as calorias do componente ANTIGO
+  // (Usamos o kcal do componente, que foi calculado na geração)
+  const oldKcal = oldComponent.kcal || 0;
+  if (oldKcal === 0) return null; // Não troca alimentos sem calorias
+
+  // 3. Pega os kcal/100g do NOVO alimento
   const newKcalPer100g = newFoodRec.nutrition?.kcal || 0;
   if (newKcalPer100g === 0) return null; // Evita divisão por zero
 
-  // Regra de troca: Manter as calorias (ISOCALÓRICO)
+  // 4. Regra de troca: Manter as calorias (ISOCALÓRICO)
   // newGrams = (oldKcal / newKcal_per_100g) * 100
   const newGrams = (oldKcal / newKcalPer100g) * 100;
 
-  // Cria o novo componente
+  // 5. Cria o novo componente
   const newComponent = {
     ...oldComponent, // Mantém o 'role' (ex: 'proteina', 'carbo')
     food: stripParenthesis(newFoodRec.name),
@@ -394,7 +426,8 @@ function showFoodSwapModal(planPayload, planId) {
       d.meals.forEach(m => {
         allMealNames.add(m.mealName);
         m.components.forEach(c => {
-          if (c.source_id && c.role !== 'verdura_folha') { // Não permite trocar vegetais
+          // Não permite trocar vegetais de folha ou suplementos
+          if (c.source_id && c.role !== 'verdura_folha' && c.role !== 'suplemento') { 
             allFoods.set(c.source_id, c.food);
           }
         });
@@ -508,10 +541,35 @@ function showFoodSwapModal(planPayload, planId) {
     }
 
     // Encontra o "grupo" de categorias (ex: 'tuberculo' -> 'tuberculo')
+    // Esta é a regra principal da troca
     let categoriesToSearch = [category];
-    // Se for um carboidrato de snack, busca em todos os snacks
-    if (category.startsWith('snack_carb_')) categoriesToSearch = ['snack_carb_cereal', 'snack_carb_pao', 'snack_carb_outro'];
-    if (category.startsWith('laticinio_')) categoriesToSearch = ['laticinio_liquido', 'laticinio_cremoso', 'laticinio_solido'];
+    const slotMap = SuperDietEngine.SLOT_MAP || {};
+    
+    // Agrupa categorias similares para troca
+    const categoryGroups = {
+        'proteina': ['proteina_main', 'peixe'],
+        'carbo_main': ['cereal_main', 'tuberculo', 'leguminosa'],
+        'snack_carb': ['snack_carb_cereal', 'snack_carb_pao', 'snack_carb_outro'],
+        'snack_prot': ['snack_prot_ovo', 'laticinio_liquido', 'laticinio_cremoso', 'laticinio_solido'],
+        'gordura': ['gordura_boa'],
+        'fruta': ['fruta']
+    };
+
+    let groupFound = null;
+    for (const group in categoryGroups) {
+        if (categoryGroups[group].includes(category)) {
+            groupFound = group;
+            break;
+        }
+    }
+
+    if (groupFound) {
+      categoriesToSearch = categoryGroups[groupFound];
+      toLabel.textContent = `Trocar por qual? (Grupo: ${groupFound})`;
+    } else {
+      toLabel.textContent = `Trocar por qual? (Categoria: ${category})`;
+    }
+
 
     let substitutes = [];
     categoriesToSearch.forEach(cat => {
@@ -522,12 +580,10 @@ function showFoodSwapModal(planPayload, planId) {
     const substituteIds = new Set(substitutes.map(f => f.id));
     substituteIds.delete(selectedFoodFromId);
     
-    const substituteOptions = Array.from(substituteIds).map(id => SuperDietEngine.findFood(id));
+    const substituteOptions = Array.from(substituteIds).map(id => SuperDietEngine.findFood(id)).filter(Boolean);
 
-    toLabel.textContent = `Trocar por qual? (Categoria: ${category})`;
-    
     if (substituteOptions.length === 0) {
-      toGrid.innerHTML = `<div class="swap-loading">Nenhum substituto encontrado para esta categoria.</div>`;
+      toGrid.innerHTML = `<div class="swap-loading">Nenhum substituto encontrado para este grupo.</div>`;
       return;
     }
 
@@ -573,11 +629,11 @@ function showFoodSwapModal(planPayload, planId) {
       
       // 3. Re-renderiza o plano com os novos dados
       // Encontra o container do mês atual e o payload do mês
-      const contentArea = document.getElementById('plan-content-area');
-      const monthPayload = dietaCard.querySelector('.plan-tabs')._currentMonthPayload;
+      const planView = document.getElementById('plan-view');
+      const monthPayload = planView._currentMonthPayload; // Pega o payload do mês salvo no container
       
-      if (contentArea && monthPayload) {
-         renderMonth(monthPayload, contentArea);
+      if (planView && monthPayload) {
+         renderMonth(monthPayload, document.getElementById('plan-content-area'));
       } else {
          // Fallback: re-renderiza tudo (menos eficiente, mas seguro)
          renderGeneratedPlanEditor(dietaCard, currentPlan, planId);
@@ -587,7 +643,6 @@ function showFoodSwapModal(planPayload, planId) {
     closeModal();
   };
 }
-
 
 /* ===================================================================
  * INICIALIZAÇÃO DO SCRIPT
@@ -787,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const current = await getCurrentUser();
         if(current){
           // Salva o plano na tabela 'user_diets' (o que já funciona)
-a
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
@@ -809,7 +863,52 @@ a
     const welcomeMsg = document.getElementById('welcome-msg');
     
     if (!user) {
-  ... existing code ...
+      window.location.replace('/login.html');
+      return;
+    }
+    
+    if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
+
+    // --- Lógica da Página 'membros-saude.html' ---
+    const formWrapper = document.getElementById('form-wrapper');
+    if (formWrapper) {
+      // Estamos na 'membros-saude.html'
+      loadFreshDifyChat();
+      
+      try {
+        // Correção do Bug 2 (Carregamento)
+        const latestPlan = await fetchLatestUserDiet(); 
+        
+        if (latestPlan && latestPlan.payload) {
+          // SUCESSO: Usuário TEM um plano, esconde formulário
+          
+          // Pega os dados de progresso do snapshot salvo DENTRO do plano
+          const profileData = latestPlan.payload.profile_snapshot;
+          
+          if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
+            displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
+          }
+          
+          const playlistSection = document.getElementById('playlist-section');
+          if (playlistSection && profileData) {
+             playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
+          }
+          
+          formWrapper.style.display = 'none';
+          document.getElementById('results-wrapper').style.display = 'block';
+        } else {
+          // SUCESSO: Usuário NÃO tem plano, mostra formulário
+          formWrapper.style.display = 'block';
+          document.getElementById('results-wrapper').style.display = 'none';
+        }
+      } catch(e) {
+        // Erro? Mostra o formulário por segurança.
+        console.error("Erro no initializePageData:", e);
+        formWrapper.style.display = 'block';
+        document.getElementById('results-wrapper').style.display = 'none';
+      }
+    }
+
     // --- Lógica da Página 'percurso.html' ---
     const dietaCard = document.getElementById('dieta-card');
     if (dietaCard) {
@@ -826,6 +925,7 @@ a
           if (currentPlan && latest) {
             showFoodSwapModal(currentPlan, latest.id);
           } else {
+            console.error('Não foi possível carregar o plano para edição.', currentPlan, latest);
             alert('Não foi possível carregar o plano para edição.');
           }
         });
