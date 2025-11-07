@@ -1,153 +1,146 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <title>Plataforma de IA — Saúde & Estética</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="robots" content="noindex,nofollow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- CORREÇÃO 1: O nome do arquivo é "membro.css" (singular) -->
-  <link rel="stylesheet" href="membro.css">
-  
-  </head>
+  <meta charset="utf-8" />
+  <title>Plataforma de IA — Saúde & Estética</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="membros.css">
+  
+  </head>
 <body>
 
-  <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+  <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
 
-  <div class="sidebar" id="sidebar" role="navigation" aria-label="Navegação lateral">
-    <nav>
-      <ul>
-        <li><a href="membros-saude.html" class="nav-link link-ia active" aria-current="page">IA Especialista</a></li>
-        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
-        <li><a href="percurso.html" class="nav-link link-percurso">Percurso</a></li>
-      </ul>
-    </nav>
-    <div class="sidebar-footer">
-      <button id="config-btn" class="sidebar-config-btn" aria-expanded="false"><span>⚙️</span><span>Configurações</span></button>
-      <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
-      <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
-    </div>
-  </div>
+  <div class="sidebar" id="sidebar" role="navigation" aria-label="Navegação lateral">
+    <nav>
+      <ul>
+        <li><a href="membros-saude.html" class="nav-link link-ia active" aria-current="page">IA Especialista</a></li>
+        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
+        <li><a href="percurso.html" class="nav-link link-percurso">Percurso</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="config-btn" class="sidebar-config-btn" aria-expanded="false"><span>⚙️</span><span>Configurações</span></button>
+      <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
+      <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
+    </div>
+  </div>
 
-  <div class="overlay" id="overlay" tabindex="-1"></div>
+  <div class="overlay" id="overlay" tabindex="-1"></div>
 
-  <div class="container">
-    <div class="header">
-      <p id="welcome-msg">A carregar...</p>
-    </div>
+  <div class="container">
+    <div class="header">
+      <p id="welcome-msg">A carregar...</p>
+    </div>
 
-    <div id="ia-planejamento" class="tab-content active">
-      
-      <div class="form-wrapper" id="form-wrapper" style="display:block;">
-        <div class="form-container">
-          <h1>Crie a sua Meta</h1>
-          <form id="ia-fit-form">
-            <div class="goal-section">
-              <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
-              <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo... (Ex: perder 10kg, ganhar massa muscular)" required aria-label="Objetivo principal"></textarea>
+    <div id="ia-planejamento" class="tab-content active">
+      
+      <div class="form-wrapper" id="form-wrapper" style="display:block;">
+        <div class="form-container">
+          <h1>Crie a sua Meta</h1>
+          <form id="ia-fit-form">
+            <div class="goal-section">
+              <h2 class="goal-title text-glow-blue">Qual é a sua Grande Meta?</h2>
+              <textarea id="objetivo" name="objetivo" placeholder="Escreva aqui seu principal objetivo... (Ex: perder 10kg, ganhar massa muscular)" required aria-label="Objetivo principal"></textarea>
 
-              <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
-                <label for="prazo">Qual o prazo para esta meta?</label>
-                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required aria-label="Prazo da meta">
-              </div>
-            </div>
+              <div id="prazo-group" class="form-group" style="margin-top:20px; text-align:left; display:none;">
+                <label for="prazo">Qual o prazo para esta meta?</label>
+                <input type="text" id="prazo" name="prazo" placeholder="Ex: 3 meses, 1 ano, 1.5 anos..." required aria-label="Prazo da meta">
+              </div>
+            </div>
 
-            <h3>Informações Básicas e Realidade Atual</h3>
+            <h3>Informações Básicas e Realidade Atual</h3>
 
-            <div class="form-group"><label for="sexo">Sexo</label>
-              <select id="sexo" name="sexo" required aria-label="Sexo">
-                <option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option>
-              </select>
-            </div>
+            <div class="form-group"><label for="sexo">Sexo</label>
+              <select id="sexo" name="sexo" required aria-label="Sexo">
+                <option value="" disabled selected>Selecione...</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option>
+              </select>
+            </div>
 
-            <div class="form-group"><label for="altura">Altura (m)</label><input type="number" step="0.01" min="0.5" max="2.5" id="altura" name="altura" placeholder="Ex: 1.75" required aria-label="Altura"></div>
-            <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" step="0.1" min="20" max="400" id="peso" name="peso" placeholder="Ex: 75" required aria-label="Peso"></div>
-            <div class="form-group"><label for="idade">Idade</label><input type="number" min="10" max="120" id="idade" name="idade" placeholder="Ex: 25" required aria-label="Idade"></div>
+            <div class="form-group"><label for="altura">Altura (m)</label><input type="number" step="0.01" min="0.5" max="2.5" id="altura" name="altura" placeholder="Ex: 1.75" required aria-label="Altura"></div>
+            <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" step="0.1" min="20" max="400" id="peso" name="peso" placeholder="Ex: 75" required aria-label="Peso"></div>
+            <div class="form-group"><label for="idade">Idade</label><input type="number" min="10" max="120" id="idade" name="idade" placeholder="Ex: 25" required aria-label="Idade"></div>
 
-            <div class="form-group">
-              <details class="day-selector-container">
-                <summary class="day-selector-summary">Dias de treino</summary>
-                <div class="day-selector-grid">
-                  <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input"><label for="dia-dom" class="day-circle-label">Dom</label>
-                  <input type="checkbox" name="dias_treino" value="seg" id="dia-seg" class="day-circle-input"><label for="dia-seg" class="day-circle-label">Seg</label>
-                  <input type="checkbox" name="dias_treino" value="ter" id="dia-ter" class="day-circle-input"><label for="dia-ter" class="day-circle-label">Ter</label>
-                  <input type="checkbox" name="dias_treino" value="qua" id="dia-qua" class="day-circle-input"><label for="dia-qua" class="day-circle-label">Qua</label>
-                  <input type="checkbox" name="dias_treino" value="qui" id="dia-qui" class="day-circle-input"><label for="dia-qui" class="day-circle-label">Qui</label>
-                  <input type="checkbox" name="dias_treino" value="sex" id="dia-sex" class="day-circle-input"><label for="dia-sex" class="day-circle-label">Sex</label>
-                  <input type="checkbox" name="dias_treino" value="sab" id="dia-sab" class="day-circle-input"><label for="dia-sab" class="day-circle-label">Sáb</label>
-                </div>
-              </details>
-            </div>
+            <div class="form-group">
+              <details class="day-selector-container">
+                <summary class="day-selector-summary">Dias de treino</summary>
+                <div class="day-selector-grid">
+                  <input type="checkbox" name="dias_treino" value="dom" id="dia-dom" class="day-circle-input"><label for="dia-dom" class="day-circle-label">Dom</label>
+                  <input type="checkbox" name="dias_treino" value="seg" id="dia-seg" class="day-circle-input"><label for="dia-seg" class="day-circle-label">Seg</label>
+                  <input type="checkbox" name="dias_treino" value="ter" id="dia-ter" class="day-circle-input"><label for="dia-ter" class="day-circle-label">Ter</label>
+                  <input type="checkbox" name="dias_treino" value="qua" id="dia-qua" class="day-circle-input"><label for="dia-qua" class="day-circle-label">Qua</label>
+                  <input type="checkbox" name="dias_treino" value="qui" id="dia-qui" class="day-circle-input"><label for="dia-qui" class="day-circle-label">Qui</label>
+                  <input type="checkbox" name="dias_treino" value="sex" id="dia-sex" class="day-circle-input"><label for="dia-sex" class="day-circle-label">Sex</label>
+                  <input type="checkbox" name="dias_treino" value="sab" id="dia-sab" class="day-circle-input"><label for="dia-sab" class="day-circle-label">Sáb</label>
+                </div>
+              </details>
+            </div>
 
-            <div class="form-group"><label for="local_treino">Onde vai treinar?</label>
-              <select id="local_treino" name="local_treino" required>
-                <option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option>
-              </select>
-            </div>
+            <div class="form-group"><label for="local_treino">Onde vai treinar?</label>
+              <select id="local_treino" name="local_treino" required>
+                <option value="" disabled selected>Selecione...</option><option value="Academia">Academia</option><option value="Casa">Em Casa</option>
+              </select>
+            </div>
 
-            <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="number" step="0.01" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4500.50" required></div>
+            <div class="form-group"><label for="orcamento">Orçamento mensal para dieta (R$)</label><input type="number" step="0.01" inputmode="decimal" id="orcamento" name="orcamento" placeholder="Ex: 500 ou 4500.50" required></div>
 
-            <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
-              <select id="uso_suplemento" name="uso_suplemento" required>
-                <option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option>
-              </select>
-            </div>
+            <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
+              <select id="uso_suplemento" name="uso_suplemento" required>
+                <option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option>
+              </select>
+            </div>
 
-            <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
+            <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
 
-            <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label>
-              <select id="nivel" name="nivel" required>
-                <option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option>
-              </select>
-            </div>
+            <div class="form-group"><label for="nivel">Seu nível em atividades físicas</label>
+              <select id="nivel" name="nivel" required>
+                <option value="" disabled selected>Selecione...</option><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option>
+              </select>
+            </div>
 
-            <button type="submit">Crie seu próprio caminho</button>
-          </form>
-        </div>
-      </div>
+            <button type="submit">Crie seu próprio caminho</button>
+          </form>
+        </div>
+      </div>
 
-      <div class="results-wrapper" id="results-wrapper" style="display:none;">
-        <div class="results-container">
-          <h2>Fale com a IA</h2>
-          <div id="dify-container" class="iframe-container" aria-hidden="false">
-            <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
-            <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
-            <div class="dify-bottom-mask"></div>
-          </div>
+      <div class="results-wrapper" id="results-wrapper" style="display:none;">
+        <div class="results-container">
+          <h2>Fale com a IA</h2>
+          <div id="dify-container" class="iframe-container" aria-hidden="false">
+            <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
+            <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+            <div class="dify-bottom-mask"></div>
+          </div>
 
-          <div class="playlist-section" id="playlist-section" style="display:none;">
-            <h4>Roteiro de Aulas Sugerido</h4>
-            <p style="color:#bbb; margin-top:-10px;">Com base na sua meta, preparamos um roteiro para acelerar os seus resultados.</p>
-    _       <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
-          </div>
+          <div class="playlist-section" id="playlist-section" style="display:none;">
+            <h4>Roteiro de Aulas Sugerido</h4>
+            <p style="color:#bbb; margin-top:-10px;">Com base na sua meta, preparamos um roteiro para acelerar os seus resultados.</p>
+            <button id="playlist-btn" class="playlist-btn">Ver seu Roteiro de Aulas</button>
+          </div>
 
-          <div class="progress-section">
-            <h3>Sua Jornada</h3>
-            <div class="progress-bar-container"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
-            <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
-            <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <div class="progress-section">
+            <h3>Sua Jornada</h3>
+            <div class="progress-bar-container"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
+            <div class="progress-labels"><span id="start-date-label"></span><span id="end-date-label"></span></div>
+            <div class="countdown-container"><div id="countdown-days" class="countdown-days"></div><div class="countdown-label">dias para mudar de vida</div></div>
+          </div>
+        </div>
+      </div>
+    </div> <div id="video-aulas" class="tab-content" aria-hidden="true">
+      <h2>Nossas Aulas</h2>
+      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+    </div>
+    
+    </div> <div id="followup-root" style="display:none;"></div>
 
-    <div id="video-aulas" class="tab-content" aria-hidden="true">
-t     <h2>Nossas Aulas</h2>
-      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-    </div>
-    
-  </div> <!-- Fecha .container -->
-
-  <!-- Este div será usado para todos os modais (Follow-up e Troca) -->
-  <div id="followup-root" style="display:none;"></div>
-
-  <!-- CORREÇÃO 2: Adicionado o "=" em type="module" -->
-  <script type="module" src="membros.js"></script>
-  
-  </body>
+  <script type="module" src="membros.js"></script>
+  
+  </body>
 </html>
