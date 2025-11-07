@@ -708,14 +708,13 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.classList.toggle('hidden');
     resetBtn.classList.toggle('hidden');
     configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
-section in `ia-fit-form`'s submit handler (around line 430).
   });
 
   // Correção do Bug 1 (Reset)
   if (resetBtn) resetBtn.addEventListener('click', async () => {
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) formWrapper.style.display = 'block';
-    
+  g   
     const resultsWrapper = document.getElementById('results-wrapper');
     if (resultsWrapper) resultsWrapper.style.display = 'none';
 
@@ -750,6 +749,7 @@ section in `ia-fit-form`'s submit handler (around line 430).
       await supabase.auth.signOut();
       window.location.replace('/login.html');
     } catch(err){
+warning in `logout-btn` click handler (around line 380).
       alert('Falha ao sair: ' + (err.message || err));
     }
   });
@@ -768,6 +768,7 @@ section in `ia-fit-form`'s submit handler (around line 430).
     if (suppGroup) suppGroup.style.display = this.value === 'Sim' ? 'block' : 'none'; 
     if(this.value !== 'Sim') {
       const quaisSupp = document.getElementById('quais_suplementos');
+A `getElementById` call in `uso_suplemento` change handler (around line 400).
       if (quaisSupp) quaisSupp.value = '';
     }
   });
@@ -813,7 +814,6 @@ section in `ia-fit-form`'s submit handler (around line 430).
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
         if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
-section in `ia-fit-form`'s submit handler (around line 520).
         // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
         const inputs = {
           grande_meta: objetivoText,
@@ -823,10 +823,10 @@ section in `ia-fit-form`'s submit handler (around line 520).
           peso: parseFloat((formElements.peso.value || '0').replace(',', '.')) || 70,
           idade: parseInt(formElements.idade.value,10) || 30,
           disponibilidade: selectedDaysArray.length,
-section in `ia-fit-form`'s submit handler (around line 530).
           selected_days: selectedDaysArray,
           local_treino: formElements.local_treino.value,
           orcamento: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
+section in `ia-fit-form`'s submit handler (around line 535).
           orcamento_mes_R$: parseFloat((formElements.orcamento.value||'').replace(',','.')) || 0,
           uso_suplemento: formElements.uso_suplemento.value,
           quais_suplementos: formElements.quais_suplementos.value || '',
@@ -844,10 +844,10 @@ section in `ia-fit-form`'s submit handler (around line 530).
           const answers = await showFollowupQuestions(strategy.nextQuestions);
           if(!answers){
             submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
-label in `ia-fit-form`'s submit handler (around line 551).
             return;
           }
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
+section in `ia-fit-form`'s submit handler (around line 558).
         }
 
         const diffTime = Math.abs(endDate - startDate);
@@ -861,6 +861,7 @@ section in `ia-fit-form`'s submit handler (around line 560).
         const current = await getCurrentUser();
         if(current){
           // Salva o plano na tabela 'user_diets' (o que já funciona)
+A `savePlan` call in `ia-fit-form`'s submit handler (around line 570).
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
@@ -909,6 +910,7 @@ section in `initializePageData` (around line 620).
           const profileData = latestPlan.payload.profile_snapshot;
           
           if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
+Do you want to display the progress?
             displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
           }
           
@@ -922,6 +924,7 @@ section in `initializePageData` (around line 630).
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
           // SUCESSO: Usuário NÃO tem plano, mostra formulário
+section in `initializePageData` (around line 640).
           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
