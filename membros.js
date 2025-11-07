@@ -1,6 +1,6 @@
 /* ===================================================================
    ARQUIVO: membros.js (O "ENGENHEIRO") - v4.1 (Com Troca de Alimentos)
-.
+   
    Melhoria:
    1. Adicionada lógica para o Modal de Troca de Alimentos.
    2. Novas funções: openSwapModal, closeSwapModal, updateSwapUI,
@@ -463,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
           const answers = await showFollowupQuestions(strategy.nextQuestions);
           if(!answers){
-      mbers.js:1000
             submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
             return;
           }
@@ -726,8 +725,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mealGroup.style.display = 'block';
       } else {
         mealGroup.style.display = 'none';
+    </div>
       }
-    }
 
     // 3. Habilita o botão de confirmar
     if (selectedFoodId && selectedNewFood) {
@@ -833,7 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
               comp.source_id = newFoodId;
               comp.grams = newGrams;
               comp.kcal = Math.round(newKcal);
-a
+
               swapsMade++;
               totalMealKcal += comp.kcal;
             } else {
