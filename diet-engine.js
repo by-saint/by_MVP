@@ -893,6 +893,9 @@ const SuperDietEngine = (function(){
     const base = (sat * satW) + (giScore * giW) + (costS * costW);
     return Math.max(0, Math.min(1, base));
   }
+  
+  // Variável global interna do módulo para armazenar o cache do ranking
+  const fullRotation = {};
 
   /* UPDATED: _rankFoodsByCategory includes restrictions parameter and zeroes rank for restricted IDs */
   function _rankFoodsByCategory(categories, profile, shortTermAvoidList = [], longTermPenalizeList = [], restrictionList = []){
@@ -1161,9 +1164,12 @@ const SuperDietEngine = (function(){
       'snack_carb_cereal', 'snack_carb_pao', 'snack_carb_outro',
       'fruta','gordura_boa','suplemento', 'verdura_folha', 'verdura_legume'
     ];
-    // Declaração do fullRotation movida para fora do loop (correto)
-    const fullRotation = {};
-    cats.forEach(cat => { fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], [], restrictions).slice(0, 40); });
+    // A variável fullRotation agora é preenchida aqui
+    cats.forEach(cat => { 
+      if (!fullRotation[cat]) { // Popula apenas se não estiver já cacheado
+        fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], [], restrictions).slice(0, 40); 
+      }
+    });
 
     // Fallbacks (caso alguma categoria não tenha alimentos após restrições)
     const fallbackProtein = 'frango_peito';
