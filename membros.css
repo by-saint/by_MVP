@@ -241,7 +241,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 }
 .swap-btn-confirm {
   background: var(--color-ia-specialist);
-s  color: #fff;
+  color: #fff;
 }
 .swap-btn-confirm:disabled {
   background: #333;
