@@ -1,5 +1,5 @@
 /* ===================================================================
- * ARQUIVO: diet-engine.js (O "CÉREBRO") - v4.2 (Pronto para Troca)
+ * ARQUIVO: diet-engine.js (O "CÉREBRO") - v4.2 (Correção Refeições)
  *
  * MUDANÇAS (Falhas Corrigidas):
  *
@@ -16,10 +16,6 @@
  * - "Ceia" foi COMPLETAMENTE REMOVIDA da lógica.
  *
  * 4. (Falha 4 - Variedade) ROTAÇÃO DE ALIMENTOS: OK
- *
- * 5. (Melhoria 2 - Troca) FUNÇÕES EXPOSTAS:
- * - Adicionadas `getFoodCategory`, `getFoodsByCategory`, e
- * `SLOT_MAP` na API pública para o `membros.js` usar.
  * =================================================================== */
 
 const SuperDietEngine = (function(){
@@ -893,9 +889,6 @@ const SuperDietEngine = (function(){
     const base = (sat * satW) + (giScore * giW) + (costS * costW);
     return Math.max(0, Math.min(1, base));
   }
-  
-  // Variável global interna do módulo para armazenar o cache do ranking
-  const fullRotation = {};
 
   /* UPDATED: _rankFoodsByCategory includes restrictions parameter and zeroes rank for restricted IDs */
   function _rankFoodsByCategory(categories, profile, shortTermAvoidList = [], longTermPenalizeList = [], restrictionList = []){
@@ -1002,7 +995,7 @@ const SuperDietEngine = (function(){
 
     out.protein_grams = Math.round(numProtPortions * protPortGrams);
     out.carb_grams = Math.round(numCarbPortions * carbPortGrams);
-    out.veg_grams = vegRec ? vegPortGrams : 100; // Porção de vegetal é fixa (ex: 100g) ou baseada na porção da DB
+    out.veg_grams = vegRec ? vegPortGrams : 100; // Porção padrão de vegetal
 
     const protKcalPer100 = _safeNum(protRec?.nutrition?.kcal, (protPer100 * 4));
     const carbKcalPer100 = _safeNum(carbRec?.nutrition?.kcal, (carbPer100 * 4));
@@ -1164,12 +1157,8 @@ const SuperDietEngine = (function(){
       'snack_carb_cereal', 'snack_carb_pao', 'snack_carb_outro',
       'fruta','gordura_boa','suplemento', 'verdura_folha', 'verdura_legume'
     ];
-    // A variável fullRotation agora é preenchida aqui
-    cats.forEach(cat => { 
-      if (!fullRotation[cat]) { // Popula apenas se não estiver já cacheado
-        fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], [], restrictions).slice(0, 40); 
-      }
-    });
+    const fullRotation = {};
+    cats.forEach(cat => { fullRotation[cat] = _rankFoodsByCategory([cat], profileWithTargets, [], [], restrictions).slice(0, 40); });
 
     // Fallbacks (caso alguma categoria não tenha alimentos após restrições)
     const fallbackProtein = 'frango_peito';
@@ -1256,7 +1245,7 @@ const SuperDietEngine = (function(){
 
 
         // meal weights & nutrient timing
-        let mealWeights = mealNames.map(m => /almoço|jantar/i.test(m) ? 1.8 : (/café/i.test(m) ? 1.2 : (/lanche tarde/i.test(m) ? 0.8 : 0.6))); // Lanche tarde com peso 0.8
+        let mealWeights = mealNames.map(m => /almoço|jantar/i.test(m) ? 1.8 : (/café/i.test(m) ? 1.2 : 0.6));
         if(isTraining){
           mealWeights = mealWeights.map((wgt,idx) => {
             const name = mealNames[idx].toLowerCase();
@@ -1322,8 +1311,7 @@ const SuperDietEngine = (function(){
              blueprintPool = [BLUEPRINTS['lanche'][0], BLUEPRINTS['lanche'][1], BLUEPRINTS['lanche'][2], BLUEPRINTS['lanche'][3]]; // Iogurte, Pão, Ovos, Fruta
              if(userHasSupplement(profile, 'whey')) blueprintPool.push(BLUEPRINTS['lanche'][4]); // Shake
           }
-          // A "Ceia" foi removida da lógica de `mealNames`, então este 'else if' não será chamado
-          // else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia'];
+          else if (lname.includes('ceia')) blueprintPool = BLUEPRINTS['ceia']; // Não deve ser chamado mais
           else blueprintPool = BLUEPRINTS['lanche']; // Fallback
 
           // Seleção determinística do blueprint
@@ -1547,8 +1535,8 @@ const SuperDietEngine = (function(){
   // ==========================================================
   // <<<<< NOVAS FUNÇÕES PARA MELHORIA 2 (Troca de Alimentos) >>>>>
   // ==========================================================
-  
-  // (Definido no escopo externo para ser acessível aqui)
+  // MAPA DE SLOTS: Mapeia os slots dos blueprints para as categorias da v6_FoodDatabase
+  // (Duplicado aqui para ser exportado, idealmente seria definido uma vez só)
   const SLOT_MAP = {
       'proteina_main': ['proteina_main'],
       'peixe': ['peixe'],
@@ -1592,12 +1580,9 @@ const SuperDietEngine = (function(){
       'fruta','gordura_boa','suplemento', 'verdura_folha', 'verdura_legume'
     ];
 
-    // O `fullRotation` é populado dentro de `planLongTerm`.
-    // Para esta função funcionar de forma independente (caso `planLongTerm` não tenha sido chamado),
-    // precisamos de um fallback para popular o `fullRotation` sob demanda.
+    // Se `fullRotation` não foi populado ainda para esta categoria (improvável, mas seguro)
     if (!fullRotation[category]) {
-       // Popula apenas esta categoria (com um perfil vazio, apenas para ranking)
-       console.warn(`[diet-engine] Populando fullRotation sob demanda para: ${category}`);
+       // Popula apenas esta categoria
        fullRotation[category] = _rankFoodsByCategory([category], {}, [], [], []).slice(0, 40);
     }
     
