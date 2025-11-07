@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="membros.css">
+  <!-- CORREÇÃO: O nome do arquivo é "membro.css", não "membros.css" -->
+  <link rel="stylesheet" href="membro.css">
   
   </head>
 <body>
@@ -92,8 +93,7 @@
             <div class="form-group"><label for="uso_suplemento">Pretende usar suplementos?</label>
               <select id="uso_suplemento" name="uso_suplemento" required>
                 <option value="" disabled selected>Selecione...</option><option value="Sim">Sim</option><option value="Não">Não</option>
-              </select>
-            </div>
+    _         </div>
 
             <div class="form-group" id="suplementos-detalhes-group" style="display:none;"><label for="quais_suplementos">Quais suplementos?</label><textarea id="quais_suplementos" name="quais_suplementos" placeholder="Ex: Whey, Creatina..."></textarea></div>
 
@@ -104,7 +104,7 @@
             </div>
 
             <button type="submit">Crie seu próprio caminho</button>
-          </form>
+f         </form>
         </div>
       </div>
 
@@ -113,8 +113,8 @@
           <h2>Fale com a IA</h2>
           <div id="dify-container" class="iframe-container" aria-hidden="false">
             <div class="dify-top-strip"><div class="dify-top-badge">Fale com a IA</div><div class="mvp-label">MVPia</div></div>
-      _         <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
-f           <div class="dify-bottom-mask"></div>
+            <iframe id="dify-iframe" src="" frameborder="0" title="Chat IA" style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+            <div class="dify-bottom-mask"></div>
           </div>
 
           <div class="playlist-section" id="playlist-section" style="display:none;">
@@ -145,7 +145,7 @@ f           <div class="dify-bottom-mask"></div>
   <!-- Este div será usado para todos os modais (Follow-up e Troca) -->
   <div id="followup-root" style="display:none;"></div>
 
-  <!-- ERRO CORRIGIDO ABAIXO: Faltava o "=" em type="module" -->
+  <!-- CORREÇÃO: Adicionado o "=" em type="module" -->
   <script type="module" src="membros.js"></script>
   
   </body>
