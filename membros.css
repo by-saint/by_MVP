@@ -1,13 +1,13 @@
 :root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
+  --color-ia-specialist: #007BFF;
+  --color-video-lessons: #8A2BE2;
+  --color-journey: #DC143C;
+  --journey-red-1: #ff2646;
+  --journey-red-2: #be123c;
+  --journey-dark: #2a0a12;
+  --bg: #121212;
+  --card: #1E1E1E;
+  --muted: #bbb;
 }
 html { scroll-behavior: smooth; }
 body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
@@ -108,11 +108,11 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+  .percurso-forms{ grid-template-columns:1fr; }
+  .plan-days{ grid-template-columns:1fr; }
+  body{ padding:20px 12px; }
+  .day-circle-label{ width:36px; height:36px; font-size:13px; }
+  .iframe-container{ height:48vh; min-height:220px; }
 }
 
 /* modal for follow-up questions */
@@ -123,3 +123,157 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
+
+/* === ESTILOS PARA TROCA DE ALIMENTOS (Melhoria 2) === */
+.swap-modal {
+  width: 640px; /* Um pouco mais largo que o followup-modal */
+  max-width: 95%;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  color: #fff;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.swap-modal h3 {
+  margin-top: 0;
+  color: #fff;
+  text-align: left; /* Alinha o título à esquerda */
+}
+
+.swap-section {
+  margin-bottom: 15px;
+}
+
+.swap-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #BBBBBB;
+}
+
+/* Estilo para os seletores <select> */
+.swap-select {
+  width: 100%;
+  padding: 12px;
+  background-color: #2C2C2C;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #E0E0E0;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Grid de substituição de alimentos */
+.swap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  max-height: 280px; /* Altura máxima antes de rolar */
+  overflow-y: auto;
+  padding: 10px;
+  background: #111;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+/* Cada item de comida clicável */
+.swap-item {
+  background: #2C2C2C;
+  border: 2px solid #444;
+  color: #E0E0E0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  line-height: 1.3;
+}
+
+.swap-item:hover {
+  background: #3a3a3a;
+  border-color: #555;
+}
+
+/* Estilo para o item selecionado */
+.swap-item.selected {
+  background: var(--color-ia-specialist);
+  border-color: var(--color-ia-specialist);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0,123,255,0.5);
+}
+
+/* Estado de carregamento ou mensagem */
+.swap-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botões de ação no modal */
+.swap-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+}
+
+.swap-actions button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.swap-btn-cancel {
+  background: #444;
+  color: #fff;
+}
+.swap-btn-confirm {
+  background: #28a745; /* Verde (cor do botão de troca) */
+  color: #fff;
+}
+.swap-btn-confirm:disabled {
+  background: #333;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Estilos para os Radio Buttons (Todas / Refeição Específica) */
+.swap-radio-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.swap-radio-group label {
+  flex: 1;
+  padding: 10px;
+  background: #2C2C2C;
+  border: 2px solid #444;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+}
+.swap-radio-group input {
+  display: none; /* Esconde o radio button real */
+}
+/* Estilo quando o radio está selecionado */
+.swap-radio-group input:checked + label {
+  background: #333;
+  border-color: var(--color-ia-specialist);
+  color: #fff;
+}
