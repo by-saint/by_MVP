@@ -76,6 +76,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .playlist-section{ text-align:center; margin:24px 0; }
 .playlist-btn{ background:#007BFF; color:white; border:none; padding:12px 24px; font-size:1.1em; cursor:pointer; border-radius:8px; }
 
+/* CORREÇÃO VISUAL: Garante que os formulários fiquem lado a lado em telas maiores */
 .percurso-forms{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
 .percurso-card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border:1px solid rgba(190,18,60,0.06); padding:20px; border-radius:12px; }
 .generated-diet-card{ border:2px solid rgba(190,18,60,0.14); box-shadow:0 8px 24px rgba(190,18,60,0.06); padding:18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.16)); color:#ddd; }
@@ -87,7 +88,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .plan-days{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .plan-day{ background: linear-gradient(180deg,#141414,#0f0f0f); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
 .meal-row{ margin-bottom:10px; padding:8px; border-radius:8px; background:#0d0d0d; display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid rgba(255,255,255,0.02); }
-.meal-left{ display:flex; gap:10px; align-items:center; }
+.meal-left{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; } /* Adicionado flex-wrap */
 .meal-name{ font-weight:700; color:#fff; }
 .meal-kcal{ font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; }
 
@@ -108,7 +109,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
+  .percurso-forms{ grid-template-columns:1fr; } /* Em telas menores, volta a ser 1 coluna */
   .plan-days{ grid-template-columns:1fr; }
   body{ padding:20px 12px; }
   .day-circle-label{ width:36px; height:36px; font-size:13px; }
@@ -123,6 +124,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
+
 
 /* === ESTILOS PARA TROCA DE ALIMENTOS (Melhoria 2) === */
 .swap-modal {
@@ -217,6 +219,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   display: flex;
   align-items: center;
   justify-content: center;
+  grid-column: 1 / -1; /* Ocupa a linha inteira */
 }
 
 /* Botões de ação no modal */
@@ -243,7 +246,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   color: #fff;
 }
 .swap-btn-confirm {
-  background: #28a745; /* Verde (cor do botão de troca) */
+  background: var(--journey-red-1); /* CORREÇÃO: Botão de confirmação vermelho */
   color: #fff;
 }
 .swap-btn-confirm:disabled {
@@ -254,9 +257,9 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 
 /* Estilos para os Radio Buttons (Todas / Refeição Específica) */
 .swap-radio-group {
-  display: flex;
+  display: grid; /* Alterado para grid */
+  grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
   gap: 10px;
-  margin-bottom: 15px;
 }
 .swap-radio-group label {
   flex: 1;
@@ -267,6 +270,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   text-align: center;
   cursor: pointer;
   font-weight: 600;
+  margin-bottom: 0; /* Reseta a margem padrão do label */
 }
 .swap-radio-group input {
   display: none; /* Esconde o radio button real */
