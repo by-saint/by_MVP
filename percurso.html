@@ -1,69 +1,110 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <title>Meu Percurso — Saúde & Estética</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="robots" content="noindex,nofollow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="membros.css">
+  <meta charset="utf-8" />
+  <title>Meu Percurso — Saúde & Estética</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="membros.css">
 </head>
 <body>
 
-  <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+  <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
 
-  <div class="sidebar" id="sidebar" role="navigation" aria-label="Navegação lateral">
-    <nav>
-      <ul>
-        <li><a href="membros-saude.html" class="nav-link link-ia">IA Especialista</a></li>
-        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
-        <li><a href="percurso.html" class="nav-link link-percurso active" aria-current="page">Percurso</a></li>
-      </ul>
-    </nav>
-    <div class="sidebar-footer">
-      <button id="config-btn" class="sidebar-config-btn" aria-expanded="false"><span>⚙️</span><span>Configurações</span></button>
-      <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
-      <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
-    </div>
-  </div>
+  <div class="sidebar" id="sidebar" role="navigation" aria-label="Navegação lateral">
+    <nav>
+      <ul>
+        <li><a href="membros-saude.html" class="nav-link link-ia">IA Especialista</a></li>
+        <li><a href="#" class="nav-link link-aulas" data-tab="video-aulas">Videoaulas</a></li>
+        <li><a href="percurso.html" class="nav-link link-percurso active" aria-current="page">Percurso</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="config-btn" class="sidebar-config-btn" aria-expanded="false"><span>⚙️</span><span>Configurações</span></button>
+      <button id="reset-btn" class="sidebar-action-btn sidebar-reset-btn hidden">Definir Nova Meta</button>
+      <button id="logout-btn" class="sidebar-action-btn sidebar-logout-btn hidden">Sair da conta</button>
+    </div>
+  </div>
 
-  <div class="overlay" id="overlay" tabindex="-1"></div>
+  <div class="overlay" id="overlay" tabindex="-1"></div>
 
-  <div class="container">
-    <div class="header">
-      <p id="welcome-msg">A carregar...</p>
-    </div>
+  <div class="container">
+    <div class="header">
+      <p id="welcome-msg">A carregar...</p>
+    </div>
 
-    <div id="video-aulas" class="tab-content" aria-hidden="true">
-      <h2>Nossas Aulas</h2>
-      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
-    </div>
-    
-    <div id="percurso" class="tab-content active" aria-hidden="false">
-      <div class="percurso-container">
-        <h2>Meu Percurso</h2>
-        <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
-        <div class="percurso-forms">
-          <div class="percurso-card" id="treino-card">
-            <h4>Formulário: Treino</h4>
-            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
-            <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
-          </div>
+    <div id="video-aulas" class="tab-content" aria-hidden="true">
+      <h2>Nossas Aulas</h2>
+      <div id="video-block-1"><h3>Aula 1: Introdução ao Treino Estético</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-2" style="margin-top:18px;"><h3>Aula 2: Fundamentos da Nutrição</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+      <div id="video-block-3" style="margin-top:18px;"><h3>Aula 3: Desvendando a Hipertrofia</h3><div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;"><iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>
+    </div>
+    
+    <div id="percurso" class="tab-content active" aria-hidden="false">
+      <div class="percurso-container">
+        <h2>Meu Percurso</h2>
+        <p style="text-align:center;color:#bbb;">Abaixo está seu formulário / plano de dieta. Edite, salve ou crie novas versões.</p>
+        <div class="percurso-forms">
+          <div class="percurso-card" id="treino-card">
+            <h4>Formulário: Treino</h4>
+            <div class="form-group"><label for="objetivo_treino">Objetivo de Treino</label><textarea id="objetivo_treino" placeholder="Ex: hipertrofia de membros superiores..."></textarea></div>
+            <div class="form-group"><label for="frequencia_treino">Frequência semanal</label><input id="frequencia_treino" type="number" min="1" max="7" placeholder="Ex: 4"></div>
+          </div>
 
-          <div class="percurso-card generated-diet-card" id="dieta-card">
-            <h4>Formulário: Dieta</h4>
-            <div id="dieta-card-content"><p style="color:#bbb;">Carregando seu plano de dieta...</p></div>
-          </div>
-        </div>
-      </div>
-    </div> </div> <div id="followup-root" style="display:none;"></div>
+          <div class="percurso-card generated-diet-card" id="dieta-card">
+            <h4>Formulário: Dieta</h4>
+                        <button id="open-swap-modal-btn" class="sidebar-action-btn sidebar-reset-btn" style="display:block; width:auto; margin: -10px auto 15px auto; padding: 10px 20px; font-size: 15px; background-color: var(--color-ia-specialist); border-color: var(--color-ia-specialist); color:#fff;">Troca de Alimentos</button>
+                        <div id="dieta-card-content"><p style="color:#bbb;">Carregando seu plano de dieta...</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>   <div id="followup-root" style="display:none;"></div>
 
-  <script type="module" src="membros.js"></script>
+    <div id="food-swap-modal-overlay" class="followup-overlay" style="display:none;">
+    <div class="followup-modal" id="food-swap-modal">
+      <h4>Troca de Alimentos</h4>
+      <p style="color:#bbb; font-size:14px; margin-top:-10px;">Selecione o alimento do seu plano atual e por qual deseja trocar.</p>
+      
+      <div class="followup-field">
+        <label for="swap-food-select">Alimento que quer trocar:</label>
+        <select id="swap-food-select" class="followup-select">
+          <option value="">Carregando alimentos do plano...</option>
+  V     </select>
+      </div>
+      
+      <div class="followup-field">
+        <label for="swap-scope-select">Trocar em:</label>
+        <select id="swap-scope-select" class="followup-select">
+          <option value="all">Todas as refeições</option>
+          <option value="specific">Apenas em uma refeição específica</option>
+        </select>
+      </div>
+
+      <div class="followup-field" id="swap-meal-specific-group" style="display:none;">
+        <label for="swap-meal-select">Qual refeição?</label>
+        <select id="swap-meal-select" class="followup-select">
+              M   </select>
+      </div>
+      
+      <div class="followup-field">
+        <label for="swap-new-food-select">Trocar por:</label>
+        <select id="swap-new-food-select" class="followup-select" disabled>
+          <option value="">Selecione um alimento para trocar</option>
+        </select>
+      </div>
+      
+      <div class="followup-actions">
+        <button id="swap-cancel-btn" class="followup-actions-btn">Cancelar</button>
+        <button id="swap-execute-btn" class="followup-actions-btn" style="background:linear-gradient(90deg,#007BFF,#0056b3); color:#fff;" disabled>Realizar Troca</button>
+      </div>
+    </div>
+  </div>
+    <script type="module" src="membros.js"></script>
 
 </body>
 </html>
