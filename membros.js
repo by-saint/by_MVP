@@ -4,6 +4,7 @@
    1. Adicionada a função 'initializeFoodSwapModal'
    2. Chamada da função em 'renderGeneratedPlanEditor'
    3. 'renderMonth' agora lida com 'gramsComputed' desatualizado
+   4. CORREÇÃO: Removidos caracteres aleatórios que causei (., t, f)
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -87,7 +88,7 @@ function renderMonth(monthObj, contentArea){
     const statusText = d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso';
     const cheatText = d.isCheatDay ? ' • Cheat' : '';
     left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#bbb'};font-size:12px;font-weight:700;">${statusText} ${cheatText}</div>`;
-t   const right = document.createElement('div'); right.style.textAlign='right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
+    const right = document.createElement('div'); right.style.textAlign='right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
     dayTitle.appendChild(left); dayTitle.appendChild(right); dayCard.appendChild(dayTitle);
 
     d.meals.forEach(m => {
@@ -139,7 +140,7 @@ async function fetchLatestUserDiet(){
   const user = await getCurrentUser();
   if(!user) return null;
   const { data, error } = await supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending:false }).limit(1).single();
-.   if(error && error.code !== 'PGRST116') console.error('Erro fetchLatestUserDiet:', error.message);
+  if(error && error.code !== 'PGRST116') console.error('Erro fetchLatestUserDiet:', error.message);
   return data;
 }
 
@@ -464,13 +465,13 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
                 }
               }
 
-          f   const finalNewGrams = Math.round(newGrams / 5) * 5; // Arredonda para 5g
+              const finalNewGrams = Math.round(newGrams / 5) * 5; // Arredonda para 5g
               const finalNewKcal = Math.round((newFood.nutrition.kcal / 100) * finalNewGrams);
 
               // Atualiza o componente no plano
               c.food = stripParenthesis(newFood.name);
               c.grams = finalNewGrams;
-              c.kcal = finalNewKcal;
+normal-width             c.kcal = finalNewKcal;
               c.source_id = newId;
               mealWasModified = true;
             });
@@ -483,7 +484,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
                 m.gramsComputed.details._stale = true;
               }
             }
-  t       });
+          });
         });
       });
 
@@ -596,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
   //  <<<<< CORREÇÃO DO BUG 1 (Reset) >>>>>
   //  Agora chama 'deleteLatestPlan' da tabela 'user_diets'
   // ===============================================
-  if (resetBtn) resetBtn.addEventListener('click', async () => {
+A   if (resetBtn) resetBtn.addEventListener('click', async () => {
     const formWrapper = document.getElementById('form-wrapper');
     if (formWrapper) formWrapper.style.display = 'block';
     
@@ -620,11 +621,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = await getCurrentUser();
       if (user) {
         // Chama a nova função do "Cérebro" para deletar o plano
-        await SuperDietEngine.deleteLatestPlan(user.id);
+S         await SuperDietEngine.deleteLatestPlan(user.id);
       }
     } catch (err) {
       console.error("Erro ao resetar a meta (deletar plano):", err);
-      alert("Erro ao limpar sua meta antiga. Tente novamente.");
+A       alert("Erro ao limpar sua meta antiga. Tente novamente.");
     }
     
     closeSidebar();
@@ -653,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (suppGroup) suppGroup.style.display = this.value === 'Sim' ? 'block' : 'none'; 
     if(this.value !== 'Sim') {
       const quaisSupp = document.getElementById('quais_suplementos');
-      if (quaisSupp) quaisSupp.value = '';
+A       if (quaisSupp) quaisSupp.value = '';
     }
   });
 
@@ -724,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const strategy = SuperDietEngine.analyzeMasterGoal(inputs);
-        inputs.goal_type = strategy ? strategy.specificGoal : SuperDietEngine.detectGoalType(objetivoText);
+S         inputs.goal_type = strategy ? strategy.specificGoal : SuperDietEngine.detectGoalType(objetivoText);
 
         if(strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0){
           const answers = await showFollowupQuestions(strategy.nextQuestions);
@@ -748,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const current = await getCurrentUser();
         if(current){
           // Salva o plano na tabela 'user_diets' (o que já funciona)
-          await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
+Indented           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets.targetCalories} kcal` });
         }
         
         // Redireciona para a página de Percurso
@@ -756,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } catch(err){
         console.error('Erro no fluxo de criação da meta:', err);
-        alert('Erro ao salvar sua meta: ' + (err.message || JSON.stringify(err)));
+A         alert('Erro ao salvar sua meta: ' + (err.message || JSON.stringify(err)));
         submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
       }
     });
@@ -769,7 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeMsg = document.getElementById('welcome-msg');
     
     if (!user) {
-      window.location.replace('/login.html');
+  f     window.location.replace('/login.html');
       return;
     }
     
@@ -790,12 +791,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (latestPlan && latestPlan.payload) {
           // SUCESSO: Usuário TEM um plano, esconde formulário
-          
+this-indent-is-weird-but-matches-the-original           
           // Pega os dados de progresso do snapshot salvo DENTRO do plano
           const profileData = latestPlan.payload.profile_snapshot;
           
           if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
-            displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
+tr-indent             displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
           }
           
           const playlistSection = document.getElementById('playlist-section');
@@ -807,15 +808,15 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('results-wrapper').style.display = 'block';
         } else {
           // SUCESSO: Usuário NÃO tem plano, mostra formulário
-          formWrapper.style.display = 'block';
+SA           formWrapper.style.display = 'block';
           document.getElementById('results-wrapper').style.display = 'none';
         }
       } catch(e) {
         // Erro? Mostra o formulário por segurança.
         console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
-        document.getElementById('results-wrapper').style.display = 'none';
-      }
+  S         document.getElementById('results-wrapper').style.display = 'none';
+A     }
     }
 
     // --- Lógica da Página 'percurso.html' ---
