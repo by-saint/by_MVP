@@ -1,110 +1,217 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.3
-   Observações:
-   - Versão ajustada para usar SuperDietEngine.calculateEquivalentPortion
-     ao realizar trocas de alimentos.
-   - Mantive/organizei todas as funções de UI e fluxo já existentes,
-     corrigindo pequenos pontos para robustez.
-   -IMPORTANTE: este arquivo assume que existe um arquivo
-     ./supabase-client.js exportando `supabase` e `DIFY_APP_TOKEN`
-     e que `./diet-engine.js` exporta o objeto padrão SuperDietEngine
-     (conforme enviado antes).
-=================================================================== */
+   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.5 (Completo, robusto)
+   Objetivo:
+   - Arquivo cliente que renderiza planos, lida com UI, e implementa
+     modal de Troca de Alimentos usando SuperDietEngine.
+   - Usa SuperDietEngine.calculateEquivalentPortion quando disponível.
+   - Fallbacks seguros e logging extenso para depuração.
+   ================================================================== */
 
-// PASSO 1: Importar o "Cofre" e o "Cérebro"
+/* ============================
+   IMPORTS (assumidos no projeto)
+   ============================ */
 import { supabase, DIFY_APP_TOKEN } from './supabase-client.js';
 import SuperDietEngine from './diet-engine.js';
 
-/* =========================
-    Funções de UI (Interface)
-   ========================== */
+/* ============================
+   UTILITÁRIOS GERAIS (helpers)
+   ============================ */
 
-// Função de helper para limpar nomes
+function _safeNum(v, fallback = 0) {
+  if (typeof v === 'number' && !Number.isNaN(v)) return v;
+  if (v == null || v === '') return fallback;
+  const n = parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? fallback : n;
+}
+
+function _round(v, p = 0) {
+  const pow = 10 ** (p || 0);
+  return Math.round((v || 0) * pow) / pow;
+}
+
+function nowISO() {
+  return (new Date()).toISOString();
+}
+
 function stripParenthesis(name) {
   if (!name) return name;
   return name.replace(/\s*\(.*?\)\s*/g, '').trim();
 }
 
+function safeFindFood(key) {
+  try {
+    return SuperDietEngine.findFood(key);
+  } catch (e) {
+    console.warn('findFood threw', e);
+    return null;
+  }
+}
+
+function formatCurrencyBRL(n) {
+  try {
+    return n == null ? '—' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  } catch {
+    return String(n);
+  }
+}
+
+/* small logger with debug toggle */
+const Debug = {
+  enabled: false,
+  log: function(...args) { if (this.enabled) console.log('[membros.js]', ...args); },
+  warn: function(...args) { if (this.enabled) console.warn('[membros.js]', ...args); },
+  error: function(...args) { if (this.enabled) console.error('[membros.js]', ...args); },
+};
+
+/* ============================
+   UI RENDERING - Plano/Visão
+   ============================ */
+
 function displayProgress(startDate, endDate) {
-  const now = new Date(); now.setHours(0, 0, 0, 0);
-  const sDate = new Date(startDate); sDate.setHours(0, 0, 0, 0);
-  const eDate = new Date(endDate); eDate.setHours(0, 0, 0, 0);
-  const totalDuration = eDate.getTime() - sDate.getTime();
-  const elapsedDuration = now.getTime() - sDate.getTime();
-  const daysRemaining = Math.ceil((eDate - now) / (1000 * 60 * 60 * 24));
-  let progressPercentage = (elapsedDuration / totalDuration) * 100;
-  if (progressPercentage < 0) progressPercentage = 0;
-  if (progressPercentage > 100) progressPercentage = 100;
+  try {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const sDate = new Date(startDate); sDate.setHours(0, 0, 0, 0);
+    const eDate = new Date(endDate); eDate.setHours(0, 0, 0, 0);
+    const totalDuration = eDate.getTime() - sDate.getTime();
+    const elapsedDuration = now.getTime() - sDate.getTime();
+    const daysRemaining = Math.ceil((eDate - now) / (1000 * 60 * 60 * 24));
+    let progressPercentage = totalDuration > 0 ? (elapsedDuration / totalDuration) * 100 : 0;
+    progressPercentage = Math.max(0, Math.min(100, progressPercentage));
 
-  const progressBar = document.getElementById('progress-bar');
-  const startDateLabel = document.getElementById('start-date-label');
-  const endDateLabel = document.getElementById('end-date-label');
-  const countdownDays = document.getElementById('countdown-days');
+    const progressBar = document.getElementById('progress-bar');
+    const startDateLabel = document.getElementById('start-date-label');
+    const endDateLabel = document.getElementById('end-date-label');
+    const countdownDays = document.getElementById('countdown-days');
 
-  if (progressBar) progressBar.style.width = `${progressPercentage}%`;
-  if (startDateLabel) startDateLabel.textContent = sDate.toLocaleDateString('pt-BR');
-  if (endDateLabel) endDateLabel.textContent = eDate.toLocaleDateString('pt-BR');
-  if (countdownDays) countdownDays.textContent = daysRemaining >= 0 ? daysRemaining : 0;
+    if (progressBar) progressBar.style.width = `${progressPercentage}%`;
+    if (startDateLabel) startDateLabel.textContent = sDate.toLocaleDateString('pt-BR');
+    if (endDateLabel) endDateLabel.textContent = eDate.toLocaleDateString('pt-BR');
+    if (countdownDays) countdownDays.textContent = daysRemaining >= 0 ? daysRemaining : 0;
+  } catch (err) {
+    Debug.error('displayProgress failed', err);
+  }
 }
 
 function renderPlanToContainer(container, planPayload) {
-  container.innerHTML = '';
-  const header = document.createElement('div'); header.style.display = 'flex'; header.style.justifyContent = 'space-between'; header.style.alignItems = 'center';
-  const title = document.createElement('h4'); title.textContent = 'Plano de Dieta — visão geral';
-  const meta = document.createElement('div'); meta.style.color = '#bbb';
-  const targetCals = planPayload.targets?.targetCalories || planPayload.estimates?.dailyTargetCalories || '...';
-  const tdee = planPayload.targets?.tdee || planPayload.estimates?.tdee || '...';
-  meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <div style="font-size:12px;color:#bbb">TDEE: ${tdee} kcal</div>`;
-  header.appendChild(title); header.appendChild(meta); container.appendChild(header);
+  try {
+    container.innerHTML = '';
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
 
-  const months = {};
-  (planPayload.timeline_weeks || []).forEach(week => {
-    const date = new Date(week.weekStartISO + 'T00:00:00Z');
-    const monthKey = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}`;
-    months[monthKey] = months[monthKey] || { monthIndex: date.getUTCMonth(), label: date.toLocaleString('pt-BR', { timeZone: 'UTC', month: 'long', year: 'numeric' }), weeks: [] };
-    months[monthKey].weeks.push(week);
-  });
+    const title = document.createElement('h4');
+    title.textContent = 'Plano de Dieta — visão geral';
 
-  const monthKeys = Object.keys(months).sort();
-  const tabsBar = document.createElement('div'); tabsBar.className = 'plan-tabs'; container.appendChild(tabsBar);
-  const contentArea = document.createElement('div'); container.appendChild(contentArea);
+    const meta = document.createElement('div');
+    meta.style.color = '#bbb';
+    const targetCals = planPayload.targets?.targetCalories || planPayload.estimates?.dailyTargetCalories || '...';
+    const tdee = planPayload.targets?.tdee || planPayload.estimates?.tdee || '...';
+    meta.innerHTML = `Alvo: <b>${targetCals} kcal</b> <div style="font-size:12px;color:#bbb">TDEE: ${tdee} kcal</div>`;
 
-  monthKeys.forEach((mk, idx) => {
-    const pill = document.createElement('div'); pill.className = 'plan-tab' + (idx === 0 ? ' active' : ''); pill.textContent = months[mk].label;
-    pill.onclick = () => { document.querySelectorAll('.plan-tab.active').forEach(p => p.classList.remove('active')); pill.classList.add('active'); renderMonth(months[mk], contentArea); };
-    tabsBar.appendChild(pill);
-  });
-  if (monthKeys.length) renderMonth(months[monthKeys[0]], contentArea);
+    header.appendChild(title);
+    header.appendChild(meta);
+    container.appendChild(header);
+
+    // group weeks by month
+    const months = {};
+    (planPayload.timeline_weeks || []).forEach(week => {
+      const date = new Date((week.weekStartISO || '').toString() + 'T00:00:00Z');
+      const monthKey = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}`;
+      months[monthKey] = months[monthKey] || {
+        monthIndex: date.getUTCMonth(),
+        label: date.toLocaleString('pt-BR', { timeZone: 'UTC', month: 'long', year: 'numeric' }),
+        weeks: []
+      };
+      months[monthKey].weeks.push(week);
+    });
+
+    const monthKeys = Object.keys(months).sort();
+    const tabsBar = document.createElement('div');
+    tabsBar.className = 'plan-tabs';
+    container.appendChild(tabsBar);
+
+    const contentArea = document.createElement('div');
+    container.appendChild(contentArea);
+
+    monthKeys.forEach((mk, idx) => {
+      const pill = document.createElement('div');
+      pill.className = 'plan-tab' + (idx === 0 ? ' active' : '');
+      pill.textContent = months[mk].label;
+      pill.onclick = () => {
+        document.querySelectorAll('.plan-tab.active').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        renderMonth(months[mk], contentArea);
+      };
+      tabsBar.appendChild(pill);
+    });
+
+    if (monthKeys.length) renderMonth(months[monthKeys[0]], contentArea);
+    else contentArea.innerHTML = '<p style="color:#bbb">Plano vazio.</p>';
+  } catch (err) {
+    Debug.error('renderPlanToContainer failed', err);
+    container.innerHTML = '<p style="color:#f66">Erro ao renderizar plano. Veja console.</p>';
+  }
 }
 
 function renderMonth(monthObj, contentArea) {
   contentArea.innerHTML = '';
-  const wrapper = document.createElement('div'); wrapper.style.marginTop = '12px';
-  const days = [];
-  monthObj.weeks.forEach(w => { (w.days || []).forEach(d => { const copy = { ...d }; copy.weekIndex = w.weekIndex; days.push(copy); }); });
+  const wrapper = document.createElement('div');
+  wrapper.style.marginTop = '12px';
 
-  const daysWrap = document.createElement('div'); daysWrap.className = 'plan-days';
+  const days = [];
+  monthObj.weeks.forEach(w => {
+    (w.days || []).forEach(d => {
+      const copy = { ...d };
+      copy.weekIndex = w.weekIndex;
+      days.push(copy);
+    });
+  });
+
+  const daysWrap = document.createElement('div');
+  daysWrap.className = 'plan-days';
+
   const dayNameMap = { 0: 'Dom', 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sab' };
 
   days.forEach(d => {
     const dayOfWeekIndex = d.dayOfWeekIndex;
     const dayName = dayNameMap[dayOfWeekIndex] !== undefined ? dayNameMap[dayOfWeekIndex] : 'Dia';
-    const dayCard = document.createElement('div'); dayCard.className = 'plan-day';
-    const dayTitle = document.createElement('div'); dayTitle.style.display = 'flex'; dayTitle.style.justifyContent = 'space-between'; dayTitle.style.alignItems = 'center';
+    const dayCard = document.createElement('div');
+    dayCard.className = 'plan-day';
+
+    const dayTitle = document.createElement('div');
+    dayTitle.style.display = 'flex';
+    dayTitle.style.justifyContent = 'space-between';
+    dayTitle.style.alignItems = 'center';
+
     const left = document.createElement('div');
     const statusText = d.isTrainingDay ? 'DIA DE TREINO' : 'Dia de Descanso';
     const cheatText = d.isCheatDay ? ' • Cheat' : '';
     left.innerHTML = `<strong>${dayName}</strong><div style="color:${d.isTrainingDay ? 'var(--journey-red-1)' : '#bbb'};font-size:12px;font-weight:700;">${statusText} ${cheatText}</div>`;
-    const right = document.createElement('div'); right.style.textAlign = 'right'; right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
-    dayTitle.appendChild(left); dayTitle.appendChild(right); dayCard.appendChild(dayTitle);
+
+    const right = document.createElement('div');
+    right.style.textAlign = 'right';
+    right.innerHTML = `<div style="font-weight:700">${d.baseCalories} kcal</div>`;
+
+    dayTitle.appendChild(left);
+    dayTitle.appendChild(right);
+    dayCard.appendChild(dayTitle);
 
     (d.meals || []).forEach(m => {
-      const mealRow = document.createElement('div'); mealRow.className = 'meal-row';
-      const mealLeft = document.createElement('div'); mealLeft.className = 'meal-left';
-      const name = document.createElement('div'); name.className = 'meal-name'; name.textContent = m.mealName;
-      const listPreview = document.createElement('div'); listPreview.style.color = '#bbb'; listPreview.style.fontSize = '13px';
+      const mealRow = document.createElement('div');
+      mealRow.className = 'meal-row';
 
-      // Ignora 'gramsComputed.details' se ele estiver 'stale' (desatualizado)
+      const mealLeft = document.createElement('div');
+      mealLeft.className = 'meal-left';
+
+      const name = document.createElement('div');
+      name.className = 'meal-name';
+      name.textContent = m.mealName;
+
+      const listPreview = document.createElement('div');
+      listPreview.style.color = '#bbb';
+      listPreview.style.fontSize = '13px';
+
       const details = (m.gramsComputed && !m.gramsComputed.details?._stale) ? (m.gramsComputed.details || {}) : {};
 
       const items = (m.components || []).map(c => {
@@ -118,14 +225,21 @@ function renderMonth(monthObj, contentArea) {
       }).join(' • ');
 
       listPreview.textContent = items;
-      mealLeft.appendChild(name); mealLeft.appendChild(listPreview);
+      mealLeft.appendChild(name);
+      mealLeft.appendChild(listPreview);
 
-      const mealRight = document.createElement('div'); mealRight.style.display = 'flex'; mealRight.style.flexDirection = 'column'; mealRight.style.alignItems = 'flex-end';
-      const kcal = document.createElement('div'); kcal.className = 'meal-kcal'; kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
+      const mealRight = document.createElement('div');
+      mealRight.style.display = 'flex';
+      mealRight.style.flexDirection = 'column';
+      mealRight.style.alignItems = 'flex-end';
+      const kcal = document.createElement('div');
+      kcal.className = 'meal-kcal';
+      kcal.textContent = `${m.mealKcalTotal || '—'} kcal`;
 
       mealRight.appendChild(kcal);
 
-      mealRow.appendChild(mealLeft); mealRow.appendChild(mealRight);
+      mealRow.appendChild(mealLeft);
+      mealRow.appendChild(mealRight);
       dayCard.appendChild(mealRow);
     });
 
@@ -136,18 +250,38 @@ function renderMonth(monthObj, contentArea) {
   contentArea.appendChild(wrapper);
 }
 
-// Funções de ajuda do Supabase (agora só leem de 'user_diets')
-async function getCurrentUser() { const { data } = await supabase.auth.getUser(); return data?.user; }
+/* ============================
+   SUPABASE HELPERS
+   (interagem com a tabela user_diets)
+   ============================ */
 
-async function fetchLatestUserDiet() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  const { data, error } = await supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single();
-  if (error && error.code !== 'PGRST116') console.error('Erro fetchLatestUserDiet:', error.message);
-  return data;
+async function getCurrentUser() {
+  try {
+    const { data } = await supabase.auth.getUser();
+    return data?.user || null;
+  } catch (err) {
+    Debug.error('getCurrentUser error', err);
+    return null;
+  }
 }
 
-// Chamado pela página 'percurso.html'
+async function fetchLatestUserDiet() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    const { data, error } = await supabase.from('user_diets').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single();
+    if (error && error.code !== 'PGRST116') console.error('Erro fetchLatestUserDiet:', error);
+    return data;
+  } catch (err) {
+    Debug.error('fetchLatestUserDiet error', err);
+    return null;
+  }
+}
+
+/* ============================
+   RENDER / FLUXOS DA PÁGINA
+   ============================ */
+
 async function renderPercursoDietArea() {
   const dietaCard = document.getElementById('dieta-card');
   if (!dietaCard) return;
@@ -166,7 +300,10 @@ async function renderPercursoDietArea() {
   }
 }
 
-// Desenha o editor do plano
+/* ============================
+   RENDER: Editor de Plano Gerado
+   ============================ */
+
 function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
   container.innerHTML = '';
 
@@ -174,7 +311,9 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
   title.textContent = 'Plano de Dieta — Plano gerado';
   title.style.marginTop = 0;
 
-  const meta = document.createElement('p'); meta.style.color = '#bbb'; meta.style.marginTop = 0;
+  const meta = document.createElement('p');
+  meta.style.color = '#bbb';
+  meta.style.marginTop = 0;
   const targetCals = planPayload.targets?.targetCalories || '...';
   const tdee = planPayload.targets?.tdee || '...';
   meta.innerHTML = `Meta: ${planPayload.profile_snapshot?.grande_meta || ''} | Alvo: <b>${targetCals} kcal</b> <span style="font-size:11px;color:#bbb">(TDEE: ${tdee} kcal)</span>`;
@@ -182,16 +321,37 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
   container.appendChild(title);
   container.appendChild(meta);
 
-  const planView = document.createElement('div'); planView.style.marginTop = '12px'; planView.id = 'plan-view';
-  container._lastPlan = planPayload; // Armazena o plano no elemento
+  const planView = document.createElement('div');
+  planView.style.marginTop = '12px';
+  planView.id = 'plan-view';
+  container._lastPlan = planPayload; // guarda o plano atual
   renderPlanToContainer(planView, planPayload);
   container.appendChild(planView);
 
-  const btnWrap = document.createElement('div'); btnWrap.style.display = 'flex'; btnWrap.style.gap = '8px'; btnWrap.style.marginTop = '12px';
-  const saveBtn = document.createElement('button'); saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário'; saveBtn.className = 'playlist-btn';
-  const saveNewBtn = document.createElement('button'); saveNewBtn.textContent = 'Salvar como novo'; saveNewBtn.style.background = '#444'; saveNewBtn.style.color = '#fff'; saveNewBtn.style.border = 'none'; saveNewBtn.style.padding = '10px 14px'; saveNewBtn.style.borderRadius = '8px';
-  const statusSpan = document.createElement('span'); statusSpan.style.color = '#bbb'; statusSpan.style.marginLeft = '8px';
-  btnWrap.appendChild(saveBtn); btnWrap.appendChild(saveNewBtn); btnWrap.appendChild(statusSpan);
+  const btnWrap = document.createElement('div');
+  btnWrap.style.display = 'flex';
+  btnWrap.style.gap = '8px';
+  btnWrap.style.marginTop = '12px';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = existingId ? 'Salvar alterações' : 'Salvar formulário';
+  saveBtn.className = 'playlist-btn';
+
+  const saveNewBtn = document.createElement('button');
+  saveNewBtn.textContent = 'Salvar como novo';
+  saveNewBtn.style.background = '#444';
+  saveNewBtn.style.color = '#fff';
+  saveNewBtn.style.border = 'none';
+  saveNewBtn.style.padding = '10px 14px';
+  saveNewBtn.style.borderRadius = '8px';
+
+  const statusSpan = document.createElement('span');
+  statusSpan.style.color = '#bbb';
+  statusSpan.style.marginLeft = '8px';
+
+  btnWrap.appendChild(saveBtn);
+  btnWrap.appendChild(saveNewBtn);
+  btnWrap.appendChild(statusSpan);
   container.appendChild(btnWrap);
 
   saveBtn.onclick = async () => {
@@ -199,7 +359,6 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
     try {
       const user = await getCurrentUser();
       if (!user) { statusSpan.textContent = 'Usuário não autenticado.'; return; }
-      // Usa o plano modificado que está em 'container._lastPlan'
       container._lastPlan.modified_at = new Date().toISOString();
       if (existingId) {
         const { error } = await supabase.from('user_diets').update({ payload: container._lastPlan }).eq('id', existingId);
@@ -210,7 +369,10 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
         statusSpan.textContent = 'Salvo com sucesso.';
         await renderPercursoDietArea();
       }
-    } catch (err) { console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
+    } catch (err) {
+      Debug.error('saveBtn onclick error', err);
+      statusSpan.textContent = 'Erro: ' + (err.message || String(err));
+    }
   };
 
   saveNewBtn.onclick = async () => {
@@ -220,70 +382,122 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
       if (!user) { statusSpan.textContent = 'Usuário não autenticado.'; return; }
       await SuperDietEngine.savePlan(user.id, container._lastPlan, { title: `Plano cópia - ${container._lastPlan.targets?.targetCalories} kcal` });
       statusSpan.textContent = 'Cópia salva.';
-    } catch (err) { console.error(err); statusSpan.textContent = 'Erro: ' + err.message; }
+    } catch (err) {
+      Debug.error('saveNewBtn error', err);
+      statusSpan.textContent = 'Erro: ' + (err.message || String(err));
+    }
   };
 
-  // Inicializa o modal de Troca de Alimentos (Melhoria)
+  // inicializa modal de troca
   initializeFoodSwapModal(planPayload, container, planView);
 }
 
-// Carrega o chat Dify
+/* ============================
+   DIFY IFRAME
+   ============================ */
+
 function loadFreshDifyChat() {
-  const iframe = document.getElementById('dify-iframe');
-  if (!iframe) return;
-  const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-  const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
-  iframe.src = difyUrl;
+  try {
+    const iframe = document.getElementById('dify-iframe');
+    if (!iframe) return;
+    const randomSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    const difyUrl = `https://udify.app/chatbot/${DIFY_APP_TOKEN}?user=${randomSessionId}&theme=dark&panel_background_color=%23000000&chat_background_color=%23000000&bot_message_background_color=%231A1A1A&user_message_background_color=%232B2B2B&_=${Date.now()}`;
+    iframe.src = difyUrl;
+  } catch (err) {
+    Debug.error('loadFreshDifyChat error', err);
+  }
 }
 
-// Mostra o modal de perguntas
+/* ============================
+   FOLLOWUP QUESTIONS MODAL
+   ============================ */
+
 function showFollowupQuestions(questions) {
   return new Promise((resolve) => {
     const root = document.getElementById('followup-root');
     if (!root) { resolve(null); return; }
     root.style.display = 'block';
     root.innerHTML = '';
-    const overlay = document.createElement('div'); overlay.className = 'followup-overlay';
-    const modal = document.createElement('div'); modal.className = 'followup-modal';
-    const title = document.createElement('h4'); title.textContent = 'Precisamos de mais alguns detalhes';
+    const overlay = document.createElement('div');
+    overlay.className = 'followup-overlay';
+    const modal = document.createElement('div');
+    modal.className = 'followup-modal';
+    const title = document.createElement('h4');
+    title.textContent = 'Precisamos de mais alguns detalhes';
     modal.appendChild(title);
+
     const fields = [];
+
     (questions || []).forEach(q => {
-      const fldWrap = document.createElement('div'); fldWrap.className = 'followup-field';
-      const lbl = document.createElement('label'); lbl.style.display = 'block'; lbl.style.marginBottom = '6px'; lbl.textContent = q.label;
+      const fldWrap = document.createElement('div');
+      fldWrap.className = 'followup-field';
+      const lbl = document.createElement('label');
+      lbl.style.display = 'block';
+      lbl.style.marginBottom = '6px';
+      lbl.textContent = q.label;
       fldWrap.appendChild(lbl);
       if (q.type === 'select') {
-        const sel = document.createElement('select'); sel.className = 'followup-select';
-        (q.options || []).forEach(opt => { const o = document.createElement('option'); o.value = opt; o.textContent = opt; sel.appendChild(o); });
-        if (q.placeholder) { const ph = document.createElement('option'); ph.value = ''; ph.textContent = q.placeholder; ph.disabled = true; ph.selected = true; sel.insertBefore(ph, sel.firstChild); }
+        const sel = document.createElement('select');
+        sel.className = 'followup-select';
+        (q.options || []).forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.textContent = opt;
+          sel.appendChild(o);
+        });
+        if (q.placeholder) {
+          const ph = document.createElement('option');
+          ph.value = '';
+          ph.textContent = q.placeholder;
+          ph.disabled = true;
+          ph.selected = true;
+          sel.insertBefore(ph, sel.firstChild);
+        }
         fldWrap.appendChild(sel);
         fields.push({ id: q.id, el: sel, type: 'select' });
       } else {
-        const inp = document.createElement('input'); inp.className = 'followup-input'; inp.type = 'text'; inp.placeholder = q.placeholder || '';
+        const inp = document.createElement('input');
+        inp.className = 'followup-input';
+        inp.type = 'text';
+        inp.placeholder = q.placeholder || '';
         fldWrap.appendChild(inp);
         fields.push({ id: q.id, el: inp, type: 'text' });
       }
       modal.appendChild(fldWrap);
     });
-    const actions = document.createElement('div'); actions.className = 'followup-actions';
-    const cancelBtn = document.createElement('button'); cancelBtn.textContent = 'Cancelar';
-    const okBtn = document.createElement('button'); okBtn.textContent = 'Continuar';
-    okBtn.style.background = 'linear-gradient(90deg,#007BFF,#0056b3)'; okBtn.style.color = '#fff';
+
+    const actions = document.createElement('div');
+    actions.className = 'followup-actions';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancelar';
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'Continuar';
+    okBtn.style.background = 'linear-gradient(90deg,#007BFF,#0056b3)';
+    okBtn.style.color = '#fff';
+
     cancelBtn.onclick = () => { root.style.display = 'none'; root.innerHTML = ''; resolve(null); };
     okBtn.onclick = () => {
       const answers = {};
       fields.forEach(f => { answers[f.id] = (f.el.value || '').toString(); });
-      root.style.display = 'none'; root.innerHTML = ''; resolve(answers);
+      root.style.display = 'none';
+      root.innerHTML = '';
+      resolve(answers);
     };
-    actions.appendChild(cancelBtn); actions.appendChild(okBtn); modal.appendChild(actions);
-    overlay.appendChild(modal); root.appendChild(overlay);
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(okBtn);
+    modal.appendChild(actions);
+    overlay.appendChild(modal);
+    root.appendChild(overlay);
   });
 }
 
+/* ===================================================================
+   SISTEMA DE TROCA DE ALIMENTOS (MODAL)
+   - implementa performSwap que usa calculateEquivalentPortion
+   - fallback robusto caso função ausente/erro
+   =================================================================== */
 
-// ===================================================================
-// NOVA FUNÇÃO: SISTEMA DE TROCA DE ALIMENTOS
-// ===================================================================
 function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   const openBtn = document.getElementById('open-swap-modal-btn');
   const overlay = document.getElementById('food-swap-modal-overlay');
@@ -295,8 +509,8 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   const mealSelect = document.getElementById('swap-meal-select');
   const newFoodSelect = document.getElementById('swap-new-food-select');
 
-  if (!openBtn || !overlay || !SuperDietEngine.findFood) {
-    console.error("Elementos do modal de troca ou 'SuperDietEngine.findFood' não encontrados.");
+  if (!openBtn || !overlay || !foodSelect || !newFoodSelect || !executeBtn) {
+    Debug.warn('Modal elements missing; disabling swap UI.');
     if (openBtn) openBtn.style.display = 'none';
     return;
   }
@@ -305,95 +519,104 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
 
   /** Popula o dropdown 'Alimento que quer trocar' */
   function populateFoodsToSwap() {
-    foodSelect.innerHTML = '';
-    const foods = new Map(); // Usa um Map para guardar [id, nome]
-    const plan = cardContainer._lastPlan || planPayload;
+    try {
+      foodSelect.innerHTML = '';
+      const foods = new Map();
+      const plan = cardContainer._lastPlan || planPayload;
+      (plan.timeline_weeks || []).forEach(w => {
+        (w.days || []).forEach(d => {
+          (d.meals || []).forEach(m => {
+            (m.components || []).forEach(c => {
+              if (c.source_id && !foods.has(c.source_id) && c.role !== 'suplemento') {
+                foods.set(c.source_id, c.food);
+              }
+            });
+          });
+        });
+      });
 
-    (plan.timeline_weeks || []).forEach(w => {
-      (w.days || []).forEach(d => {
-        (d.meals || []).forEach(m => {
-          (m.components || []).forEach(c => {
-            if (c.source_id && !foods.has(c.source_id) && c.role !== 'suplemento') {
-              foods.set(c.source_id, c.food);
+      foodSelect.appendChild(new Option('Selecione um alimento...', ''));
+      const sortedFoods = [...foods.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+      sortedFoods.forEach(([id, name]) => {
+        foodSelect.appendChild(new Option(name, id));
+      });
+    } catch (err) {
+      Debug.error('populateFoodsToSwap failed', err);
+      foodSelect.innerHTML = '<option>Erro</option>';
+    }
+  }
+
+  /** Popula substitutos para uma categoria */
+  function populateReplacements(foodId) {
+    try {
+      newFoodSelect.innerHTML = '';
+      newFoodSelect.disabled = true;
+
+      if (!foodId) {
+        newFoodSelect.appendChild(new Option('Selecione um alimento para trocar', ''));
+        return;
+      }
+
+      const food = safeFindFood(foodId);
+      if (!food || !food.category) {
+        newFoodSelect.appendChild(new Option('Categoria não encontrada', ''));
+        return;
+      }
+
+      const replacements = SuperDietEngine.getFoodsByCategory(food.category) || [];
+      if (!replacements || replacements.length === 0) {
+        newFoodSelect.appendChild(new Option('Nenhum substituto encontrado', ''));
+        return;
+      }
+
+      newFoodSelect.appendChild(new Option('Selecione um substituto...', ''));
+      replacements.forEach(rep => {
+        if (rep && rep.id && rep.id !== foodId) {
+          newFoodSelect.appendChild(new Option(stripParenthesis(rep.name || rep.id), rep.id));
+        }
+      });
+      newFoodSelect.disabled = false;
+    } catch (err) {
+      Debug.error('populateReplacements failed', err);
+      newFoodSelect.innerHTML = '<option>Erro</option>';
+    }
+  }
+
+  /** Popula as ocorrências (refeições onde o alimento aparece) */
+  function populateSpecificMeals(foodId) {
+    try {
+      mealSelect.innerHTML = '';
+      if (!foodId) return;
+      const plan = cardContainer._lastPlan || planPayload;
+      const meals = [];
+      (plan.timeline_weeks || []).forEach((w, wi) => {
+        (w.days || []).forEach((d, di) => {
+          (d.meals || []).forEach((m, mi) => {
+            if ((m.components || []).some(c => c.source_id === foodId)) {
+              const mealKey = `w${wi}-d${di}-m${mi}`;
+              const dayName = dayNameMap[d.dayOfWeekIndex] || 'Dia';
+              const label = `Semana ${w.weekIndex} / ${dayName} / ${m.mealName}`;
+              meals.push({ key: mealKey, label, wi, di, mi });
             }
           });
         });
       });
-    });
-
-    foodSelect.appendChild(new Option('Selecione um alimento...', ''));
-    const sortedFoods = [...foods.entries()].sort((a, b) => a[1].localeCompare(b[1]));
-
-    sortedFoods.forEach(([id, name]) => {
-      foodSelect.appendChild(new Option(name, id));
-    });
-  }
-
-  /** Popula o dropdown 'Trocar por' com alimentos equivalentes */
-  function populateReplacements(foodId) {
-    newFoodSelect.innerHTML = '';
-    newFoodSelect.disabled = true;
-
-    if (!foodId) {
-      newFoodSelect.appendChild(new Option('Selecione um alimento para trocar', ''));
-      return;
-    }
-
-    const food = SuperDietEngine.findFood(foodId);
-    if (!food || !food.category) {
-      newFoodSelect.appendChild(new Option('Categoria não encontrada', ''));
-      return;
-    }
-
-    const replacements = SuperDietEngine.getFoodsByCategory(food.category) || [];
-    if (!replacements || replacements.length === 0) {
-      newFoodSelect.appendChild(new Option('Nenhum substituto encontrado', ''));
-      return;
-    }
-
-    newFoodSelect.appendChild(new Option('Selecione um substituto...', ''));
-    replacements.forEach(rep => {
-      if (rep.id !== foodId) { // Não mostra o próprio alimento
-        newFoodSelect.appendChild(new Option(stripParenthesis(rep.name), rep.id));
+      if (meals.length > 0) {
+        mealSelect.appendChild(new Option('Selecione a refeição específica...', ''));
+        meals.forEach(m => mealSelect.appendChild(new Option(m.label, m.key)));
+      } else {
+        mealSelect.appendChild(new Option('Erro: Alimento não encontrado', ''));
       }
-    });
-    newFoodSelect.disabled = false;
-  }
-
-  /** Popula o dropdown 'Qual refeição?' com ocorrências */
-  function populateSpecificMeals(foodId) {
-    mealSelect.innerHTML = '';
-    if (!foodId) return;
-
-    const plan = cardContainer._lastPlan || planPayload;
-    const meals = [];
-
-    (plan.timeline_weeks || []).forEach((w, wi) => {
-      (w.days || []).forEach((d, di) => {
-        (d.meals || []).forEach((m, mi) => {
-          if ((m.components || []).some(c => c.source_id === foodId)) {
-            const mealKey = `w${wi}-d${di}-m${mi}`;
-            const dayName = dayNameMap[d.dayOfWeekIndex] || 'Dia';
-            const label = `Semana ${w.weekIndex} / ${dayName} / ${m.mealName}`;
-            meals.push({ key: mealKey, label, wi, di, mi });
-          }
-        });
-      });
-    });
-
-    if (meals.length > 0) {
-      mealSelect.appendChild(new Option('Selecione a refeição específica...', ''));
-      meals.forEach(m => {
-        mealSelect.appendChild(new Option(m.label, m.key));
-      });
-    } else {
-      mealSelect.appendChild(new Option('Erro: Alimento não encontrado', ''));
+    } catch (err) {
+      Debug.error('populateSpecificMeals failed', err);
+      mealSelect.innerHTML = '<option>Erro</option>';
     }
   }
 
-  /** Executa a troca do alimento no objeto do plano */
+  /** Função principal de troca */
   function performSwap() {
     executeBtn.disabled = true;
+    const prevTxt = executeBtn.textContent;
     executeBtn.textContent = 'Trocando...';
 
     try {
@@ -406,19 +629,21 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
       if (!oldId || !newId) {
         alert('Selecione o alimento original e o substituto.');
         executeBtn.disabled = false;
-        executeBtn.textContent = 'Realizar Troca';
+        executeBtn.textContent = prevTxt;
         return;
       }
 
-      const oldFood = SuperDietEngine.findFood(oldId);
-      const newFood = SuperDietEngine.findFood(newId);
+      const oldFood = safeFindFood(oldId);
+      const newFood = safeFindFood(newId);
       if (!oldFood || !newFood) {
-        alert('Erro ao encontrar dados dos alimentos.');
+        alert('Erro ao localizar dados dos alimentos (veja console).');
+        Debug.error('performSwap: findFood failed', { oldId, oldFood, newId, newFood });
         executeBtn.disabled = false;
-        executeBtn.textContent = 'Realizar Troca';
+        executeBtn.textContent = prevTxt;
         return;
       }
 
+      // percorre semanas/dias/refeições e troca componentes
       (plan.timeline_weeks || []).forEach((w, wi) => {
         (w.days || []).forEach((d, di) => {
           (d.meals || []).forEach((m, mi) => {
@@ -426,85 +651,111 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
             let mealWasModified = false;
 
             (m.components || []).forEach(c => {
+              // apenas componentes que são o alimento antigo
               if (c.source_id !== oldId) return;
 
-              // Verifica o escopo
-              if (scope === 'specific' && currentMealKey !== mealKey) {
-                return;
-              }
+              // verifica escopo
+              if (scope === 'specific' && currentMealKey !== mealKey) return;
 
-              // --- Substituição usando calculateEquivalentPortion ---
               const oldGrams = _safeNum(c.grams, 0);
+              let eq = null;
+              let usedCalc = false;
 
-              // chama a função do SuperDietEngine para calcular a porção equivalente
-              let eq;
-              try {
-                eq = SuperDietEngine.calculateEquivalentPortion(oldFood, newFood, oldGrams);
-              } catch (errEq) {
-                console.warn('calculateEquivalentPortion falhou, fallback para cálculo simples', errEq);
-                // Fallback replicando comportamento antigo se necessário
-                const nutrientToMatch = (c.role === 'proteina') ? 'protein_g' : 'carb_g';
-                const oldNutrientPer100 = oldFood?.nutrition?.[nutrientToMatch] || 0;
-                const newNutrientPer100 = newFood?.nutrition?.[nutrientToMatch] || 0;
-                let newGramsFallback = oldGrams;
-                if (newNutrientPer100 > 0.1 && oldNutrientPer100 > 0.1) {
-                  const totalOldNutrient = (oldNutrientPer100 / 100) * oldGrams;
-                  newGramsFallback = (totalOldNutrient * 100) / newNutrientPer100;
-                } else {
-                  const oldKcal = c.kcal || ((oldFood?.nutrition?.kcal || 0) / 100) * oldGrams;
-                  const newKcalPer100 = newFood?.nutrition?.kcal || 0;
-                  if (newKcalPer100 > 0.1) {
-                    newGramsFallback = (oldKcal * 100) / newKcalPer100;
-                  }
+              // Tenta usar a função do engine
+              if (SuperDietEngine && typeof SuperDietEngine.calculateEquivalentPortion === 'function') {
+                try {
+                  eq = SuperDietEngine.calculateEquivalentPortion(oldFood, newFood, oldGrams);
+                  usedCalc = true;
+                  Debug.log('calculateEquivalentPortion returned', eq);
+                } catch (errCalc) {
+                  Debug.warn('calculateEquivalentPortion threw, will fallback', errCalc);
+                  eq = null;
                 }
-                const finalNewGramsFB = Math.max(0, Math.round(newGramsFallback / 5) * 5);
-                const finalNewKcalFB = Math.round(((newFood?.nutrition?.kcal || 0) / 100) * finalNewGramsFB);
-                eq = { grams: finalNewGramsFB, kcal: finalNewKcalFB, score: 0, by: 'fallback' };
+              } else {
+                Debug.log('calculateEquivalentPortion not available, using fallback.');
               }
 
-              const finalNewGrams = _safeNum(eq.grams, 0);
-              const finalNewKcal = _safeNum(eq.kcal, Math.round(((newFood?.nutrition?.kcal || 0) / 100) * finalNewGrams));
+              // Se eq inválido, usa fallback local
+              if (!eq || typeof eq.grams === 'undefined' || typeof eq.kcal === 'undefined') {
+                try {
+                  const nutrientToMatch = (c.role === 'proteina') ? 'protein_g' : 'carb_g';
+                  const oldNutrPer100 = _safeNum(oldFood?.nutrition?.[nutrientToMatch], 0);
+                  const newNutrPer100 = _safeNum(newFood?.nutrition?.[nutrientToMatch], 0);
 
-              // Atualiza o componente no plano
+                  let newGramsFallback = oldGrams;
+
+                  if (newNutrPer100 > 0.1 && oldNutrPer100 > 0.1) {
+                    const totalOldNutrient = (oldNutrPer100 / 100) * oldGrams;
+                    newGramsFallback = (totalOldNutrient * 100) / newNutrPer100;
+                  } else {
+                    const oldKcal = _safeNum(c.kcal, Math.round((_safeNum(oldFood?.nutrition?.kcal, 0) / 100) * oldGrams));
+                    const newKcalPer100 = _safeNum(newFood?.nutrition?.kcal, 0);
+                    if (newKcalPer100 > 0.1) {
+                      newGramsFallback = (oldKcal * 100) / newKcalPer100;
+                    } else {
+                      newGramsFallback = oldGrams;
+                    }
+                  }
+
+                  const quantize = (v) => Math.max(5, Math.round(v / 5) * 5); // quantize para 5g
+                  const finalNewGramsFB = Math.max(0, quantize(newGramsFallback || 0));
+                  const finalNewKcalFB = Math.round((_safeNum(newFood?.nutrition?.kcal, 0) / 100) * finalNewGramsFB);
+
+                  eq = { grams: finalNewGramsFB, kcal: finalNewKcalFB, score: 0, by: 'fallback' };
+                  Debug.log('fallback eq', eq);
+                } catch (errFb) {
+                  Debug.error('fallback calculation failed', errFb);
+                  eq = { grams: oldGrams, kcal: Math.round((_safeNum(newFood?.nutrition?.kcal, 0) / 100) * oldGrams), score: 0, by: 'fallback_error' };
+                }
+              }
+
+              // Final values (sanity)
+              const finalNewGrams = Math.max(0, Math.round(_safeNum(eq.grams, 0)));
+              const finalNewKcal = Math.max(0, Math.round(_safeNum(eq.kcal, Math.round((_safeNum(newFood?.nutrition?.kcal, 0) / 100) * finalNewGrams))));
+
+              // Atualiza o componente
               c.food = stripParenthesis(newFood.name);
               c.grams = finalNewGrams;
               c.kcal = finalNewKcal;
               c.source_id = newId;
-              // marca meta-informação sobre a troca
-              c._swap_meta = { from: oldId, to: newId, method: eq.by || 'unknown', score: _safeNum(eq.score, 0) };
+              c._swap_meta = {
+                from: oldId,
+                to: newId,
+                method: (eq && eq.by) ? eq.by : (usedCalc ? 'calc_unknown' : 'fallback'),
+                score: _safeNum(eq && eq.score, 0),
+                computed_at: nowISO()
+              };
+
               mealWasModified = true;
-            });
+            }); // fim componentes
 
             if (mealWasModified) {
-              // Recalcula o total de kcal da refeição
-              m.mealKcalTotal = (m.components || []).reduce((acc, comp) => acc + (comp.kcal || 0), 0);
-              // Marca 'gramsComputed' como desatualizado
+              // recalcula kcal total
+              m.mealKcalTotal = (m.components || []).reduce((acc, comp) => acc + _safeNum(comp.kcal, 0), 0);
+              // marca gramsComputed details stale para forçar recalc visual
               if (m.gramsComputed && m.gramsComputed.details) {
                 m.gramsComputed.details._stale = true;
               }
             }
-          });
-        });
-      });
+          }); // fim refeições
+        }); // fim dias
+      }); // fim semanas
 
-      // Atualiza o objeto do plano
+      // persiste o plano no container e re-renderiza
       cardContainer._lastPlan = plan;
-      // Re-renderiza o plano na tela
       renderPlanToContainer(planView, plan);
-      // Fecha o modal
       overlay.style.display = 'none';
-
     } catch (err) {
-      console.error("Erro ao realizar a troca:", err);
-      alert("Ocorreu um erro ao realizar a troca.");
+      Debug.error('performSwap error', err);
+      // mostra erro ao usuário porém com detalhe para devs no console
+      alert('Ocorreu um erro ao realizar a troca. Verifique o console do navegador para detalhes.');
     } finally {
       executeBtn.disabled = false;
-      executeBtn.textContent = 'Realizar Troca';
+      executeBtn.textContent = prevTxt;
     }
-  }
+  } // end performSwap
 
-  // --- Event Listeners do Modal ---
-
+  // Event listeners do modal
   openBtn.addEventListener('click', () => {
     populateFoodsToSwap();
     scopeSelect.value = 'all';
@@ -516,9 +767,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
     overlay.style.display = 'flex';
   });
 
-  cancelBtn.addEventListener('click', () => {
-    overlay.style.display = 'none';
-  });
+  cancelBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
 
   scopeSelect.addEventListener('change', () => {
     specificMealGroup.style.display = (scopeSelect.value === 'specific') ? 'block' : 'none';
@@ -528,7 +777,6 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
     const foodId = foodSelect.value;
     populateReplacements(foodId);
     populateSpecificMeals(foodId);
-    // atualiza estado do botão
     executeBtn.disabled = !foodId || !newFoodSelect.value;
   });
 
@@ -537,7 +785,6 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   });
 
   mealSelect.addEventListener('change', () => {
-    // só atualiza se estiver no modo specific
     if (scopeSelect.value === 'specific') {
       executeBtn.disabled = !foodSelect.value || !newFoodSelect.value || !mealSelect.value;
     }
@@ -545,22 +792,24 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
 
   executeBtn.addEventListener('click', performSwap);
 }
-// ==========================================================
-// FIM DA FUNÇÃO Troca de Alimentos
-// ==========================================================
 
-
-/* ===================================================================
-   INICIALIZAÇÃO DO SCRIPT
-=================================================================== */
+/* ============================
+   INICIALIZAÇÃO DO SCRIPT (DOMContentLoaded)
+   ============================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // small debug toggle by URL param ?debug=true
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('debug') === 'true') Debug.enabled = true;
+  } catch (e) {}
 
   try {
     SuperDietEngine.init({ supabase });
   } catch (e) {
-    console.error('Falha ao inicializar o SuperDietEngine:', e);
+    console.error('Falha ao inicializar SuperDietEngine', e);
     alert('Erro crítico ao carregar a lógica de dieta. Contate o suporte.');
+    return;
   }
 
   const menuToggle = document.getElementById('menu-toggle');
@@ -570,11 +819,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetBtn = document.getElementById('reset-btn');
   const logoutBtn = document.getElementById('logout-btn');
 
-  function openSidebar() { sidebar.classList.add('open'); menuToggle.classList.add('open'); overlay.classList.add('show'); }
-  function closeSidebar() { sidebar.classList.remove('open'); menuToggle.classList.remove('open'); overlay.classList.remove('show'); }
+  function openSidebar() { if (sidebar) sidebar.classList.add('open'); if (menuToggle) menuToggle.classList.add('open'); if (overlay) overlay.classList.add('show'); }
+  function closeSidebar() { if (sidebar) sidebar.classList.remove('open'); if (menuToggle) menuToggle.classList.remove('open'); if (overlay) overlay.classList.remove('show'); }
 
   if (menuToggle) menuToggle.addEventListener('click', () => {
-    if (sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
+    if (sidebar && sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
   });
   if (overlay) overlay.addEventListener('click', closeSidebar);
 
@@ -583,11 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const tab = link.dataset.tab;
-
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         const tabContent = document.getElementById(tab);
         if (tabContent) tabContent.classList.add('active');
-
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
         closeSidebar();
@@ -597,43 +844,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (configBtn) configBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    logoutBtn.classList.toggle('hidden');
-    resetBtn.classList.toggle('hidden');
-    configBtn.setAttribute('aria-expanded', String(!logoutBtn.classList.contains('hidden')));
+    if (logoutBtn) logoutBtn.classList.toggle('hidden');
+    if (resetBtn) resetBtn.classList.toggle('hidden');
+    configBtn.setAttribute('aria-expanded', String(!(logoutBtn && logoutBtn.classList.contains('hidden'))));
   });
 
   // Reset -> delete latest plan
   if (resetBtn) resetBtn.addEventListener('click', async () => {
-    const formWrapper = document.getElementById('form-wrapper');
-    if (formWrapper) formWrapper.style.display = 'block';
-
-    const resultsWrapper = document.getElementById('results-wrapper');
-    if (resultsWrapper) resultsWrapper.style.display = 'none';
-
-    const form = document.getElementById('ia-fit-form');
-    if (form) form.reset();
-
-    const prazoGroup = document.getElementById('prazo-group');
-    if (prazoGroup) prazoGroup.style.display = 'none';
-
-    const suppGroup = document.getElementById('suplementos-detalhes-group');
-    if (suppGroup) suppGroup.style.display = 'none';
-
-    const objetivo = document.getElementById('objetivo');
-    if (objetivo) objetivo.focus();
-
-    // ATUALIZA O BANCO DE DADOS (usando a tabela 'user_diets')
     try {
+      const formWrapper = document.getElementById('form-wrapper');
+      if (formWrapper) formWrapper.style.display = 'block';
+      const resultsWrapper = document.getElementById('results-wrapper');
+      if (resultsWrapper) resultsWrapper.style.display = 'none';
+      const form = document.getElementById('ia-fit-form');
+      if (form) form.reset();
+      const prazoGroup = document.getElementById('prazo-group');
+      if (prazoGroup) prazoGroup.style.display = 'none';
+      const suppGroup = document.getElementById('suplementos-detalhes-group');
+      if (suppGroup) suppGroup.style.display = 'none';
+      const objetivo = document.getElementById('objetivo');
+      if (objetivo) objetivo.focus();
+
       const user = await getCurrentUser();
       if (user) {
-        // Chama a nova função do "Cérebro" para deletar o plano
         await SuperDietEngine.deleteLatestPlan(user.id);
+        // refresh visualizar percurso
+        const dietaCard = document.getElementById('dieta-card');
+        if (dietaCard) await renderPercursoDietArea();
       }
     } catch (err) {
-      console.error("Erro ao resetar a meta (deletar plano):", err);
-      alert("Erro ao limpar sua meta antiga. Tente novamente.");
+      Debug.error('resetBtn click error', err);
+      alert('Erro ao limpar sua meta antiga. Tente novamente.');
     }
-
     closeSidebar();
   });
 
@@ -646,8 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Lógica da Página (Formulários) ---
-
+  // Forms
   const objetivoInput = document.getElementById('objetivo');
   if (objetivoInput) objetivoInput.addEventListener('input', function () {
     const prazoGroup = document.getElementById('prazo-group');
@@ -674,6 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aulasLink) aulasLink.classList.add('active');
   });
 
+  // submit form
   const iaFitForm = document.getElementById('ia-fit-form');
   if (iaFitForm) {
     iaFitForm.addEventListener('keydown', function (e) {
@@ -689,23 +931,31 @@ document.addEventListener('DOMContentLoaded', () => {
     iaFitForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const submitButton = iaFitForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true; submitButton.textContent = 'A gerar o seu plano...';
+      if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'A gerar o seu plano...'; }
 
       try {
         const formElements = event.target.elements;
         const prazoText = formElements.prazo.value;
         const endDate = SuperDietEngine.calculateEndDate(prazoText);
 
-        if (!endDate) { alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+        if (!endDate) {
+          alert('Prazo inválido. Use "3 meses", "1 ano", "1.5 anos", etc.');
+          if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; }
+          return;
+        }
 
-        const startDate = new Date(); startDate.setHours(0, 0, 0, 0);
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
         const objetivoText = formElements.objetivo.value;
 
         const selectedDaysCheckboxes = document.querySelectorAll('input[name="dias_treino"]:checked');
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
-        if (selectedDaysArray.length === 0) { alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
+        if (selectedDaysArray.length === 0) {
+          alert('Selecione pelo menos um dia de treino.');
+          if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; }
+          return;
+        }
 
-        // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
         const inputs = {
           grande_meta: objetivoText,
           prazo: prazoText,
@@ -721,7 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
           uso_suplemento: formElements.uso_suplemento.value,
           quais_suplementos: formElements.quais_suplementos.value || '',
           nivel: formElements.nivel.value,
-          // Adiciona as datas da meta ao snapshot
+          // datas da meta
           goal_start_date: startDate.toISOString(),
           goal_end_date: endDate.toISOString(),
           goal_prompt: objetivoText
@@ -733,7 +983,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (strategy && strategy.nextQuestions && strategy.nextQuestions.length > 0) {
           const answers = await showFollowupQuestions(strategy.nextQuestions);
           if (!answers) {
-            submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+            if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; }
             return;
           }
           Object.keys(answers).forEach(k => { inputs[k] = answers[k]; });
@@ -743,85 +993,72 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
-        // O 'inputs' é passado aqui e salvo como 'profile_snapshot' dentro do plano
+        // gera plano via engine
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
         const current = await getCurrentUser();
         if (current) {
-          // Salva o plano na tabela 'user_diets'
           await SuperDietEngine.savePlan(current.id, plan, { title: `Plano - ${plan.targets?.targetCalories} kcal` });
         }
 
-        // Redireciona para a página de Percurso
         window.location.href = 'percurso.html';
-
       } catch (err) {
-        console.error('Erro no fluxo de criação da meta:', err);
+        Debug.error('iaFitForm submit error', err);
         alert('Erro ao salvar sua meta: ' + (err.message || JSON.stringify(err)));
-        submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho';
+        if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; }
       }
     });
   }
 
   (async function initializePageData() {
+    try {
+      const user = await getCurrentUser();
+      const welcomeMsg = document.getElementById('welcome-msg');
+      if (!user) {
+        window.location.replace('/login.html');
+        return;
+      }
+      if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
 
-    const user = await getCurrentUser();
-    const welcomeMsg = document.getElementById('welcome-msg');
+      const formWrapper = document.getElementById('form-wrapper');
+      if (formWrapper) {
+        loadFreshDifyChat();
+        try {
+          const latestPlan = await fetchLatestUserDiet();
+          if (latestPlan && latestPlan.payload) {
+            const profileData = latestPlan.payload.profile_snapshot;
+            if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
+              displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
+            }
+            const playlistSection = document.getElementById('playlist-section');
+            if (playlistSection && profileData) {
+              playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
+            }
 
-    if (!user) {
-      window.location.replace('/login.html');
-      return;
-    }
-
-    if (welcomeMsg) welcomeMsg.textContent = user.email || user.id;
-
-    // --- Lógica da Página 'membros-saude.html' ---
-    const formWrapper = document.getElementById('form-wrapper');
-    if (formWrapper) {
-      // Estamos na 'membros-saude.html'
-      loadFreshDifyChat();
-
-      try {
-        // Checa 'user_diets' em vez de 'profiles'
-        const latestPlan = await fetchLatestUserDiet();
-
-        if (latestPlan && latestPlan.payload) {
-          // Pega os dados de progresso do snapshot salvo DENTRO do plano
-          const profileData = latestPlan.payload.profile_snapshot;
-
-          if (profileData && profileData.goal_start_date && profileData.goal_end_date) {
-            displayProgress(new Date(profileData.goal_start_date), new Date(profileData.goal_end_date));
+            formWrapper.style.display = 'none';
+            const resultsWrapper = document.getElementById('results-wrapper');
+            if (resultsWrapper) resultsWrapper.style.display = 'block';
+          } else {
+            formWrapper.style.display = 'block';
+            const resultsWrapper = document.getElementById('results-wrapper');
+            if (resultsWrapper) resultsWrapper.style.display = 'none';
           }
-
-          const playlistSection = document.getElementById('playlist-section');
-          if (playlistSection && profileData) {
-            playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
-          }
-
-          formWrapper.style.display = 'none';
-          const resultsWrapper = document.getElementById('results-wrapper');
-          if (resultsWrapper) resultsWrapper.style.display = 'block';
-        } else {
-          // Usuário NÃO tem plano, mostra formulário
+        } catch (e) {
+          Debug.error('initializePageData inner error', e);
           formWrapper.style.display = 'block';
           const resultsWrapper = document.getElementById('results-wrapper');
           if (resultsWrapper) resultsWrapper.style.display = 'none';
         }
-      } catch (e) {
-        // Erro? Mostra o formulário por segurança.
-        console.error("Erro no initializePageData:", e);
-        formWrapper.style.display = 'block';
-        const resultsWrapper = document.getElementById('results-wrapper');
-        if (resultsWrapper) resultsWrapper.style.display = 'none';
       }
+
+      // percurso page
+      const dietaCard = document.getElementById('dieta-card');
+      if (dietaCard) {
+        await renderPercursoDietArea();
+      }
+    } catch (err) {
+      Debug.error('initializePageData outer error', err);
     }
+  })();
 
-    // --- Lógica da Página 'percurso.html' ---
-    const dietaCard = document.getElementById('dieta-card');
-    if (dietaCard) {
-      await renderPercursoDietArea();
-    }
-
-  })(); // Fim da inicialização da página
-
-}); // Fim do DOMContentLoaded
+}); // end DOMContentLoaded
