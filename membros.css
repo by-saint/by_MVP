@@ -1,14 +1,15 @@
 :root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
+  --color-ia-specialist: #007BFF;
+  --color-video-lessons: #8A2BE2;
+  --color-journey: #DC143C;
+  --journey-red-1: #ff2646;
+  --journey-red-2: #be123c;
+  --journey-dark: #2a0a12;
+  --bg: #121212;
+  --card: #1E1E1E;
+  --muted: #bbb;
 }
+
 html { scroll-behavior: smooth; }
 body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
 .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
@@ -25,12 +26,10 @@ h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px;
 .sidebar.open { left: 0; }
 .sidebar nav { padding-top: 100px; }
 .sidebar nav ul{ list-style:none; padding:0; margin:0; }
-/* Nav link style updated to show colored rectangle at left when active */
 .sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
 .sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
 .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
 .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-/* colored rectangle per tab */
 .link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
 .link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
 .link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
@@ -108,50 +107,44 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+  .percurso-forms{ grid-template-columns:1fr; }
+  .plan-days{ grid-template-columns:1fr; }
+  body{ padding:20px 12px; }
+  .day-circle-label{ width:36px; height:36px; font-size:13px; }
+  .iframe-container{ height:48vh; min-height:220px; }
 }
 
-/* modal for follow-up questions */
+/* modal for follow-up questions and food-swap */
 .followup-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
 .followup-modal { width: 560px; max-width:94%; background:var(--card); border-radius:12px; padding:20px; box-shadow:0 12px 40px rgba(0,0,0,0.6); color:#fff; }
 .followup-modal h4 { margin-top:0; }
 .followup-field { margin-bottom:12px; }
 .followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+
+/* inputs used inside modals */
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
 
-
-/* ===================================================
-    NOVOS ESTILOS - ADICIONADOS PARA A MELHORIA 1
-    (SISTEMA DE TROCA DE ALIMENTOS)
-    =================================================== */
-
-/* Estilo para os botões de ação do modal de troca */
+/* NOVOS ESTILOS - ADICIONADOS PARA A MELHORIA (SISTEMA DE TROCA) */
 .followup-actions-btn {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
 }
-
-/* Estilo específico para o botão de cancelar/padrão */
 .followup-actions-btn:not([style]) {
-  background-color: #333;
-  color: #fff;
-  border: 1px solid #555;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
 }
 .followup-actions-btn:not([style]):hover {
-  background-color: #444;
+  background-color: #444;
 }
 
-/* Estilo para botões e selects desabilitados */
+/* Estilo para selects e botões desabilitados */
 .followup-select:disabled,
 .followup-actions-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
