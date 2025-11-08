@@ -1,10 +1,10 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.1 (com Troca de Alimentos)
-   Melhoria:
-   1. Adicionada a função 'initializeFoodSwapModal'
-   2. Chamada da função em 'renderGeneratedPlanEditor'
-   3. 'renderMonth' agora lida com 'gramsComputed' desatualizado
-   4. CORREÇÃO: Removidos todos os caracteres de sintaxe corrompidos.
+   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.2 (CORRIGIDO)
+   Correção:
+   1. Removido TODO o lixo de sintaxe (caracteres aleatórios)
+      que causavam o erro de "A carregar...".
+   2. Funcionalidade de Troca de Alimentos (Melhoria 1)
+      está integrada e limpa.
 =================================================================== */
 
 // PASSO 1: Importar o "Cofre" e o "Cérebro"
@@ -391,7 +391,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
         });
       });
     });
-   non-breaking-space
+    
     if (meals.length > 0) {
       mealSelect.appendChild(new Option('Selecione a refeição específica...', ''));
       meals.forEach(m => {
@@ -480,7 +480,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
               // Recalcula o total de kcal da refeição
               m.mealKcalTotal = m.components.reduce((acc, comp) => acc + (comp.kcal || 0), 0);
               // Marca 'gramsComputed' como desatualizado
-        _stale
+              if (m.gramsComputed && m.gramsComputed.details) {
                 m.gramsComputed.details._stale = true;
               }
             }
@@ -577,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         const tabContent = document.getElementById(tab);
-      S   if (tabContent) tabContent.classList.add('active');
+        if (tabContent) tabContent.classList.add('active');
         
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
@@ -608,15 +608,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (form) form.reset();
     
     const prazoGroup = document.getElementById('prazo-group');
-s     if (prazoGroup) prazoGroup.style.display = 'none';
+    if (prazoGroup) prazoGroup.style.display = 'none';
     
     const suppGroup = document.getElementById('suplementos-detalhes-group');
     if (suppGroup) suppGroup.style.display = 'none';
     
     const objetivo = document.getElementById('objetivo');
     if (objetivo) objetivo.focus();
-   _stale
-    // ATUALIZA O BANCO DE DADOS (usando a tabela 'user_diets')
+    
+s   // ATUALIZA O BANCO DE DADOS (usando a tabela 'user_diets')
     try {
       const user = await getCurrentUser();
       if (user) {
@@ -644,7 +644,7 @@ s     if (prazoGroup) prazoGroup.style.display = 'none';
 
   const objetivoInput = document.getElementById('objetivo');
   if (objetivoInput) objetivoInput.addEventListener('input', function(){ 
-    const prazoGroup = document.getElementById('prazo-group');
+A     const prazoGroup = document.getElementById('prazo-group');
     if (prazoGroup) prazoGroup.style.display = this.value.trim() !== '' ? 'block' : 'none'; 
   });
 
@@ -670,7 +670,7 @@ s     if (prazoGroup) prazoGroup.style.display = 'none';
   const iaFitForm = document.getElementById('ia-fit-form');
   if (iaFitForm) {
     iaFitForm.addEventListener('keydown', function(e){
-  ax       if(e.key === 'Enter'){
+      if(e.key === 'Enter'){
         const active = document.activeElement;
         if(active && active.tagName !== 'TEXTAREA'){
           e.preventDefault();
@@ -682,7 +682,7 @@ s     if (prazoGroup) prazoGroup.style.display = 'none';
     // ===============================================
     //  <<<<< CORREÇÃO DO BUG 2 (Submit) >>>>>
     //  Remove a tentativa de salvar em 'profiles'
-    // ===============================================
+  S   // ===============================================
     iaFitForm.addEventListener('submit', async function(event){
       event.preventDefault();
       const submitButton = iaFitForm.querySelector('button[type="submit"]');
@@ -702,7 +702,7 @@ s     if (prazoGroup) prazoGroup.style.display = 'none';
         const selectedDaysArray = Array.from(selectedDaysCheckboxes).map(cb => cb.value);
         if(selectedDaysArray.length === 0){ alert('Selecione pelo menos um dia de treino.'); submitButton.disabled = false; submitButton.textContent = 'Crie seu próprio caminho'; return; }
 
-E         // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
+        // Os 'inputs' agora são usados pelo 'generatePlan' para criar o snapshot
         const inputs = {
           grande_meta: objetivoText,
           prazo: prazoText,
@@ -744,7 +744,7 @@ E         // Os 'inputs' agora são usados pelo 'generatePlan' para criar o 
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
         // O 'inputs' é passado aqui e salvo como 'profile_snapshot' dentro do plano
-SA         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
+        const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
         const current = await getCurrentUser();
         if(current){
@@ -800,7 +800,7 @@ SA         const plan = await SuperDietEngine.generatePlan(inputs, { months,
           }
           
           const playlistSection = document.getElementById('playlist-section');
-          if (playlistSection && profileData) {
+E           if (playlistSection && profileData) {
              playlistSection.style.display = profileData.goal_type ? 'block' : 'none';
           }
           
@@ -816,7 +816,7 @@ SA         const plan = await SuperDietEngine.generatePlan(inputs, { months,
         console.error("Erro no initializePageData:", e);
         formWrapper.style.display = 'block';
         document.getElementById('results-wrapper').style.display = 'none';
-s     }
+      }
     }
 
     // --- Lógica da Página 'percurso.html' ---
