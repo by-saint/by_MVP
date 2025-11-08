@@ -1,13 +1,13 @@
 :root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
+  --color-ia-specialist: #007BFF;
+  --color-video-lessons: #8A2BE2;
+  --color-journey: #DC143C;
+  --journey-red-1: #ff2646;
+  --journey-red-2: #be123c;
+  --journey-dark: #2a0a12;
+  --bg: #121212;
+  --card: #1E1E1E;
+  --muted: #bbb;
 }
 html { scroll-behavior: smooth; }
 body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
@@ -108,11 +108,11 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+  .percurso-forms{ grid-template-columns:1fr; }
+  .plan-days{ grid-template-columns:1fr; }
+  body{ padding:20px 12px; }
+  .day-circle-label{ width:36px; height:36px; font-size:13px; }
+  .iframe-container{ height:48vh; min-height:220px; }
 }
 
 /* modal for follow-up questions */
@@ -123,3 +123,35 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
+
+
+/* ===================================================
+    NOVOS ESTILOS - ADICIONADOS PARA A MELHORIA 1
+    (SISTEMA DE TROCA DE ALIMENTOS)
+    =================================================== */
+
+/* Estilo para os botões de ação do modal de troca */
+.followup-actions-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Estilo específico para o botão de cancelar/padrão */
+.followup-actions-btn:not([style]) {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+.followup-actions-btn:not([style]):hover {
+  background-color: #444;
+}
+
+/* Estilo para botões e selects desabilitados */
+.followup-select:disabled,
+.followup-actions-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
