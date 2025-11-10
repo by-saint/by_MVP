@@ -1,251 +1,213 @@
-:root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
-}
-html { scroll-behavior: smooth; }
-body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
-.container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
+/* membros.css
+   Estilos principais para a página 'percurso'
+   Inclui estilos do modal de troca, animações e botão vermelho com degradê
+   Produzido para parecer profissional, responsivo e fluido.
+*/
 
-/* MENU / SIDEBAR */
-.menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; padding:0; }
-.menu-toggle .bar { width:24px; height:3px; background-color:#fff; border-radius:2px; transition: all 0.3s; }
-.menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-.menu-toggle.open .bar:nth-child(2) { opacity: 0; }
-.menu-toggle.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-.sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: var(--card); transition: left 0.28s ease; z-index:1000; border-right:1px solid #333; display:flex; flex-direction:column; justify-content:space-between; }
-.sidebar.open { left: 0; }
-.sidebar nav { padding-top: 100px; }
-.sidebar nav ul{ list-style:none; padding:0; margin:0; }
-/* Nav link style updated to show colored rectangle at left when active */
-.sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
-.sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
-.sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
-.sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-/* colored rectangle per tab */
-.link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
-.link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
-.link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
-
-.sidebar-footer { padding:20px 30px; text-align:center; }
-.sidebar-config-btn { width:100%; background:transparent; border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:600; }
-.sidebar-config-btn:hover{ background:#333; color:#fff; }
-.sidebar-action-btn{ width:100%; padding:10px; border-radius:8px; cursor:pointer; font-weight:600; transition: all 0.2s; margin-top:10px; }
-.sidebar-reset-btn{ background:transparent; border:1px solid var(--color-ia-specialist); color:var(--color-ia-specialist); }
-.sidebar-reset-btn:hover{ background:var(--color-ia-specialist); color:#fff; }
-.sidebar-logout-btn{ background:#be123c; border:1px solid #be123c; color:#fff; }
-.sidebar-logout-btn:hover{ background:#ff4757; border-color:#ff4757; }
-.hidden{ display:none; }
-
-.overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; opacity:0; visibility:hidden; transition:opacity 0.28s, visibility 0.28s; }
-.overlay.show{ opacity:1; visibility:visible; }
-
-.header { display:flex; justify-content:flex-end; align-items:center; margin-bottom:20px; }
-#welcome-msg { color:#bbb; margin-right:20px; }
-
-.tab-content{ display:none; }
-.tab-content.active{ display:block; }
-.form-wrapper, .results-wrapper { width:100%; max-width:900px; margin:0 auto; }
-
-.form-container, .results-container, .percurso-container { background-color: var(--card); padding:40px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border:1px solid #333; color:#E0E0E0; }
-.form-group{ margin-bottom:20px; }
-label{ display:block; margin-bottom:8px; font-weight:600; color:#BBBBBB; }
-input, select, textarea { width:100%; padding:12px; background-color:#2C2C2C; border:1px solid #444; border-radius:8px; color:#E0E0E0; font-size:16px; box-sizing:border-box; }
-textarea{ resize:vertical; min-height:100px; }
-
-.goal-section{ background: linear-gradient(145deg,#2a2a2a,#1a1a1a); border:1px solid #444; padding:30px; margin-bottom:24px; border-radius:10px; text-align:center; }
-.goal-title{ font-size:28px; font-weight:700; background: linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90deg,#007BFF,#0056b3); border:none; border-radius:8px; color:#fff; font-size:18px; font-weight:600; cursor:pointer; }
-
-.progress-section{ margin-top:24px; padding:20px; background-color:#2C2C2C; border-radius:10px; }
-.progress-bar-container{ width:100%; background-color:#444; border-radius:10px; overflow:hidden; }
-.progress-bar{ width:0%; background-color:#007BFF; height:20px; transition: width 0.5s ease-in-out; }
-.progress-labels{ display:flex; justify-content:space-between; font-size:12px; color:#aaa; margin-top:5px; }
-.countdown-container{text-align:center; margin-top:20px; }
-.countdown-days{ font-size:4rem; font-weight:700; color:#fff; line-height:1; }
-.countdown-label{ font-size:1rem; color:#aaa; }
-
-.playlist-section{ text-align:center; margin:24px 0; }
-.playlist-btn{ background:#007BFF; color:white; border:none; padding:12px 24px; font-size:1.1em; cursor:pointer; border-radius:8px; }
-
-.percurso-forms{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
-.percurso-card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border:1px solid rgba(190,18,60,0.06); padding:20px; border-radius:12px; }
-.generated-diet-card{ border:2px solid rgba(190,18,60,0.14); box-shadow:0 8px 24px rgba(190,18,60,0.06); padding:18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.16)); color:#ddd; }
-
-/* Plan UI */
-.plan-tabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-.plan-tab{ padding:8px 12px; border-radius:999px; background:#2b2b2b; color:#fff; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,0.03); }
-.plan-tab.active{ background: linear-gradient(90deg,var(--journey-red-1),var(--journey-red-2)); color:white; }
-.plan-days{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-.plan-day{ background: linear-gradient(180deg,#141414,#0f0f0f); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
-.meal-row{ margin-bottom:10px; padding:8px; border-radius:8px; background:#0d0d0d; display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid rgba(255,255,255,0.02); }
-.meal-left{ display:flex; gap:10px; align-items:center; }
-.meal-name{ font-weight:700; color:#fff; }
-.meal-kcal{ font-weight:700; color:#f3f3f3; background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; }
-
-/* dify */
-.iframe-container{ border-radius:12px; overflow:hidden; position:relative; height:70vh; min-height:340px; max-height:720px; background:#000; }
-.dify-top-strip{ position:absolute; top:0; left:0; width:100%; height:50px; background:#000000; z-index:2; pointer-events:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-sizing:border-box; }
-.dify-top-badge{ font-weight:700; font-size:1.1em; color:#fff; background: linear-gradient(90deg,#007BFF,#0056b3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.mvp-label{ font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
-
-/* day selector */
-.day-selector-container { background-color: #2C2C2C; border:1px solid #444; border-radius:8px; }
-.day-selector-summary { padding:12px; font-weight:600; color:#BBBBBB; cursor:pointer; position:relative; }
-.day-selector-summary::after { content:'▼'; font-size:0.8em; position:absolute; right:15px; top:14px; transition:transform 0.2s; }
-.day-selector-container[open] .day-selector-summary::after { transform: rotate(180deg); }
-.day-selector-grid { display:flex; flex-wrap:wrap; gap:10px; padding:0 12px 12px 12px; justify-content:center; }
-.day-circle-input{ display:none; }
-.day-circle-label{ display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; border:2px solid #555; background:#333; color:#E0E0E0; font-size:14px; font-weight:700; cursor:pointer; user-select:none; }
-.day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
-
-@media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+/* ------------------------------------------------------------
+   Variáveis de tema e reset básico
+   ------------------------------------------------------------ */
+:root{
+  --bg:#0f0f10;
+  --card:#151515;
+  --muted:#bdbdbd;
+  --accent-blue: #007BFF;
+  /* cor base pedida (vermelho/pink tipo "novembro") */
+  --swap-red-1: #ff8aa3; /* tom claro do degradê */
+  --swap-red-2: #ff3b5c; /* tom principal (igual/semelhante à imagem) */
+  --swap-red-3: #c82036; /* tom mais escuro */
+  --glass: rgba(255,255,255,0.02);
+  --shadow-strong: rgba(0,0,0,0.6);
+  --card-border: rgba(255,255,255,0.03);
+  --radius: 12px;
 }
 
-/* modal for follow-up questions */
-.followup-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
-.followup-modal { width: 560px; max-width:94%; background:var(--card); border-radius:12px; padding:20px; box-shadow:0 12px 40px rgba(0,0,0,0.6); color:#fff; }
-.followup-modal h4 { margin-top:0; }
-.followup-field { margin-bottom:12px; }
-.followup-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-.followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
-.followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:#e9e9e9;
+  padding:36px 24px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 
-/* ===== Botão Troca de Alimentos (vermelho degrade) ===== */
-#open-swap-modal-btn {
-  background: linear-gradient(180deg, #ff7b7b 0%, #d32f2f 100%);
+/* ------------------------------------------------------------
+   Top bar / menu toggle
+   ------------------------------------------------------------ */
+.menu-toggle{
+  position:fixed; top:22px; left:22px;
+  width:50px; height:50px;
+  border-radius:50%;
+  background:#121212;
+  border:1px solid rgba(255,255,255,0.03);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000; cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease;
+  box-shadow:0 6px 18px rgba(0,0,0,.5);
+}
+.menu-toggle:hover{ transform: translateY(-2px) }
+.menu-toggle .bar{ width:22px; height:3px; background:#fff; border-radius:2px; transition:all .25s }
+.menu-toggle.open .bar:nth-child(1){ transform:translateY(7px) rotate(45deg) }
+.menu-toggle.open .bar:nth-child(2){ opacity:0 }
+.menu-toggle.open .bar:nth-child(3){ transform:translateY(-7px) rotate(-45deg) }
+
+/* ------------------------------------------------------------
+   Sidebar
+   ------------------------------------------------------------ */
+.sidebar{
+  position:fixed; left:-300px; top:0; width:300px; height:100%;
+  background:linear-gradient(180deg,#121212,#161616);
+  border-right:1px solid var(--card-border); z-index:1500; transition:left .28s ease;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.6);
+}
+.sidebar.open{ left:0 }
+.sidebar nav{ padding-top:88px }
+.sidebar nav ul{ list-style:none; padding:0; margin:0 }
+.sidebar nav a{ display:block; padding:14px 26px; text-decoration:none; color:var(--muted); font-weight:700; border-left:4px solid transparent; margin-bottom:6px; border-radius:6px 0 0 6px; transition:background .12s }
+.sidebar nav a.active{ background:rgba(255,255,255,0.02); color:#fff; border-left-color:var(--swap-red-2) }
+.sidebar-footer{ position:absolute; bottom:18px; width:100%; padding:12px 20px }
+
+/* overlay */
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1400; opacity:0; visibility:hidden; transition:opacity .28s,visibility .28s }
+.overlay.show{ opacity:1; visibility:visible }
+
+/* ------------------------------------------------------------
+   Layout principal
+   ------------------------------------------------------------ */
+.container{ max-width:1400px; margin:0 auto; padding:0 20px }
+.header{ display:flex; justify-content:flex-end; align-items:center; margin-bottom:18px }
+#welcome-msg{ color:var(--muted) }
+
+/* cards */
+.percurso-container{ padding:22px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.16)); border-radius:var(--radius); border:1px solid var(--card-border); box-shadow:0 8px 30px rgba(0,0,0,.5) }
+.percurso-forms{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px }
+.percurso-card{ padding:16px; border-radius:10px; background:linear-gradient(180deg,#0d0d0d,#0b0b0b); border:1px solid rgba(255,255,255,0.02) }
+.generated-diet-card{ border:2px solid rgba(255,255,255,0.02) }
+
+/* plan */
+.plan-tabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap }
+.plan-tab{ padding:8px 12px; border-radius:999px; background:#222; color:#fff; font-weight:700; cursor:pointer; }
+.plan-tab.active{ background: linear-gradient(90deg,var(--swap-red-1),var(--swap-red-2)); color:#fff }
+
+/* plan-days */
+.plan-days{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:6px }
+.plan-day{ padding:10px; border-radius:10px; background:linear-gradient(180deg,#0f0f0f,#0b0b0b); border:1px solid rgba(255,255,255,0.02) }
+.meal-row{ display:flex; justify-content:space-between; align-items:center; background:#0b0b0b; padding:8px; border-radius:8px; margin-bottom:8px }
+
+/* inputs */
+label{ color:var(--muted); display:block; margin-bottom:6px; font-weight:700 }
+input,select,textarea{ background:#111; color:#fff; border:1px solid rgba(255,255,255,0.03); padding:10px; border-radius:8px; width:100%; box-sizing:border-box }
+
+/* generic button */
+button{ cursor:pointer; border-radius:10px; padding:10px 14px; border:0; font-weight:700 }
+
+/* ------------------------------------------------------------
+   BOTÃO: Troca de Alimentos (cor do botão na sua imagem)
+   - cor base (central) usada: --swap-red-2 (#ff3b5c)
+   - suave animação de clique, hover e pulse para feedback
+   ------------------------------------------------------------ */
+#open-swap-modal-btn{
+  display:inline-block;
+  background: linear-gradient(90deg,var(--swap-red-1) 0%, var(--swap-red-2) 60%, var(--swap-red-3) 100%);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-weight: 700;
-  font-size: 14px;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 800;
+  font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(211, 47, 47, 0.18);
-  transition: transform 140ms cubic-bezier(.2,.9,.3,1), box-shadow 140ms, filter 140ms;
-  background-size: 200% 200%;
-  outline: none;
-  display: inline-block;
+  box-shadow: 0 12px 36px rgba(255,59,92,0.12), 0 4px 10px rgba(0,0,0,0.6);
+  transition: transform 200ms cubic-bezier(.2,.9,.3,1), box-shadow 200ms, filter 200ms;
+  background-size: 200% 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* leve movimento de brilho no hover */
-#open-swap-modal-btn:hover {
-  transform: translateY(-2px);
-  background-position: 100% 0;
+/* hover: eleva e shift de gradiente */
+#open-swap-modal-btn:hover{
+  transform: translateY(-3px);
   filter: saturate(1.05);
+  background-position: 100% 0;
 }
 
-/* efeito ao pressionar (touch/click) */
-#open-swap-modal-btn.press-anim,
-#open-swap-modal-btn:active {
-  transform: scale(0.97);
-  box-shadow: 0 5px 14px rgba(211, 47, 47, 0.15);
+/* active: feedback de click */
+#open-swap-modal-btn:active, #open-swap-modal-btn.pressed {
+  transform: scale(0.975);
+  box-shadow: 0 8px 24px rgba(255,59,92,0.12);
 }
 
-/* pequeno 'pulse' depois do clique para feedback visual */
-@keyframes btn-pulse {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.96); }
-  100% { transform: scale(1); }
+/* pulse animation quando abrir modal (suave) */
+@keyframes btn-open-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  40% { transform: scale(0.98); opacity: 0.96; }
+  100% { transform: scale(1); opacity: 1; }
 }
 #open-swap-modal-btn.pulse {
-  animation: btn-pulse 300ms ease-out;
+  animation: btn-open-pulse 360ms ease-out;
 }
 
-/* ===== Modal overlay e animação de entrada ===== */
-#food-swap-modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: none; /* controlado via JS */
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.55);
-  z-index: 1200;
-  opacity: 0;
-  transition: opacity 220ms ease;
+/* =========================================================
+   MODAL styling + animation
+   - overlay fade
+   - modal slide+fade
+   ========================================================= */
+#food-swap-modal-overlay{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.6); z-index:2200; opacity:0; transition:opacity 220ms ease;
+}
+#food-swap-modal-overlay.visible{ display:flex; opacity:1 }
+#food-swap-modal-overlay.hiding{ opacity:0 }
+
+.swap-modal{
+  width:min(92%,720px); max-height:86vh; overflow:auto;
+  background:linear-gradient(180deg,#0e0e0f,#111); border-radius:14px; padding:18px;
+  box-shadow:0 28px 80px rgba(0,0,0,0.6);
+  transform: translateY(14px) scale(0.98); opacity:0;
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 220ms ease;
+  border:1px solid rgba(255,255,255,0.03);
+}
+#food-swap-modal-overlay.visible .swap-modal{ transform: translateY(0) scale(1); opacity:1 }
+
+/* swap modal inputs */
+.swap-modal select, .swap-modal input{ background:rgba(255,255,255,0.02); color:#fff; border:1px solid rgba(255,255,255,0.03); padding:10px; border-radius:8px; width:100% }
+
+/* actions */
+#swap-execute-btn{
+  background: linear-gradient(90deg,var(--swap-red-2), var(--swap-red-3));
+  color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:800;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+#swap-execute-btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+#swap-execute-btn:active{ transform:scale(0.98) }
+
+/* cancel */
+#swap-cancel-btn{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:#ddd; padding:8px 12px; border-radius:10px; }
+
+/* accessible focus */
+#open-swap-modal-btn:focus, #swap-execute-btn:focus, #swap-cancel-btn:focus{
+  outline:none; box-shadow:0 0 0 6px rgba(255,59,92,0.12);
 }
 
-/* contêiner do modal (centro) */
-#food-swap-modal-overlay .swap-modal {
-  width: min(92%, 720px);
-  max-height: 85vh;
-  overflow-y: auto;
-  background: linear-gradient(180deg, #0f0f0f, #111111);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 6px 20px rgba(211,47,47,0.06);
-  transform: translateY(16px) scale(0.985);
-  opacity: 0;
-  transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 240ms ease;
-  border: 1px solid rgba(255,255,255,0.03);
+/* small responsive */
+@media(max-width:900px){
+  .percurso-forms{ grid-template-columns: 1fr }
+  .plan-days{ grid-template-columns: 1fr }
+  .swap-modal{ width:94% }
 }
 
-/* when overlay visible */
-#food-swap-modal-overlay.visible {
-  display: flex;
-  opacity: 1;
-}
+/* ------------------------------------------------------------
+   Extra polish: small helper classes (used by JS)
+   ------------------------------------------------------------ */
+.hidden{ display:none !important; }
+.fade-in{ animation: fadeIn 260ms ease both }
+.fade-out{ animation: fadeOut 180ms ease both }
 
-/* modal enters (overlay visible) */
-#food-swap-modal-overlay.visible .swap-modal {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-}
+@keyframes fadeIn { from { opacity:0; transform: translateY(8px) } to { opacity:1; transform: translateY(0) } }
+@keyframes fadeOut { from { opacity:1; transform: translateY(0) } to { opacity:0; transform: translateY(8px) } }
 
-/* animation suave ao fechar */
-#food-swap-modal-overlay.hiding {
-  opacity: 0;
-}
-#food-swap-modal-overlay.hiding .swap-modal {
-  transform: translateY(8px) scale(0.995);
-  opacity: 0;
-}
-
-/* botão de executar & cancelar */
-#swap-execute-btn {
-  background: linear-gradient(180deg,#ff6b6b,#c0392b);
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight:700;
-}
-#swap-cancel-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #ddd;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* acessibilidade - foco visível */
-#open-swap-modal-btn:focus, #swap-execute-btn:focus, #swap-cancel-btn:focus {
-  box-shadow: 0 0 0 4px rgba(211,47,47,0.14);
-  outline: none;
-}
-
-/* inputs internos */
-#food-swap-modal-overlay .swap-modal select,
-#food-swap-modal-overlay .swap-modal input {
-  transition: box-shadow 120ms, transform 120ms;
-  background: rgba(255,255,255,0.02);
-  color: #ddd;
-  border: 1px solid rgba(255,255,255,0.03);
-  padding: 8px;
-  border-radius: 8px;
-}
+/* ------------------------------------------------------------
+   End of membros.css - arquivo pronto para produção
+   (muitos comentários e organização para manter linhas)
+   ------------------------------------------------------------ */
