@@ -1,13 +1,13 @@
 :root {
-  --color-ia-specialist: #007BFF;
-  --color-video-lessons: #8A2BE2;
-  --color-journey: #DC143C;
-  --journey-red-1: #ff2646;
-  --journey-red-2: #be123c;
-  --journey-dark: #2a0a12;
-  --bg: #121212;
-  --card: #1E1E1E;
-  --muted: #bbb;
+  --color-ia-specialist: #007BFF;
+  --color-video-lessons: #8A2BE2;
+  --color-journey: #DC143C;
+  --journey-red-1: #ff2646;
+  --journey-red-2: #be123c;
+  --journey-dark: #2a0a12;
+  --bg: #121212;
+  --card: #1E1E1E;
+  --muted: #bbb;
 }
 
 /* Global */
@@ -108,11 +108,11 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .day-circle-input:checked + .day-circle-label{ background:var(--color-ia-specialist); border-color:var(--color-ia-specialist); color:#fff; box-shadow:0 0 10px rgba(0,123,255,0.5); }
 
 @media(max-width:900px){
-  .percurso-forms{ grid-template-columns:1fr; }
-  .plan-days{ grid-template-columns:1fr; }
-  body{ padding:20px 12px; }
-  .day-circle-label{ width:36px; height:36px; font-size:13px; }
-  .iframe-container{ height:48vh; min-height:220px; }
+  .percurso-forms{ grid-template-columns:1fr; }
+  .plan-days{ grid-template-columns:1fr; }
+  body{ padding:20px 12px; }
+  .day-circle-label{ width:36px; height:36px; font-size:13px; }
+  .iframe-container{ height:48vh; min-height:220px; }
 }
 
 /* modal for follow-up questions */
@@ -125,41 +125,41 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
 
 /* =========================
-   BOTÃO TROCA (novo design, menor e pill vermelho)
-   ========================= */
+   BOTÃO TROCA (novo design, menor e pill vermelho)
+   ========================= */
 .swap-btn,
 #open-swap-modal-btn {
-  display:inline-block;
-  background: linear-gradient(90deg, #ff3758 0%, #be123c 100%); /* degradê mais próximo da imagem 2 */
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 8px 20px; /* menor do que antes */
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 8px 26px rgba(190,18,60,0.16);
-  transition: transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 180ms, filter 180ms;
-  outline: none;
-  line-height: 1;
-  min-width: 160px;
-  text-align:center;
+  display:inline-block;
+  background: linear-gradient(90deg, #ff3758 0%, #be123c 100%); /* degradê mais próximo da imagem 2 */
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 20px; /* menor do que antes */
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 26px rgba(190,18,60,0.16);
+  transition: transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 180ms, filter 180ms;
+  outline: none;
+  line-height: 1;
+  min-width: 160px;
+  text-align:center;
 }
 
 /* hover e entrada */
 .swap-btn:hover,
 #open-swap-modal-btn:hover {
-  transform: translateY(-3px);
-  filter: saturate(1.06) brightness(1.02);
-  box-shadow: 0 14px 36px rgba(190,18,60,0.22);
+  transform: translateY(-3px);
+  filter: saturate(1.06) brightness(1.02);
+  box-shadow: 0 14px 36px rgba(190,18,60,0.22);
 }
 
 /* press feedback */
 .swap-btn.press-anim,
 .swap-btn:active,
 #open-swap-modal-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 6px 18px rgba(190,18,60,0.12);
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(190,18,60,0.12);
 }
 
 /* subtle pulse after click */
@@ -167,93 +167,131 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .swap-btn.pulse { animation: btn-pulse 320ms ease-out; }
 
 /* =========================
-   MODAL OVERLAY & ANIMAÇÕES
-   ========================= */
+   MODAL OVERLAY & ANIMAÇÕES
+   ========================= */
 
 /* base overlay - controlado por classes .visible e .hiding */
 #food-swap-modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: none; /* mostrado apenas via .visible */
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.55);
-  z-index: 1200;
-  opacity: 0;
-  transition: opacity 220ms ease;
+  position: fixed;
+  inset: 0;
+  display: none; /* mostrado apenas via .visible */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  z-index: 1200;
+  opacity: 0;
+  transition: opacity 220ms ease;
 }
 
 /* container do modal */
 #food-swap-modal-overlay .followup-modal {
-  width: min(92%, 720px);
-  max-height: 85vh;
-  overflow-y: auto;
-  background: linear-gradient(180deg, #0f0f0f, #111111);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 6px 20px rgba(190,18,60,0.06);
-  transform: translateY(12px) scale(0.98);
-  opacity: 0;
-  transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 240ms ease;
-  border: 1px solid rgba(255,255,255,0.03);
+  width: min(92%, 720px);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #0f0f0f, #111111);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 6px 20px rgba(190,18,60,0.06);
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 240ms ease;
+  border: 1px solid rgba(255,255,255,0.03);
 }
 
 /* visible: mostra overlay e anima modal com movimento ascendente suave */
 #food-swap-modal-overlay.visible {
-  display: flex;
-  opacity: 1;
+  display: flex;
+  opacity: 1;
 }
 #food-swap-modal-overlay.visible .followup-modal {
-  transform: translateY(0) scale(1);
-  opacity: 1;
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }
 
 /* hiding: anima saída */
 #food-swap-modal-overlay.hiding {
-  opacity: 0;
+  opacity: 0;
 }
 #food-swap-modal-overlay.hiding .followup-modal {
-  transform: translateY(8px) scale(0.995);
-  opacity: 0;
+  transform: translateY(8px) scale(0.995);
+  opacity: 0;
 }
+
+/* ================================================================== */
+/* MODIFICAÇÃO 2: Estilo do botão "Realizar Troca" (imagem 2 -> 3) */
+/* ================================================================== */
 
 /* foco e botões dentro do modal */
 #swap-execute-btn {
-  background: linear-gradient(180deg,#ff6b6b,#c0392b);
+  /* Estilo unificado com o .swap-btn (imagem 3) */
+  display: inline-block;
+  background: linear-gradient(90deg, #ff3758 0%, #be123c 100%);
   color: #fff;
   border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 999px; /* <- Mudança principal para formato "pill" */
+  padding: 8px 20px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  font-weight:700;
-  transition: transform 120ms, box-shadow 120ms;
+  box-shadow: 0 8px 26px rgba(190,18,60,0.16);
+  transition: transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 180ms, filter 180ms;
+  outline: none;
+  line-height: 1;
 }
+
+/* Adicionando estados de hover/active para consistência */
+#swap-execute-btn:hover {
+  transform: translateY(-3px);
+  filter: saturate(1.06) brightness(1.02);
+  box-shadow: 0 14px 36px rgba(190,18,60,0.22);
+}
+
+#swap-execute-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(190,18,60,0.12);
+}
+
+/* Estilo para quando o botão está desabilitado */
+#swap-execute-btn:disabled {
+  background: #444; /* Cor mais escura para desabilitado */
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+
 #swap-cancel-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #ddd;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #ddd;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 #open-swap-modal-btn:focus, #swap-execute-btn:focus, #swap-cancel-btn:focus {
-  box-shadow: 0 0 0 6px rgba(190,18,60,0.12);
-  outline: none;
+  box-shadow: 0 0 0 6px rgba(190,18,60,0.12);
+  outline: none;
 }
+
+
+/* ================================================================== */
+/* MODIFICAÇÃO 1: Fundo dos <select> (imagem 1) */
+/* ================================================================== */
 
 /* inputs internos */
 #food-swap-modal-overlay .followup-modal select,
 #food-swap-modal-overlay .followup-modal input {
-  transition: box-shadow 120ms, transform 120ms;
-  background: rgba(255,255,255,0.02);
-  color: #ddd;
-  border: 1px solid rgba(255,255,255,0.03);
-  padding: 8px;
-  border-radius: 8px;
+  transition: box-shadow 120ms, transform 120ms;
+  background: #111; /* Alterado: estava 'rgba(255,255,255,0.02)' e causava fundo branco */
+  color: #ddd;
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 8px;
+  border-radius: 8px;
 }
 
 /* small screens adjustments */
 @media (max-width:520px) {
-  .swap-btn, #open-swap-modal-btn { min-width: 140px; padding: 8px 16px; font-size:13px; }
-  #food-swap-modal-overlay .followup-modal { padding: 14px; }
+  .swap-btn, #open-swap-modal-btn { min-width: 140px; padding: 8px 16px; font-size:13px; }
+  #food-swap-modal-overlay .followup-modal { padding: 14px; }
 }
