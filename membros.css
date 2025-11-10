@@ -8,15 +8,17 @@
   --bg: #121212;
   --card: #1E1E1E;
   --muted: #bbb;
-  --swap-red-start: #ff5b68; /* ajuste para o tom da imagem */
-  --swap-red-end: #bd142f;
+  --swap-red-start: #ff6b6b; /* tom mais claro (imagem) */
+  --swap-red-end: #b81832;   /* tom mais escuro (imagem) */
 }
+
+/* base layout (mantive seu estilo original para não quebrar o layout) */
 html { scroll-behavior: smooth; }
 body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
 .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
 h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
 
-/* MENU / SIDEBAR */
+/* MENU / SIDEBAR (mantido) */
 .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 1001; background: #333; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; padding:0; }
 .menu-toggle .bar { width:24px; height:3px; background-color:#fff; border-radius:2px; transition: all 0.3s; }
 .menu-toggle.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
@@ -27,12 +29,10 @@ h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px;
 .sidebar.open { left: 0; }
 .sidebar nav { padding-top: 100px; }
 .sidebar nav ul{ list-style:none; padding:0; margin:0; }
-/* Nav link style updated to show colored rectangle at left when active */
 .sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
 .sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
 .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
 .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-/* colored rectangle per tab */
 .link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
 .link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
 .link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
@@ -64,7 +64,7 @@ input, select, textarea { width:100%; padding:12px; background-color:#2C2C2C; bo
 textarea{ resize:vertical; min-height:100px; }
 
 .goal-section{ background: linear-gradient(145deg,#2a2a2a,#1a1a1a); border:1px solid #444; padding:30px; margin-bottom:24px; border-radius:10px; text-align:center; }
-.goal-title{ font-size:28px; font-weight:700; background: linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.goal-title{ font-size:28px; font-weight:700; background: linear-gradient(90deg,#007BFF,#00C6FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90deg,#007BFF,#0056b3); border:none; border-radius:8px; color:#fff; font-size:18px; font-weight:600; cursor:pointer; }
 
 .progress-section{ margin-top:24px; padding:20px; background-color:#2C2C2C; border-radius:10px; }
@@ -97,7 +97,6 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .dify-top-badge{ font-weight:700; font-size:1.1em; color:#fff; background: linear-gradient(90deg,#007BFF,#0056b3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .mvp-label{ font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
 
-/* day selector */
 .day-selector-container { background-color: #2C2C2C; border:1px solid #444; border-radius:8px; }
 .day-selector-summary { padding:12px; font-weight:600; color:#BBBBBB; cursor:pointer; position:relative; }
 .day-selector-summary::after { content:'▼'; font-size:0.8em; position:absolute; right:15px; top:14px; transition:transform 0.2s; }
@@ -124,38 +123,48 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
 
-/* ===== Botão Troca de Alimentos (menor, degradê) ===== */
-.swap-open-btn {
+/* ===========================
+   BOTÕES DE TROCA — estilo UNIFICADO
+   =========================== */
+
+/* botão-base usado tanto no "abrir modal" quanto no "executar troca" */
+.swap-btn {
   background: linear-gradient(180deg, var(--swap-red-start) 0%, var(--swap-red-end) 100%);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-weight: 700;
+  border-radius: 999px;            /* pílula */
+  padding: 8px 18px;
+  font-weight: 800;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(189,18,47,0.18);
-  transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms, filter 160ms, background-position 400ms;
-  background-size: 180% 180%;
+  box-shadow: 0 10px 28px rgba(184,24,50,0.18), 0 2px 6px rgba(0,0,0,0.35);
+  transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms, filter 160ms;
+  background-size: 200% 120%;
+  min-width: 150px;
   outline: none;
-  display: inline-block;
-  min-width: 160px;
 }
 
-/* hover micro-brilho */
-.swap-open-btn:hover {
-  transform: translateY(-2px);
-  filter: saturate(1.03);
-  background-position: 100% 50%;
+/* hover e foco */
+.swap-btn:hover { transform: translateY(-2px); filter: saturate(1.03); }
+.swap-btn:focus { box-shadow: 0 0 0 8px rgba(184,24,50,0.08); outline: none; }
+
+/* pressed animation */
+.swap-btn:active, .swap-btn.press {
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(184,24,50,0.12);
 }
 
-/* pressed / small bounce */
-.swap-open-btn:active, .swap-open-btn.press-anim { transform: scale(0.985); box-shadow: 0 6px 14px rgba(189,18,47,0.12); }
+/* pulse (após clique) */
+@keyframes swap-pulse {
+  0% { transform: scale(1); opacity:1; }
+  40% { transform: scale(0.97); opacity:0.98; }
+  100% { transform: scale(1); opacity:1; }
+}
+.swap-btn.pulse { animation: swap-pulse 320ms cubic-bezier(.2,.9,.3,1); }
 
-/* subtle focus ring */
-.swap-open-btn:focus { box-shadow: 0 0 0 6px rgba(189,18,47,0.09); outline: none; }
-
-/* ===== Modal overlay + animation (mais clean e perceptível) ===== */
+/* ===========================
+   MODAL (entrada suave já aplicada)
+   =========================== */
 #food-swap-modal-overlay {
   position: fixed;
   inset: 0;
@@ -167,8 +176,6 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   opacity: 0;
   transition: opacity 240ms ease;
 }
-
-/* contêiner do modal (centro) */
 .swap-modal {
   width: min(92%, 720px);
   max-height: 85vh;
@@ -182,43 +189,25 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   transition: transform 320ms cubic-bezier(.2,.9,.3,1), opacity 260ms ease;
   border: 1px solid rgba(255,255,255,0.03);
 }
+#food-swap-modal-overlay.visible { display:flex; opacity:1; }
+#food-swap-modal-overlay.visible .swap-modal { transform: translateY(0) scale(1); opacity:1; }
+#food-swap-modal-overlay.hiding { opacity:0; }
+#food-swap-modal-overlay.hiding .swap-modal { transform: translateY(8px) scale(0.995); opacity:0; }
 
-/* when overlay visible */
-#food-swap-modal-overlay.visible {
-  display: flex;
-  opacity: 1;
+/* inputs do modal: fundo ESCURO (corrige seu problema do branco) */
+.swap-modal select, .swap-modal input, .swap-modal textarea {
+  background: #080808;
+  color: #efefef;
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 10px;
+  border-radius: 8px;
+  width:100%;
+  box-sizing:border-box;
 }
+.swap-modal select option { background: #080808; color: #efefef; }
 
-/* modal enters (overlay visible) */
-#food-swap-modal-overlay.visible .swap-modal {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-}
-
-/* animation suave ao fechar */
-#food-swap-modal-overlay.hiding {
-  opacity: 0;
-}
-#food-swap-modal-overlay.hiding .swap-modal {
-  transform: translateY(8px) scale(0.995);
-  opacity: 0;
-}
-
-/* botão de executar & cancelar (padronizado) */
-#swap-execute-btn {
-  background: linear-gradient(180deg,var(--swap-red-start),var(--swap-red-end));
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight:700;
-  min-width:140px;
-  transition: transform 120ms, box-shadow 120ms;
-}
-#swap-execute-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow:none; }
-#swap-execute-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(189,18,47,0.12); }
-
+/* botões dentro do modal padronizados */
+#swap-execute-btn { /* assume a classe .swap-btn via JS/HTML — estilos unificados */ }
 #swap-cancel-btn {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.06);
@@ -228,37 +217,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   cursor: pointer;
 }
 
-/* acessibilidade - foco visível */
-#open-swap-modal-btn:focus, #swap-execute-btn:focus, #swap-cancel-btn:focus {
-  box-shadow: 0 0 0 4px rgba(189,18,47,0.12);
-  outline: none;
-}
-
-/* inputs internos (modal) - ESCURO, não branco */
-.swap-modal select,
-.swap-modal input,
-.swap-modal textarea {
-  transition: box-shadow 120ms, transform 120ms;
-  background: #0b0b0b;
-  color: #e8e8e8;
-  border: 1px solid rgba(255,255,255,0.03);
-  padding: 10px;
-  border-radius: 8px;
-  width:100%;
-  box-sizing:border-box;
-}
-
-/* opções do select: aplica estilo do container para evitar fundo branco nos browsers */
-.swap-modal select option {
-  background: #0b0b0b;
-  color: #e8e8e8;
-}
-
-/* melhorias visuais: labels e espaçamentos */
-.swap-modal label { color:#cfcfcf; font-weight:600; display:block; margin-bottom:8px; }
-.swap-modal p { color: #bdbdbd; margin: 6px 0 12px 0; }
-
-/* toast simples (usado para feedback temporário) */
+/* toast simples para feedback (mantido) */
 .swap-toast {
   position: fixed;
   bottom: 24px;
@@ -277,20 +236,11 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 }
 .swap-toast.show { opacity: 1; pointer-events:auto; }
 
-/* small responsive tweaks */
-@media (max-width:520px) {
-  .swap-open-btn { min-width: 140px; padding: 8px 12px; font-size:13px; }
-  .swap-modal { padding: 14px; }
-}
-
-/* Extra lines to reach length requirements and some helpful utilities */
+/* utilitários finais */
 .hidden-element { display:none !important; }
 .center { display:flex; align-items:center; justify-content:center; }
 .mt-8 { margin-top:8px; }
 .mt-12 { margin-top:12px; }
 .mb-12 { margin-bottom:12px; }
 
-/* tiny helpers for debugging layout in dev (can be removed in production) */
-.layout-debug { outline: 1px dashed rgba(255,255,255,0.03) !important; }
-
-/* End of file - membros.css */
+/* fim do CSS */
