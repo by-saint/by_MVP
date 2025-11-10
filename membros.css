@@ -1,4 +1,4 @@
-:root { 
+:root {
   --color-ia-specialist: #007BFF;
   --color-video-lessons: #8A2BE2;
   --color-journey: #DC143C;
@@ -10,9 +10,9 @@
   --muted: #bbb;
 }
 
-/* basic page rules */
+/* Global */
 html { scroll-behavior: smooth; }
-body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: #E0E0E0; margin: 0; padding: 40px 20px; }
 .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
 h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px; }
 
@@ -27,12 +27,10 @@ h1,h2,h3{ color:#f0f0f0; text-align:center; margin-top:30px; margin-bottom:15px;
 .sidebar.open { left: 0; }
 .sidebar nav { padding-top: 100px; }
 .sidebar nav ul{ list-style:none; padding:0; margin:0; }
-/* Nav link style updated to show colored rectangle at left when active */
 .sidebar nav a{ display:block; padding:15px 30px; padding-left:44px; text-decoration:none; font-size:1.05em; font-weight:700; border-left:5px solid transparent; transition: background-color 0.2s, border-left 0.2s; color:var(--muted); position:relative; }
 .sidebar nav a::before { content: ''; position:absolute; left:12px; top:50%; transform:translateY(-50%); width:8px; height:60%; border-radius:4px; opacity:0; transition: opacity 0.18s, transform 0.18s; }
 .sidebar nav a:hover{ background-color:#2c2c2c; color:#fff; }
 .sidebar nav a.active{ background-color:rgba(255,255,255,0.02); color:#fff; }
-/* colored rectangle per tab */
 .link-ia.active::before { background: linear-gradient(180deg,var(--color-ia-specialist), #0056b3); opacity:1; }
 .link-aulas.active::before { background: linear-gradient(180deg,#c048f2,#6b21a8); opacity:1; }
 .link-percurso.active::before { background: linear-gradient(180deg,var(--journey-red-1),var(--journey-red-2)); opacity:1; }
@@ -126,52 +124,57 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
 .followup-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .followup-input, .followup-select { width:100%; padding:10px; border-radius:8px; background:#222; border:1px solid #333; color:#fff; }
 
-/* ===== Botão Troca de Alimentos (vermelho degrade) ===== */
+/* =========================
+   BOTÃO TROCA (novo design, menor e pill vermelho)
+   ========================= */
+.swap-btn,
 #open-swap-modal-btn {
-  background: linear-gradient(180deg, #ff7b7b 0%, #d32f2f 100%);
+  display:inline-block;
+  background: linear-gradient(90deg, #ff3758 0%, #be123c 100%); /* degradê mais próximo da imagem 2 */
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 10px 18px;
+  border-radius: 999px;
+  padding: 8px 20px; /* menor do que antes */
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(211, 47, 47, 0.18);
-  transition: transform 140ms cubic-bezier(.2,.9,.3,1), box-shadow 140ms, filter 140ms;
-  background-size: 200% 200%;
+  box-shadow: 0 8px 26px rgba(190,18,60,0.16);
+  transition: transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 180ms, filter 180ms;
   outline: none;
-  display: inline-block;
+  line-height: 1;
+  min-width: 160px;
+  text-align:center;
 }
 
-/* leve movimento de brilho no hover */
+/* hover e entrada */
+.swap-btn:hover,
 #open-swap-modal-btn:hover {
-  transform: translateY(-2px);
-  background-position: 100% 0;
-  filter: saturate(1.05);
+  transform: translateY(-3px);
+  filter: saturate(1.06) brightness(1.02);
+  box-shadow: 0 14px 36px rgba(190,18,60,0.22);
 }
 
-/* efeito ao pressionar (touch/click) */
-#open-swap-modal-btn.press-anim,
+/* press feedback */
+.swap-btn.press-anim,
+.swap-btn:active,
 #open-swap-modal-btn:active {
-  transform: scale(0.97);
-  box-shadow: 0 5px 14px rgba(211, 47, 47, 0.15);
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(190,18,60,0.12);
 }
 
-/* pequeno 'pulse' depois do clique para feedback visual */
-@keyframes btn-pulse {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.96); }
-  100% { transform: scale(1); }
-}
-#open-swap-modal-btn.pulse {
-  animation: btn-pulse 300ms ease-out;
-}
+/* subtle pulse after click */
+@keyframes btn-pulse { 0%{ transform: scale(1);} 40%{ transform: scale(0.98);} 100%{ transform: scale(1);} }
+.swap-btn.pulse { animation: btn-pulse 320ms ease-out; }
 
-/* ===== Modal overlay e animação de entrada ===== */
+/* =========================
+   MODAL OVERLAY & ANIMAÇÕES
+   ========================= */
+
+/* base overlay - controlado por classes .visible e .hiding */
 #food-swap-modal-overlay {
   position: fixed;
   inset: 0;
-  display: none; /* controlado via JS */
+  display: none; /* mostrado apenas via .visible */
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,0.55);
@@ -180,43 +183,41 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   transition: opacity 220ms ease;
 }
 
-/* contêiner do modal (centro) */
-#food-swap-modal-overlay .swap-modal {
+/* container do modal */
+#food-swap-modal-overlay .followup-modal {
   width: min(92%, 720px);
   max-height: 85vh;
   overflow-y: auto;
   background: linear-gradient(180deg, #0f0f0f, #111111);
   border-radius: 14px;
   padding: 18px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 6px 20px rgba(211,47,47,0.06);
-  transform: translateY(16px) scale(0.985);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 6px 20px rgba(190,18,60,0.06);
+  transform: translateY(12px) scale(0.98);
   opacity: 0;
   transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 240ms ease;
   border: 1px solid rgba(255,255,255,0.03);
 }
 
-/* when overlay visible */
+/* visible: mostra overlay e anima modal com movimento ascendente suave */
 #food-swap-modal-overlay.visible {
   display: flex;
   opacity: 1;
 }
-
-/* modal enters (overlay visible) */
-#food-swap-modal-overlay.visible .swap-modal {
+#food-swap-modal-overlay.visible .followup-modal {
   transform: translateY(0) scale(1);
   opacity: 1;
 }
 
-/* animation suave ao fechar */
+/* hiding: anima saída */
 #food-swap-modal-overlay.hiding {
   opacity: 0;
 }
-#food-swap-modal-overlay.hiding .swap-modal {
+#food-swap-modal-overlay.hiding .followup-modal {
   transform: translateY(8px) scale(0.995);
   opacity: 0;
 }
 
-/* botão de executar & cancelar */
+/* foco e botões dentro do modal */
 #swap-execute-btn {
   background: linear-gradient(180deg,#ff6b6b,#c0392b);
   color: #fff;
@@ -225,6 +226,7 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   border-radius: 10px;
   cursor: pointer;
   font-weight:700;
+  transition: transform 120ms, box-shadow 120ms;
 }
 #swap-cancel-btn {
   background: transparent;
@@ -234,16 +236,14 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   border-radius: 10px;
   cursor: pointer;
 }
-
-/* acessibilidade - foco visível */
 #open-swap-modal-btn:focus, #swap-execute-btn:focus, #swap-cancel-btn:focus {
-  box-shadow: 0 0 0 4px rgba(211,47,47,0.14);
+  box-shadow: 0 0 0 6px rgba(190,18,60,0.12);
   outline: none;
 }
 
 /* inputs internos */
-#food-swap-modal-overlay .swap-modal select,
-#food-swap-modal-overlay .swap-modal input {
+#food-swap-modal-overlay .followup-modal select,
+#food-swap-modal-overlay .followup-modal input {
   transition: box-shadow 120ms, transform 120ms;
   background: rgba(255,255,255,0.02);
   color: #ddd;
@@ -252,16 +252,8 @@ button[type="submit"]{ width:100%; padding:15px; background:linear-gradient(90de
   border-radius: 8px;
 }
 
-/* extra helpers - visual polish, larger file to match your requirement */
-.helper-row { display:flex; gap:12px; align-items:center; margin-top:8px; }
-.helper-muted { color: #9b9b9b; font-size:13px; }
-.small { font-size:13px; }
-.center { text-align:center; }
-
-/* transitions for micro-interactions */
-.smooth { transition: all 200ms cubic-bezier(.2,.9,.3,1); }
-
-/* tiny util for hidden visually but accessible */
-.sr-only { position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
-
-/* End of membros.css (base extended) - ready for production, styling aligned with your layout */
+/* small screens adjustments */
+@media (max-width:520px) {
+  .swap-btn, #open-swap-modal-btn { min-width: 140px; padding: 8px 16px; font-size:13px; }
+  #food-swap-modal-overlay .followup-modal { padding: 14px; }
+}
