@@ -76,14 +76,14 @@
           </div>
 
           <div class="percurso-card generated-diet-card" id="dieta-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h4 style="margin:0">Formulário: Dieta</h4>
-              <!-- Botão que abre o modal de Troca de Alimentos -->
-              <!-- Estilo será aplicado pelo CSS (membros.css) -->
-              <button id="open-swap-modal-btn" title="Trocar alimentos" aria-haspopup="dialog">Troca de Alimentos</button>
-            </div>
+            <h4 style="margin-bottom:10px">Formulário: Dieta</h4>
 
-            <div id="dieta-card-content">
+            <!-- Botão que abre o modal de Troca de Alimentos -->
+            <button id="open-swap-modal-btn" class="sidebar-action-btn sidebar-reset-btn" aria-haspopup="dialog">
+              Troca de Alimentos
+            </button>
+
+            <div id="dieta-card-content" style="margin-top:14px;">
               <p style="color:#bbb;">Carregando seu plano de dieta...</p>
             </div>
           </div>
@@ -97,40 +97,44 @@
   <!-- Modal de Troca de Alimentos -->
   <div id="food-swap-modal-overlay" aria-hidden="true">
     <div class="swap-modal" role="dialog" aria-modal="true" aria-labelledby="swap-title">
-      <h3 id="swap-title" style="margin-top:0;color:#fff">Troca de Alimentos</h3>
-      <p style="color:#bbb;margin-top:0;margin-bottom:14px">Selecione o alimento do seu plano atual e por qual deseja trocar.</p>
+      <h4 id="swap-title" style="margin-top:0;color:#fff">Troca de Alimentos</h4>
+      <p style="color:#bbb; font-size:14px; margin-top:-6px; margin-bottom:10px;">Selecione o alimento do seu plano atual e por qual deseja trocar.</p>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div>
-          <label style="color:#ccc;font-weight:700;display:block;margin-bottom:6px">Alimento que quer trocar:</label>
-          <select id="swap-food-select" style="width:100%"></select>
-        </div>
-
-        <div>
-          <label style="color:#ccc;font-weight:700;display:block;margin-bottom:6px">Trocar em:</label>
-          <select id="swap-scope-select" style="width:100%">
-            <option value="all">Todas as refeições</option>
-            <option value="specific">Apenas em uma refeição específica</option>
-          </select>
-        </div>
-
-        <div id="swap-meal-specific-group" style="display:none;">
-          <label style="color:#ccc;font-weight:700;display:block;margin-bottom:6px">Trocar na refeição:</label>
-          <select id="swap-meal-select" style="width:100%"></select>
-        </div>
-
-        <div>
-          <label style="color:#ccc;font-weight:700;display:block;margin-bottom:6px">Trocar por:</label>
-          <select id="swap-new-food-select" style="width:100%"></select>
-        </div>
-
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-          <button id="swap-cancel-btn" type="button">Cancelar</button>
-          <button id="swap-execute-btn" type="button">Realizar Troca</button>
-        </div>
-
-        <div id="swap-status" style="color:#bbb;font-size:13px;min-height:18px"></div>
+      <div class="followup-field">
+        <label for="swap-food-select">Alimento que quer trocar:</label>
+        <select id="swap-food-select" class="followup-select">
+          <option value="">Carregando alimentos do plano...</option>
+        </select>
       </div>
+
+      <div class="followup-field">
+        <label for="swap-scope-select">Trocar em:</label>
+        <select id="swap-scope-select" class="followup-select">
+          <option value="all">Todas as refeições</option>
+          <option value="specific">Apenas em uma refeição específica</option>
+        </select>
+      </div>
+
+      <div class="followup-field" id="swap-meal-specific-group" style="display:none;">
+        <label for="swap-meal-select">Qual refeição?</label>
+        <select id="swap-meal-select" class="followup-select">
+          <option value="">Selecione uma refeição (apenas se escolheu "Apenas em uma refeição específica")</option>
+        </select>
+      </div>
+
+      <div class="followup-field">
+        <label for="swap-new-food-select">Trocar por:</label>
+        <select id="swap-new-food-select" class="followup-select" disabled>
+          <option value="">Selecione um alimento para trocar</option>
+        </select>
+      </div>
+
+      <div class="followup-actions" style="margin-top:12px;">
+        <button id="swap-cancel-btn" class="followup-actions-btn">Cancelar</button>
+        <button id="swap-execute-btn" class="followup-actions-btn" disabled>Realizar Troca</button>
+      </div>
+
+      <div id="swap-status" style="color:#bbb; font-size:13px; margin-top:10px; min-height:18px;"></div>
     </div>
   </div>
 
