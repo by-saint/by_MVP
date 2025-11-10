@@ -40,20 +40,20 @@
       <h2>Nossas Aulas</h2>
       <div id="video-block-1">
         <h3>Aula 1: Introdução ao Treino Estético</h3>
-        <div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/NzRo6GJgDc0" allowfullscreen title="Aula 1"></iframe>
         </div>
       </div>
       <div id="video-block-2" style="margin-top:18px;">
         <h3>Aula 2: Fundamentos da Nutrição</h3>
-        <div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/_TRvuAD2A1G" allowfullscreen title="Aula 2"></iframe>
         </div>
       </div>
       <div id="video-block-3" style="margin-top:18px;">
         <h3>Aula 3: Desvendando a Hipertrofia</h3>
-        <div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/jufiwAs6HEI" allowfullscreen title="Aula 3"></iframe>
         </div>
       </div>
     </div>
@@ -76,12 +76,14 @@
           </div>
 
           <div class="percurso-card generated-diet-card" id="dieta-card">
-            <h4>Formulário: Dieta</h4>
+            <div class="card-header-with-action">
+              <h4 style="margin:0">Formulário: Dieta</h4>
 
-            <!-- Botão que abre o modal de Troca de Alimentos -->
-            <button id="open-swap-modal-btn" class="sidebar-action-btn sidebar-reset-btn" style="display:block; width:auto; margin: -10px auto 15px auto; padding: 10px 20px; font-size: 15px; background-color: var(--color-ia-specialist); border-color: var(--color-ia-specialist); color:#fff;">
-              Troca de Alimentos
-            </button>
+              <!-- Botão estilizado vermelho com animação -->
+              <button id="open-swap-modal-btn" class="swap-action-btn" title="Trocar alimentos" aria-haspopup="dialog">
+                Troca de Alimentos
+              </button>
+            </div>
 
             <div id="dieta-card-content">
               <p style="color:#bbb;">Carregando seu plano de dieta...</p>
@@ -95,44 +97,48 @@
   <div id="followup-root" style="display:none;"></div>
 
   <!-- Modal de Troca de Alimentos -->
-  <div id="food-swap-modal-overlay" class="followup-overlay" style="display:none;">
-    <div class="followup-modal" id="food-swap-modal" role="dialog" aria-modal="true" aria-labelledby="food-swap-title">
-      <h4 id="food-swap-title">Troca de Alimentos</h4>
-      <p style="color:#bbb; font-size:14px; margin-top:-10px;">Selecione o alimento do seu plano atual e por qual deseja trocar.</p>
+  <div id="food-swap-modal-overlay" aria-hidden="true">
+    <div class="swap-modal" id="food-swap-modal" role="dialog" aria-modal="true" aria-labelledby="food-swap-title">
+      <h3 id="food-swap-title">Troca de Alimentos</h3>
+      <p class="muted-small">Selecione o alimento do seu plano atual e por qual deseja trocar.</p>
 
-      <div class="followup-field">
-        <label for="swap-food-select">Alimento que quer trocar:</label>
-        <select id="swap-food-select" class="followup-select">
-          <option value="">Carregando alimentos do plano...</option>
-        </select>
+      <div class="swap-grid">
+        <div class="followup-field">
+          <label for="swap-food-select">Alimento que quer trocar:</label>
+          <select id="swap-food-select" class="followup-select">
+            <option value="">Carregando alimentos do plano...</option>
+          </select>
+        </div>
+
+        <div class="followup-field">
+          <label for="swap-scope-select">Trocar em:</label>
+          <select id="swap-scope-select" class="followup-select">
+            <option value="all">Todas as refeições</option>
+            <option value="specific">Apenas em uma refeição específica</option>
+          </select>
+        </div>
+
+        <div class="followup-field" id="swap-meal-specific-group" style="display:none;">
+          <label for="swap-meal-select">Qual refeição?</label>
+          <select id="swap-meal-select" class="followup-select">
+            <option value="">Selecione uma refeição</option>
+          </select>
+        </div>
+
+        <div class="followup-field">
+          <label for="swap-new-food-select">Trocar por:</label>
+          <select id="swap-new-food-select" class="followup-select" disabled>
+            <option value="">Selecione um substituto</option>
+          </select>
+        </div>
       </div>
 
-      <div class="followup-field">
-        <label for="swap-scope-select">Trocar em:</label>
-        <select id="swap-scope-select" class="followup-select">
-          <option value="all">Todas as refeições</option>
-          <option value="specific">Apenas em uma refeição específica</option>
-        </select>
-      </div>
-
-      <div class="followup-field" id="swap-meal-specific-group" style="display:none;">
-        <label for="swap-meal-select">Qual refeição?</label>
-        <select id="swap-meal-select" class="followup-select">
-          <option value="">Selecione uma refeição (apenas se escolheu "Apenas em uma refeição específica")</option>
-        </select>
-      </div>
-
-      <div class="followup-field">
-        <label for="swap-new-food-select">Trocar por:</label>
-        <select id="swap-new-food-select" class="followup-select" disabled>
-          <option value="">Selecione um alimento para trocar</option>
-        </select>
-      </div>
-
-      <div class="followup-actions">
+      <div class="followup-actions swap-actions">
         <button id="swap-cancel-btn" class="followup-actions-btn">Cancelar</button>
-        <button id="swap-execute-btn" class="followup-actions-btn" style="background:linear-gradient(90deg,#007BFF,#0056b3); color:#fff;" disabled>Realizar Troca</button>
+        <button id="swap-execute-btn" class="followup-actions-btn btn-primary" disabled>Realizar Troca</button>
       </div>
+
+      <div id="swap-status" class="swap-status" aria-live="polite"></div>
     </div>
   </div>
 
