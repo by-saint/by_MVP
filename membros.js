@@ -1,88 +1,53 @@
 /* ===================================================================
-   ARQUIVO: membros.js (O "ENGENHEIRO") - v4.5 (Completo, robusto)
-   Objetivo:
-   - Arquivo cliente que renderiza planos, lida com UI, e implementa
-     modal de Troca de Alimentos usando SuperDietEngine.
+   ARQUIVO: membros.js (v4.7)
+   - Lida com a renderização do plano, modal de Troca de Alimentos e
+     persistência automática no Supabase após a troca.
    - Usa SuperDietEngine.calculateEquivalentPortion quando disponível.
-   - Fallbacks seguros e logging extenso para depuração.
-   ================================================================== */
+   - Preserva compatibilidade com o restante do seu projeto.
+   =================================================================== */
 
-/* ============================
-   IMPORTS (assumidos no projeto)
-   ============================ */
 import { supabase, DIFY_APP_TOKEN } from './supabase-client.js';
 import SuperDietEngine from './diet-engine.js';
 
 /* ============================
-   UTILITÁRIOS GERAIS (helpers)
+   UTILITÁRIOS
    ============================ */
-
 function _safeNum(v, fallback = 0) {
   if (typeof v === 'number' && !Number.isNaN(v)) return v;
   if (v == null || v === '') return fallback;
   const n = parseFloat(String(v).replace(',', '.'));
   return isNaN(n) ? fallback : n;
 }
+function nowISO() { return (new Date()).toISOString(); }
+function stripParenthesis(name) { if (!name) return name; return name.replace(/\s*\(.*?\)\s*/g, '').trim(); }
+function safeFindFood(key){ try { return SuperDietEngine.findFood(key); } catch(e){ console.warn('findFood error', e); return null; } }
 
-function _round(v, p = 0) {
-  const pow = 10 ** (p || 0);
-  return Math.round((v || 0) * pow) / pow;
-}
-
-function nowISO() {
-  return (new Date()).toISOString();
-}
-
-function stripParenthesis(name) {
-  if (!name) return name;
-  return name.replace(/\s*\(.*?\)\s*/g, '').trim();
-}
-
-function safeFindFood(key) {
-  try {
-    return SuperDietEngine.findFood(key);
-  } catch (e) {
-    console.warn('findFood threw', e);
-    return null;
-  }
-}
-
-function formatCurrencyBRL(n) {
-  try {
-    return n == null ? '—' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  } catch {
-    return String(n);
-  }
-}
-
-/* small logger with debug toggle */
+/* DEBUG */
 const Debug = {
   enabled: false,
-  log: function(...args) { if (this.enabled) console.log('[membros.js]', ...args); },
-  warn: function(...args) { if (this.enabled) console.warn('[membros.js]', ...args); },
-  error: function(...args) { if (this.enabled) console.error('[membros.js]', ...args); },
+  log(...args){ if (this.enabled) console.log('[membros.js]', ...args); },
+  warn(...args){ if (this.enabled) console.warn('[membros.js]', ...args); },
+  error(...args){ if (this.enabled) console.error('[membros.js]', ...args); },
 };
 
 /* ============================
-   UI RENDERING - Plano/Visão
+   RENDER / UI
    ============================ */
 
 function displayProgress(startDate, endDate) {
   try {
-    const now = new Date(); now.setHours(0, 0, 0, 0);
-    const sDate = new Date(startDate); sDate.setHours(0, 0, 0, 0);
-    const eDate = new Date(endDate); eDate.setHours(0, 0, 0, 0);
+    const now = new Date(); now.setHours(0,0,0,0);
+    const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
+    const eDate = new Date(endDate); eDate.setHours(0,0,0,0);
     const totalDuration = eDate.getTime() - sDate.getTime();
     const elapsedDuration = now.getTime() - sDate.getTime();
-    const daysRemaining = Math.ceil((eDate - now) / (1000 * 60 * 60 * 24));
-    let progressPercentage = totalDuration > 0 ? (elapsedDuration / totalDuration) * 100 : 0;
+    const daysRemaining = Math.ceil((eDate - now) / (1000*60*60*24));
+    let progressPercentage = totalDuration > 0 ? (elapsedDuration/totalDuration)*100 : 0;
     progressPercentage = Math.max(0, Math.min(100, progressPercentage));
-
     const progressBar = document.getElementById('progress-bar');
     const startDateLabel = document.getElementById('start-date-label');
     const endDateLabel = document.getElementById('end-date-label');
     const countdownDays = document.getElementById('countdown-days');
-
     if (progressBar) progressBar.style.width = `${progressPercentage}%`;
     if (startDateLabel) startDateLabel.textContent = sDate.toLocaleDateString('pt-BR');
     if (endDateLabel) endDateLabel.textContent = eDate.toLocaleDateString('pt-BR');
@@ -252,7 +217,6 @@ function renderMonth(monthObj, contentArea) {
 
 /* ============================
    SUPABASE HELPERS
-   (interagem com a tabela user_diets)
    ============================ */
 
 async function getCurrentUser() {
@@ -325,6 +289,7 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
   planView.style.marginTop = '12px';
   planView.id = 'plan-view';
   container._lastPlan = planPayload; // guarda o plano atual
+  container._planId = existingId || null; // mantém id do registro supabase, se houver
   renderPlanToContainer(planView, planPayload);
   container.appendChild(planView);
 
@@ -365,7 +330,9 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
         if (error) { console.error(error); statusSpan.textContent = 'Erro ao atualizar.'; return; }
         statusSpan.textContent = 'Salvo (atualizado).';
       } else {
-        await SuperDietEngine.savePlan(user.id, container._lastPlan, { title: `Plano - ${container._lastPlan.targets?.targetCalories} kcal` });
+        const { data: inserted, error } = await supabase.from('user_diets').insert([{ user_id: user.id, payload: container._lastPlan }]).select('id').single();
+        if (error) { console.error('save insert', error); statusSpan.textContent = 'Erro ao salvar.'; return; }
+        container._planId = inserted?.id || null;
         statusSpan.textContent = 'Salvo com sucesso.';
         await renderPercursoDietArea();
       }
@@ -380,7 +347,8 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
     try {
       const user = await getCurrentUser();
       if (!user) { statusSpan.textContent = 'Usuário não autenticado.'; return; }
-      await SuperDietEngine.savePlan(user.id, container._lastPlan, { title: `Plano cópia - ${container._lastPlan.targets?.targetCalories} kcal` });
+      const { error } = await supabase.from('user_diets').insert([{ user_id: user.id, payload: container._lastPlan }]);
+      if (error) { console.error('save copy error', error); statusSpan.textContent = 'Erro ao salvar cópia.'; return; }
       statusSpan.textContent = 'Cópia salva.';
     } catch (err) {
       Debug.error('saveNewBtn error', err);
@@ -393,7 +361,7 @@ function renderGeneratedPlanEditor(container, planPayload, existingId = null) {
 }
 
 /* ============================
-   DIFY IFRAME
+   DIFY IFRAME (mantido)
    ============================ */
 
 function loadFreshDifyChat() {
@@ -409,7 +377,7 @@ function loadFreshDifyChat() {
 }
 
 /* ============================
-   FOLLOWUP QUESTIONS MODAL
+   FOLLOWUP QUESTIONS MODAL (mantido)
    ============================ */
 
 function showFollowupQuestions(questions) {
@@ -492,11 +460,11 @@ function showFollowupQuestions(questions) {
   });
 }
 
-/* ===================================================================
+/* ============================
    SISTEMA DE TROCA DE ALIMENTOS (MODAL)
    - implementa performSwap que usa calculateEquivalentPortion
-   - fallback robusto caso função ausente/erro
-   =================================================================== */
+   - salva automaticamente no supabase ao finalizar a troca
+   ============================ */
 
 function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   const openBtn = document.getElementById('open-swap-modal-btn');
@@ -508,6 +476,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   const specificMealGroup = document.getElementById('swap-meal-specific-group');
   const mealSelect = document.getElementById('swap-meal-select');
   const newFoodSelect = document.getElementById('swap-new-food-select');
+  const statusDiv = document.getElementById('swap-status');
 
   if (!openBtn || !overlay || !foodSelect || !newFoodSelect || !executeBtn) {
     Debug.warn('Modal elements missing; disabling swap UI.');
@@ -516,6 +485,12 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   }
 
   const dayNameMap = { 0: 'Dom', 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sab' };
+
+  function setStatus(text, tone = 'info') {
+    if (!statusDiv) return;
+    statusDiv.textContent = text || '';
+    statusDiv.style.color = tone === 'error' ? '#ff8b8b' : '#bbb';
+  }
 
   /** Popula o dropdown 'Alimento que quer trocar' */
   function populateFoodsToSwap() {
@@ -613,11 +588,50 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
     }
   }
 
+  /** Persiste plano no Supabase: update se planId, insert caso contrário */
+  async function persistPlanToSupabase(plan) {
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        setStatus('Usuário não autenticado. Não foi possível salvar.', 'error');
+        return null;
+      }
+
+      // se tivermos id do registro, atualizamos
+      if (cardContainer._planId) {
+        const { error } = await supabase.from('user_diets').update({ payload: plan }).eq('id', cardContainer._planId);
+        if (error) {
+          Debug.error('persistPlanToSupabase update error', error);
+          setStatus('Falha ao salvar alteração no servidor.', 'error');
+          return null;
+        }
+        setStatus('Troca salva no plano (atualizado).', 'info');
+        return cardContainer._planId;
+      } else {
+        // insere novo registro e captura id
+        const { data, error } = await supabase.from('user_diets').insert([{ user_id: user.id, payload: plan }]).select('id').single();
+        if (error) {
+          Debug.error('persistPlanToSupabase insert error', error);
+          setStatus('Falha ao salvar alteração no servidor.', 'error');
+          return null;
+        }
+        cardContainer._planId = data?.id || null;
+        setStatus('Troca salva no plano (novo registro).', 'info');
+        return cardContainer._planId;
+      }
+    } catch (err) {
+      Debug.error('persistPlanToSupabase unexpected error', err);
+      setStatus('Erro ao salvar plano. Veja console.', 'error');
+      return null;
+    }
+  }
+
   /** Função principal de troca */
-  function performSwap() {
+  async function performSwap() {
     executeBtn.disabled = true;
     const prevTxt = executeBtn.textContent;
     executeBtn.textContent = 'Trocando...';
+    setStatus('');
 
     try {
       const plan = cardContainer._lastPlan || planPayload;
@@ -627,7 +641,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
       const mealKey = mealSelect.value;
 
       if (!oldId || !newId) {
-        alert('Selecione o alimento original e o substituto.');
+        setStatus('Selecione alimento original e substituto.', 'error');
         executeBtn.disabled = false;
         executeBtn.textContent = prevTxt;
         return;
@@ -636,14 +650,15 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
       const oldFood = safeFindFood(oldId);
       const newFood = safeFindFood(newId);
       if (!oldFood || !newFood) {
-        alert('Erro ao localizar dados dos alimentos (veja console).');
+        setStatus('Erro ao localizar dados dos alimentos (veja console).', 'error');
         Debug.error('performSwap: findFood failed', { oldId, oldFood, newId, newFood });
         executeBtn.disabled = false;
         executeBtn.textContent = prevTxt;
         return;
       }
 
-      // percorre semanas/dias/refeições e troca componentes
+      // apply swap (iterate weeks/days/meals)
+      let modifications = 0;
       (plan.timeline_weeks || []).forEach((w, wi) => {
         (w.days || []).forEach((d, di) => {
           (d.meals || []).forEach((m, mi) => {
@@ -651,31 +666,25 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
             let mealWasModified = false;
 
             (m.components || []).forEach(c => {
-              // apenas componentes que são o alimento antigo
               if (c.source_id !== oldId) return;
-
-              // verifica escopo
               if (scope === 'specific' && currentMealKey !== mealKey) return;
 
               const oldGrams = _safeNum(c.grams, 0);
               let eq = null;
               let usedCalc = false;
 
-              // Tenta usar a função do engine
               if (SuperDietEngine && typeof SuperDietEngine.calculateEquivalentPortion === 'function') {
                 try {
                   eq = SuperDietEngine.calculateEquivalentPortion(oldFood, newFood, oldGrams);
                   usedCalc = true;
-                  Debug.log('calculateEquivalentPortion returned', eq);
+                  Debug.log('calculateEquivalentPortion =>', eq);
                 } catch (errCalc) {
-                  Debug.warn('calculateEquivalentPortion threw, will fallback', errCalc);
+                  Debug.warn('calculateEquivalentPortion threw, using fallback', errCalc);
                   eq = null;
                 }
-              } else {
-                Debug.log('calculateEquivalentPortion not available, using fallback.');
               }
 
-              // Se eq inválido, usa fallback local
+              // fallback if eq invalid
               if (!eq || typeof eq.grams === 'undefined' || typeof eq.kcal === 'undefined') {
                 try {
                   const nutrientToMatch = (c.role === 'proteina') ? 'protein_g' : 'carb_g';
@@ -697,7 +706,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
                     }
                   }
 
-                  const quantize = (v) => Math.max(5, Math.round(v / 5) * 5); // quantize para 5g
+                  const quantize = (v) => Math.max(5, Math.round(v / 5) * 5);
                   const finalNewGramsFB = Math.max(0, quantize(newGramsFallback || 0));
                   const finalNewKcalFB = Math.round((_safeNum(newFood?.nutrition?.kcal, 0) / 100) * finalNewGramsFB);
 
@@ -709,11 +718,9 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
                 }
               }
 
-              // Final values (sanity)
               const finalNewGrams = Math.max(0, Math.round(_safeNum(eq.grams, 0)));
               const finalNewKcal = Math.max(0, Math.round(_safeNum(eq.kcal, Math.round((_safeNum(newFood?.nutrition?.kcal, 0) / 100) * finalNewGrams))));
 
-              // Atualiza o componente
               c.food = stripParenthesis(newFood.name);
               c.grams = finalNewGrams;
               c.kcal = finalNewKcal;
@@ -727,50 +734,98 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
               };
 
               mealWasModified = true;
-            }); // fim componentes
+              modifications++;
+            });
 
             if (mealWasModified) {
-              // recalcula kcal total
               m.mealKcalTotal = (m.components || []).reduce((acc, comp) => acc + _safeNum(comp.kcal, 0), 0);
-              // marca gramsComputed details stale para forçar recalc visual
               if (m.gramsComputed && m.gramsComputed.details) {
                 m.gramsComputed.details._stale = true;
               }
             }
-          }); // fim refeições
-        }); // fim dias
-      }); // fim semanas
+          });
+        });
+      });
 
-      // persiste o plano no container e re-renderiza
-      cardContainer._lastPlan = plan;
-      renderPlanToContainer(planView, plan);
-      overlay.style.display = 'none';
+      if (modifications === 0) {
+        setStatus('Nenhuma ocorrência encontrada para troca.', 'error');
+      } else {
+        // persiste o plano e re-renderiza
+        cardContainer._lastPlan = plan;
+        setStatus('Aplicando troca localmente...', 'info');
+        renderPlanToContainer(planView, plan);
+
+        // animação visual: pulse no botão principal ao confirmar e fechar modal
+        openBtn.classList.add('pulse');
+        setTimeout(()=>openBtn.classList.remove('pulse'), 420);
+
+        // salvo automaticamente
+        setStatus('Salvando alteração no servidor...', 'info');
+        await persistPlanToSupabase(plan);
+        // re-render para garantir dados atualizados
+        renderPlanToContainer(planView, plan);
+      }
+
+      // fechar modal com animação
+      overlay.classList.add('hiding');
+      setTimeout(() => {
+        overlay.classList.remove('visible', 'hiding');
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+      }, 260);
     } catch (err) {
       Debug.error('performSwap error', err);
-      // mostra erro ao usuário porém com detalhe para devs no console
-      alert('Ocorreu um erro ao realizar a troca. Verifique o console do navegador para detalhes.');
+      setStatus('Ocorreu um erro ao realizar a troca. Veja console.', 'error');
     } finally {
       executeBtn.disabled = false;
       executeBtn.textContent = prevTxt;
     }
   } // end performSwap
 
-  // Event listeners do modal
+  /* Event listeners do modal */
   openBtn.addEventListener('click', () => {
-    populateFoodsToSwap();
-    scopeSelect.value = 'all';
-    specificMealGroup.style.display = 'none';
-    newFoodSelect.innerHTML = '<option value="">Selecione um alimento para trocar</option>';
-    newFoodSelect.disabled = true;
-    mealSelect.innerHTML = '';
-    executeBtn.disabled = true;
-    overlay.style.display = 'flex';
+    try {
+      populateFoodsToSwap();
+      scopeSelect.value = 'all';
+      specificMealGroup.style.display = 'none';
+      newFoodSelect.innerHTML = '<option value="">Selecione um alimento para trocar</option>';
+      newFoodSelect.disabled = true;
+      mealSelect.innerHTML = '';
+      executeBtn.disabled = true;
+      setStatus('');
+
+      // show overlay with animation classes
+      overlay.style.display = 'flex';
+      // small delay to allow CSS transition: remove any hiding class then add visible
+      requestAnimationFrame(()=> {
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden', 'false');
+      });
+
+      // button click feedback
+      openBtn.classList.add('press-anim');
+      setTimeout(()=> openBtn.classList.remove('press-anim'), 180);
+      openBtn.classList.add('pulse');
+      setTimeout(()=> openBtn.classList.remove('pulse'), 350);
+    } catch (err) {
+      Debug.error('openBtn click error', err);
+    }
   });
 
-  cancelBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
+  cancelBtn.addEventListener('click', () => {
+    setStatus('');
+    overlay.classList.add('hiding');
+    setTimeout(() => {
+      overlay.classList.remove('visible', 'hiding');
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden', 'true');
+    }, 240);
+  });
 
   scopeSelect.addEventListener('change', () => {
     specificMealGroup.style.display = (scopeSelect.value === 'specific') ? 'block' : 'none';
+    // re-evaluate executeBtn
+    executeBtn.disabled = !foodSelect.value || !newFoodSelect.value || (scopeSelect.value === 'specific' && !mealSelect.value);
   });
 
   foodSelect.addEventListener('change', () => {
@@ -781,7 +836,7 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
   });
 
   newFoodSelect.addEventListener('change', () => {
-    executeBtn.disabled = !foodSelect.value || !newFoodSelect.value;
+    executeBtn.disabled = !foodSelect.value || !newFoodSelect.value || (scopeSelect.value === 'specific' && !mealSelect.value);
   });
 
   mealSelect.addEventListener('change', () => {
@@ -790,15 +845,19 @@ function initializeFoodSwapModal(planPayload, cardContainer, planView) {
     }
   });
 
-  executeBtn.addEventListener('click', performSwap);
+  executeBtn.addEventListener('click', () => {
+    // small UX: show quick pulse on execute
+    executeBtn.classList.add('press-anim');
+    setTimeout(()=> executeBtn.classList.remove('press-anim'), 160);
+    performSwap();
+  });
 }
 
 /* ============================
-   INICIALIZAÇÃO DO SCRIPT (DOMContentLoaded)
+   INICIALIZAÇÃO
    ============================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // small debug toggle by URL param ?debug=true
   try {
     const params = new URLSearchParams(window.location.search);
     if (params.get('debug') === 'true') Debug.enabled = true;
@@ -849,7 +908,6 @@ document.addEventListener('DOMContentLoaded', () => {
     configBtn.setAttribute('aria-expanded', String(!(logoutBtn && logoutBtn.classList.contains('hidden'))));
   });
 
-  // Reset -> delete latest plan
   if (resetBtn) resetBtn.addEventListener('click', async () => {
     try {
       const formWrapper = document.getElementById('form-wrapper');
@@ -868,7 +926,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = await getCurrentUser();
       if (user) {
         await SuperDietEngine.deleteLatestPlan(user.id);
-        // refresh visualizar percurso
         const dietaCard = document.getElementById('dieta-card');
         if (dietaCard) await renderPercursoDietArea();
       }
@@ -888,34 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Forms
-  const objetivoInput = document.getElementById('objetivo');
-  if (objetivoInput) objetivoInput.addEventListener('input', function () {
-    const prazoGroup = document.getElementById('prazo-group');
-    if (prazoGroup) prazoGroup.style.display = this.value.trim() !== '' ? 'block' : 'none';
-  });
-
-  const usoSupp = document.getElementById('uso_suplemento');
-  if (usoSupp) usoSupp.addEventListener('change', function () {
-    const suppGroup = document.getElementById('suplementos-detalhes-group');
-    if (suppGroup) suppGroup.style.display = this.value === 'Sim' ? 'block' : 'none';
-    if (this.value !== 'Sim') {
-      const quaisSupp = document.getElementById('quais_suplementos');
-      if (quaisSupp) quaisSupp.value = '';
-    }
-  });
-
-  const playlistBtn = document.getElementById('playlist-btn');
-  if (playlistBtn) playlistBtn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    const va = document.getElementById('video-aulas');
-    if (va) va.classList.add('active');
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    const aulasLink = document.querySelector('.link-aulas');
-    if (aulasLink) aulasLink.classList.add('active');
-  });
-
-  // submit form
+  // submit form bindings (kept as in original - if present on page)
   const iaFitForm = document.getElementById('ia-fit-form');
   if (iaFitForm) {
     iaFitForm.addEventListener('keydown', function (e) {
@@ -971,7 +1001,6 @@ document.addEventListener('DOMContentLoaded', () => {
           uso_suplemento: formElements.uso_suplemento.value,
           quais_suplementos: formElements.quais_suplementos.value || '',
           nivel: formElements.nivel.value,
-          // datas da meta
           goal_start_date: startDate.toISOString(),
           goal_end_date: endDate.toISOString(),
           goal_prompt: objetivoText
@@ -993,7 +1022,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const months = Math.max(1, Math.round(diffDays / 30.44));
 
-        // gera plano via engine
         const plan = await SuperDietEngine.generatePlan(inputs, { months, debug: false, strategy });
 
         const current = await getCurrentUser();
@@ -1051,7 +1079,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // percurso page
       const dietaCard = document.getElementById('dieta-card');
       if (dietaCard) {
         await renderPercursoDietArea();
